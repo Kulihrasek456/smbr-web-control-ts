@@ -8,7 +8,8 @@ import { createSignal } from "solid-js"
 import { Icon } from "../../common/Icon"
 import { ApiFetcher } from "../../common/ApiFetcher"
 import { getColor } from "../../common/colorGenerator"
-
+import { LineChart } from "../../common/LineChart"
+import { getCountdownArray } from "../../common/utils"
 
 function createRow(icon: string, name: string, rowIndex: number, target: apiMessageSimple, subRowIndex?: number) {
     return [
@@ -39,7 +40,7 @@ export function Temperature(props:TemperatureProps) {
 
 
     return (
-        <GridElement id={props.id} x={0} y={0} w={4} h={1 + Math.round(tempData().length/3)}>
+        <GridElement id={props.id} w={1} h={5 + Math.round(tempData().length/3)}>
             <Widget
                 name="Temperature"
                 hotbarTargets={() => {
@@ -58,6 +59,9 @@ export function Temperature(props:TemperatureProps) {
                 }}
             >
                 <Table data={tempData} headers={() => { return ["color", "name", "current"] }}></Table>
+                <div style={{flex:"1 1 auto"}}>
+                    <LineChart labels={getCountdownArray(15)} datasets={[{data:getCountdownArray(15),label:"test"}]}></LineChart>
+                </div>
             </Widget>
         </GridElement>
     )
