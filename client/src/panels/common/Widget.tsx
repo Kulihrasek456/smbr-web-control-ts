@@ -35,7 +35,7 @@ export function Widget(props: WidgetProps) {
 
     return (
         <div class={styles.container}>
-            <div class={styles.header}>
+            <div class={styles.header + " resize-handle"}>
                 <h2>{props.name}</h2>
                 <div class={styles.hotbarPanel}>
                     {props.hotbarTargets()}

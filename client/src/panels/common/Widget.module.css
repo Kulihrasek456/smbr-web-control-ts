@@ -1,5 +1,6 @@
 .container{
     border: var(--bg-color-4) 1px solid;
+    border-radius: 3px;
     background: var(--bg-color-2);
 
     --instance-color: var(--acc-color-2);
@@ -14,7 +15,15 @@
     border-bottom: var(--instance-color) 2px solid;
 
     padding: 3px;
+
+    cursor: grab;
+
 }
+
+.header:hover{
+    filter: brightness(0.7);
+}
+
 .hotbarPanel{
     display: flex;
     justify-content: space-between;
@@ -71,3 +80,4 @@
         width: 100%;
     }
 }
+

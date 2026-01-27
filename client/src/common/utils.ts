@@ -33,7 +33,7 @@ async function fetchDataAsJson(urlIn : string,additionalHeaders = {}, setMethod=
     //console.log(response);
     if(response.status != 200){
         let err = Error("server responded with code: "+response.status);
-        err.response = response;
+        //err.response = response;
         throw err;
     }
     return response.json()

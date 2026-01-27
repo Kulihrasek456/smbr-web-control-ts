@@ -11,6 +11,7 @@
 .main{
     display: flex;
     height: calc(100vh - 50px);
+
 }
 
 .sidebar{
@@ -80,6 +81,9 @@ li{
     height: 100%;
     width: 100%;
     background: var(--bg-color-1);
+        flex-grow: 0;
+    flex-shrink: 1;
+    overflow: scroll;
 }
 
 .hidden{
