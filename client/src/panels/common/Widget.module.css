@@ -1,0 +1,73 @@
+.container{
+    border: var(--bg-color-4) 1px solid;
+    background: var(--bg-color-2);
+
+    --instance-color: var(--acc-color-2);
+}
+.header{
+    background: var(--bg-color-3);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    border-bottom: var(--instance-color) 2px solid;
+
+    padding: 3px;
+}
+.hotbarPanel{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    >* {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--bg-color-2);
+        border: var(--bg-color-4) 1px solid;
+        border-radius: 4px;
+
+        width: min-content;
+        height: 30px;
+        padding: 4px;
+    }
+
+    >*:first-child:not(:last-child) {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    >:last-child:not(:first-child) {
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+    }
+
+    >:not(:last-child):not(:first-child) {
+        border-radius: 0;
+    }
+
+}
+
+.apiValue{
+    display: flex;
+    gap: 2px;
+}
+
+.refreshButton{
+
+}
+
+.body{
+    display: flex;
+    flex-direction: column;
+
+    justify-content: space-between;
+    align-items: center;
+
+    >*{
+        margin: 0;
+        padding: 10px;
+        width: 100%;
+    }
+}

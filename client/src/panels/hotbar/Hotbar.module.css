@@ -1,0 +1,15 @@
+.twoRowContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.bold{
+    >*:first-child{
+
+    }
+    >*:last-child{
+        font-weight: bold;
+    }
+}
