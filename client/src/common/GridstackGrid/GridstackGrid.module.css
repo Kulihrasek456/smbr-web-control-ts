@@ -5,7 +5,11 @@
 
     overflow: hidden !important;
 
+    
+
     >*{
-        flex: 1 0 auto;
+        flex: 1 1 auto;
+        max-width: 100% !important;
+        max-height: 100% !important;
     }
 }

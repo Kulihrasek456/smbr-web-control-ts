@@ -8,7 +8,7 @@ interface GridProps {
   cellHeight?: string | number;
 }
 
-export const GridstackGrid = (props: GridProps) => {
+export function GridstackGrid(props: GridProps){
   let gridElement: HTMLDivElement | undefined;
   let gridInstance: GridStack | null = null;
 
@@ -17,6 +17,7 @@ export const GridstackGrid = (props: GridProps) => {
       // Gridstack initialization
       gridInstance = GridStack.init({
         cellHeight: props.cellHeight || "100px",
+        styleInHead: true,
         margin: 5,
         float: true,
         draggable: {
@@ -25,9 +26,12 @@ export const GridstackGrid = (props: GridProps) => {
         columnOpts: {
           // number of collumns based on the width
           breakpoints: [
-            { w: 400, c: 1 },
-            { w: 700, c: 3 },
-            { w: 1000, c: 6 }
+            { w: 500,  c: 1 },
+            { w: 1000, c: 2 },
+            { w: 1500, c: 3 },
+            { w: 2000, c: 4 },
+            { w: 2500, c: 5 },
+            { w: 3000, c: 6 }
           ]
         },
         disableResize: true
@@ -65,7 +69,7 @@ interface GridElementProps {
   children: JSX.Element;
 }
 
-export const GridElement = (props: GridElementProps) => {
+export function GridElement(props: GridElementProps){
   return (
     <div 
       class="grid-stack-item" 
