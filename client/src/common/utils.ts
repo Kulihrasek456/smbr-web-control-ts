@@ -1,4 +1,4 @@
-function getCountdownArray(length : number){
+export function getCountdownArray(length : number){
     let result = [];
     for (let i = 0; i < length; i++) {
         result.push(i);
@@ -6,7 +6,7 @@ function getCountdownArray(length : number){
     return result;
 }
 
-function getEmptyDatasets(qantity : number){
+export function getEmptyDatasets(qantity : number){
     let result = [];
     for (let i = 0; i < qantity; i++) {
         result.push({
@@ -18,7 +18,7 @@ function getEmptyDatasets(qantity : number){
 }
 
 // adding additionalHeaders will cause this to not work on RestApi endpoints
-async function fetchDataAsJson(urlIn : string,additionalHeaders = {}, setMethod="GET") {
+export async function fetchDataAsJson(urlIn : string,additionalHeaders = {}, setMethod="GET") {
     const url = "http://" + window.location.hostname + urlIn;
     const response = await fetch(url,
                             {
@@ -39,7 +39,7 @@ async function fetchDataAsJson(urlIn : string,additionalHeaders = {}, setMethod=
     return response.json()
 }
 
-async function fetchData(urlIn : string,additionalHeaders = {}, setMethod="GET") {
+export async function fetchData(urlIn : string,additionalHeaders = {}, setMethod="GET") {
     const url = "http://" + window.location.hostname + urlIn;
 
 
@@ -57,7 +57,7 @@ async function fetchData(urlIn : string,additionalHeaders = {}, setMethod="GET")
 
 }
 
-async function sendData(urlIn : string, data : string,additionalHeaders = {}, setMethod="POST") {
+export async function sendData(urlIn : string, data : string,additionalHeaders = {}, setMethod="POST") {
     const url = "http://" + window.location.hostname + urlIn;
 
     console.debug("sending to ",url,": ",data);
@@ -77,7 +77,7 @@ async function sendData(urlIn : string, data : string,additionalHeaders = {}, se
     return response;
 }
 
-async function streamToString(readableStream : ReadableStream) {
+export async function streamToString(readableStream : ReadableStream) {
     const reader = readableStream.getReader();
     const decoder = new TextDecoder();
     let result = '';
@@ -93,11 +93,11 @@ async function streamToString(readableStream : ReadableStream) {
 }
 
 
-function mapRangeToRange(number : number, inMin : number,inMax : number, outMin : number,outMax : number){
+export function mapRangeToRange(number : number, inMin : number,inMax : number, outMin : number,outMax : number){
     return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 }
 
-function formatTime(formatString : String,timestamp =new Date()){
+export function formatTime(formatString : String,timestamp =new Date()){
     const seconds = timestamp.getSeconds()
     const minutes = timestamp.getMinutes()
     const hours   = timestamp.getHours()
@@ -117,7 +117,7 @@ function formatTime(formatString : String,timestamp =new Date()){
     return formatString;
 }
 
-function downloadStringAsFile(content : string, filename : string, contentType = 'application/json') {
+export function downloadStringAsFile(content : string, filename : string, contentType = 'application/json') {
     const blob = new Blob([content], { type: contentType });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -133,7 +133,7 @@ function downloadStringAsFile(content : string, filename : string, contentType =
     }, 100);
 }
 
-function downloadCanvas(canvasElement : HTMLCanvasElement, filename = 'image.png') {
+export function downloadCanvas(canvasElement : HTMLCanvasElement, filename = 'image.png') {
     const dataUrl = canvasElement.toDataURL('image/png');
 
     const link = document.createElement('a');
@@ -146,6 +146,6 @@ function downloadCanvas(canvasElement : HTMLCanvasElement, filename = 'image.png
 }
 
 
-function sleep(ms : number) {
+export function sleep(ms : number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
