@@ -1,6 +1,7 @@
 import { apiMessageSimple } from "../../apiMessages/apiMessage"
 import { Table } from "../../common/Table"
 import { Widget, WidgetHotbarValue } from "../common/Widget"
+import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import type { JSX } from "solid-js/jsx-runtime"
 import { Button } from "../../common/Button"
 import { createSignal } from "solid-js"
@@ -17,7 +18,11 @@ function createRow(icon: string, name: string, rowIndex: number, target: apiMess
     ]
 }
 
-export function Temperature() {
+interface TemperatureProps{
+    id: string;
+}
+
+export function Temperature(props:TemperatureProps) {
 
     let i = 0
     const [tempData, setTempData] = createSignal<JSX.Element[][]>([
@@ -27,27 +32,33 @@ export function Temperature() {
         createRow("wb_twilight", "LED panel", i++, new apiMessageSimple("/control/led_panel/temperature", "temperature"))
     ])
 
+    for( let i=0; i < Math.random()*100; i++){
+        setTempData( tempData().concat([createRow("wb_twilight", "LED panel", i++, new apiMessageSimple("/control/led_panel/temperature", "temperature"))]) )
+    }
+
 
 
     return (
-        <Widget
-            name="Temperature"
-            hotbarTargets={() => {
-                return (
-                    <>
-                        <WidgetHotbarValue
-                            name="API value:"
-                            apiFetcherProps={{
-                                target: new apiMessageSimple("", ""),
-                                interval: 3000,
-                                unit: " ms",
-                            }}></WidgetHotbarValue>
-                        <Button callback={async () => { return true }} ><p>test</p></Button>
-                    </>
-                )
-            }}
-        >
-            <Table data={tempData} headers={() => { return ["color", "name", "current"] }}></Table>
-        </Widget>
+        <GridElement id={props.id} x={0} y={0} w={4} h={1 + Math.round(tempData().length/3)}>
+            <Widget
+                name="Temperature"
+                hotbarTargets={() => {
+                    return (
+                        <>
+                            <WidgetHotbarValue
+                                name="API value:"
+                                apiFetcherProps={{
+                                    target: new apiMessageSimple("", ""),
+                                    interval: 3000,
+                                    unit: " ms",
+                                }}></WidgetHotbarValue>
+                            <Button callback={async () => { return true }} ><p>test</p></Button>
+                        </>
+                    )
+                }}
+            >
+                <Table data={tempData} headers={() => { return ["color", "name", "current"] }}></Table>
+            </Widget>
+        </GridElement>
     )
 }

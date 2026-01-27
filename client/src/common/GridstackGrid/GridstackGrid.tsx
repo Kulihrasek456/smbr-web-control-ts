@@ -16,7 +16,7 @@ export const GridstackGrid = (props: GridProps) => {
     if (gridElement) {
       // Gridstack initialization
       gridInstance = GridStack.init({
-        cellHeight: props.cellHeight || "auto",
+        cellHeight: props.cellHeight || "100px",
         margin: 5,
         float: true,
         draggable: {

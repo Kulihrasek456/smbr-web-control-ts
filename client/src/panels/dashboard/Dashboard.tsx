@@ -4,6 +4,6 @@ import { Temperature } from "./Temperature"
 
 export function Dashboard() {
   return (
-    <Temperature></Temperature>
+    <Temperature id="temp1"></Temperature>
   )
 }
