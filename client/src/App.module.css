@@ -96,3 +96,13 @@ li{
     height: 100%;
     padding: 0;
 }
+
+@media (width <= 500px) {
+    .main{
+        flex-direction: column;
+    }
+    .sidebar{
+        flex-direction: row;
+        height: auto;
+    }
+}
