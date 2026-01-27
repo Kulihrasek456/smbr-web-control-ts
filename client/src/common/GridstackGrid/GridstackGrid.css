@@ -1,0 +1,12 @@
+.grid-stack-item.ui-draggable-dragging {
+  opacity: 0.7; 
+  transition: transform 0.2s ease; 
+  z-index: 1000;
+  height: 200px !important;
+}
+
+.grid-stack-placeholder > .placeholder-content {
+  background-color: rgba(var(--acc-color-1-rgb),0.25);
+  border: 2px dashed var(--bg-color-5);
+  border-radius: 15px;
+}

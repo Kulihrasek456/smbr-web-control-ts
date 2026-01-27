@@ -2,6 +2,7 @@ import { onMount, onCleanup, type JSX } from "solid-js";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
 import styles from "./GridstackGrid.module.css"
+import "./GridstackGrid.css"
 
 interface GridProps {
   children: JSX.Element;
