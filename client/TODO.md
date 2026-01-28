@@ -6,8 +6,8 @@ dashboard
  - widgets
     - [ ] move handle as a smaller button
     - [ ] refresh button
- - [ ] sliders
- - [ ] value controls
+ - [x] sliders
+ - [x] value controls
  - [x] table
  - [x] Chartjs Charts
  - Spectrophotometer
