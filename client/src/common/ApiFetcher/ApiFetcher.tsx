@@ -1,5 +1,5 @@
 import { createSignal, onCleanup, onMount } from 'solid-js'
-import { apiMessageSimple } from '../apiMessages/apiMessage'
+import { apiMessageSimple } from '../../apiMessages/apiMessage'
 
 import styles from './ApiFetcher.module.css'
 

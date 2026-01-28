@@ -3,7 +3,7 @@ import './common/css/colors.css'
 import './common/css/global.css'
 import styles from './App.module.css'
 
-import { Icon } from './common/Icon'
+import { Icon } from './common/Icon/Icon'
 import { Public } from './assets/PublicFiles'
 
 import { Dashboard } from './panels/dashboard/Dashboard'

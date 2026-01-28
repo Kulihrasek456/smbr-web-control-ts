@@ -1,5 +1,7 @@
+import { TextEditor } from "../common/TextEditor/TextEditor"
+
 export function Scripts(){
-    return (<p>scripts
-        
-    </p>)
+    return (
+        <TextEditor initialValue="ahoj" onChange={() => {console.log("dwajh")}}></TextEditor>
+    )
 }

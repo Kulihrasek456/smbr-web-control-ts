@@ -1,5 +1,5 @@
 import { apiMessageSimple } from '../../apiMessages/apiMessage'
-import { ApiFetcher } from '../../common/ApiFetcher'
+import { ApiFetcher } from '../../common/ApiFetcher/ApiFetcher'
 
 import styles from './Hotbar.module.css'
 

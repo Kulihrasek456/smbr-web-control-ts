@@ -1,15 +1,15 @@
 import { apiMessageSimple } from "../../apiMessages/apiMessage"
-import { Table } from "../../common/Table"
+import { Table } from "../../common/Table/Table"
 import { Widget, WidgetHotbarValue } from "../common/Widget"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import type { JSX } from "solid-js/jsx-runtime"
-import { Button } from "../../common/Button"
+import { Button } from "../../common/Button/Button"
 import { createSignal } from "solid-js"
-import { Icon } from "../../common/Icon"
-import { ApiFetcher } from "../../common/ApiFetcher"
-import { getColor } from "../../common/colorGenerator"
-import { LineChart } from "../../common/LineChart"
-import { getCountdownArray } from "../../common/utils"
+import { Icon } from "../../common/Icon/Icon"
+import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
+import { getColor } from "../../common/other/colorGenerator"
+import { LineChart } from "../../common/LineChart/LineChart"
+import { getCountdownArray } from "../../common/other/utils"
 
 function createRow(icon: string, name: string, rowIndex: number, target: apiMessageSimple, subRowIndex?: number) {
     return [

@@ -1,12 +1,12 @@
 import { children } from "solid-js";
 import type { JSX, JSXElement } from "solid-js";
 
-import { Icon } from "../../common/Icon";
-import { Button } from "../../common/Button";
-import type { ButtonProps } from "../../common/Button"
+import { Icon } from "../../common/Icon/Icon";
+import { Button } from "../../common/Button/Button";
+import type { ButtonProps } from "../../common/Button/Button"
 
 import styles from './Widget.module.css'
-import { ApiFetcher, type ApiFetcherProps } from "../../common/ApiFetcher";
+import { ApiFetcher, type ApiFetcherProps } from "../../common/ApiFetcher/ApiFetcher";
 
 
 interface WidgetHotbarValueProps {
