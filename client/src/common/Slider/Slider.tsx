@@ -21,7 +21,8 @@ interface SliderHProps{
     initValue? : number,
     bounds : {
         min : number,
-        max : number
+        max : number,
+        show? : boolean
     }
     step? : number,
     unit? : string,
@@ -33,8 +34,7 @@ interface SliderHProps{
 
 export function Slider(props : SliderHProps){
     let slider : HTMLInputElement | undefined = undefined;
-    const bounds = props.bounds || {min:undefined, max:undefined}
-    const [value, setValue] = createSignal(props.initValue || (((bounds.min || 0) + (bounds.max || 0))/2))
+    const [value, setValue] = createSignal(props.initValue || (((props.bounds.min || 0) + (props.bounds.max || 0))/2))
 
     if(isChromium || isSafari){
         createEffect(() => {
@@ -52,18 +52,18 @@ export function Slider(props : SliderHProps){
                 <p class={styles.value}>{value() + (props.unit || "")}</p>
             </div>
             <div class={styles.body}>
-                <Show when={props.bounds}>
+                <Show when={props.bounds.show!=undefined?props.bounds.show:true}>
                     <div class={styles.minmax}>
-                        <p>{bounds.min}</p>
-                        <p>{bounds.max}</p>
+                        <p>{props.bounds.min}</p>
+                        <p>{props.bounds.max}</p>
                     </div>
                 </Show>
                 <input 
                     class={styles.slider + " " + styles[props.direction]}
                     ref={slider}
                     type="range"
-                    min={bounds.min}
-                    max={bounds.max}
+                    min={props.bounds.min}
+                    max={props.bounds.max}
                     value={value()}
                     onInput={e => {setValue(+e.currentTarget.value)}}
                 ></input>

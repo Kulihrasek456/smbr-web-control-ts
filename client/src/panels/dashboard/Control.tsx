@@ -11,18 +11,20 @@ export function Control(props : ControlProps){
             <Widget name="Control">
                 <div style={{
                     display: "flex",
-                    "flex-direction": "column"
+                    "flex-direction": "column",
+                    flex: "1 0 auto"
                 }}>
                     <Slider title="test" direction="H" bounds={{min: 0, max: 100}}></Slider>
                     <Slider title="test" direction="H" bounds={{min: 4, max: 15}}></Slider>
                     <div style={{
                         display: "flex",
-                        "flex-direction" : "row"
+                        "flex-direction" : "row",
+                        flex: "1 0 auto"
                     }}>
                         <Slider title="test" direction="V" bounds={{min: 4, max: 15}}></Slider>
                         <Slider title="test" direction="V" bounds={{min: 4, max: 15}}></Slider>
-                        <Slider title="test" direction="V" bounds={{min: 4, max: 15}}></Slider>
-                        <Slider title="test" direction="V" bounds={{min: 4, max: 15}}></Slider>
+                        <Slider title="test" direction="V" bounds={{min: 4, max: 15, show: false}}></Slider>
+                        <Slider title="long long long text" direction="V" bounds={{min: 4, max: 15, show: false}}></Slider>
                     </div>
                 </div>
             </Widget>
