@@ -1,4 +1,5 @@
 import { GridstackGrid, GridElement } from "../../common/GridstackGrid/GridstackGrid.tsx";
+import { Control } from "../dashboard/Control.tsx";
 import { Temperature } from "../dashboard/Temperature.tsx";
 
 export function Device() {
@@ -10,6 +11,8 @@ export function Device() {
           <Temperature id="b"></Temperature>
 
           <Temperature id="c"></Temperature>
+
+          <Control id="te"></Control>
       </GridstackGrid>
     </div>
   );
