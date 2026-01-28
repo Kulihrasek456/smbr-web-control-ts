@@ -15,10 +15,11 @@ function chromeFix_Slider(element : HTMLInputElement, vertical : boolean){
     }
 }
 
-interface SliderHProps{
+interface SliderProps{
     title : string,
     direction : "H"|"V",
-    initValue? : number,
+    setter : (value: number) => void,
+    getter : () => number,
     bounds : {
         min : number,
         max : number,
@@ -26,20 +27,18 @@ interface SliderHProps{
     }
     step? : number,
     unit? : string,
-    remoteTarget? : apiMessageSimple,
     onChange? : (value : number)=>void,
     onInput? : (value : number)=>void,
     displayModifier? : (apiResult : number|string|null)=>string
 }
 
-export function Slider(props : SliderHProps){
+export function Slider(props : SliderProps){
     let slider : HTMLInputElement | undefined = undefined;
-    const [value, setValue] = createSignal(props.initValue || (((props.bounds.min || 0) + (props.bounds.max || 0))/2))
 
     if(isChromium || isSafari){
         createEffect(() => {
             if(slider){
-                value();
+                props.getter();
                 chromeFix_Slider(slider,props.direction == "V");
             }
         })
@@ -49,7 +48,7 @@ export function Slider(props : SliderHProps){
         <div class={styles.container + " " + styles[props.direction]}>
             <div class={styles.header}>
                 <p class={styles.label}>{props.title}</p>
-                <p class={styles.value}>{value() + (props.unit || "")}</p>
+                <p class={styles.value}>{props.getter() + (props.unit || "")}</p>
             </div>
             <div class={styles.body}>
                 <Show when={props.bounds.show!=undefined?props.bounds.show:true}>
@@ -64,8 +63,8 @@ export function Slider(props : SliderHProps){
                     type="range"
                     min={props.bounds.min}
                     max={props.bounds.max}
-                    value={value()}
-                    onInput={e => {setValue(+e.currentTarget.value)}}
+                    value={props.getter()}
+                    onInput={e => {props.setter(+e.currentTarget.value)}}
                 ></input>
             </div>
         </div>
