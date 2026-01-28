@@ -25,7 +25,7 @@ export function WidgetHotbarValue(props: WidgetHotbarValueProps){
 
 interface WidgetProps {
     children?: JSX.Element;
-    hotbarTargets: () => JSXElement;
+    hotbarTargets?: () => JSXElement;
     name: string;
     refreshCallback?: ButtonProps
 }
@@ -38,7 +38,7 @@ export function Widget(props: WidgetProps) {
             <div class={styles.header + " resize-handle"}>
                 <h2>{props.name}</h2>
                 <div class={styles.hotbarPanel}>
-                    {props.hotbarTargets()}
+                    {(props.hotbarTargets || (() => {return (<></>)}))()}
                     {props.refreshCallback && (
                         <Button callback={props.refreshCallback.callback}>
                             <Icon name="autorenew"></Icon>
