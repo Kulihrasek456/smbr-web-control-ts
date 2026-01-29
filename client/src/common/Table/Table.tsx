@@ -32,3 +32,36 @@ export function Table(props: TableProps) {
     </table>
   );
 }
+
+
+interface TableGridProps {
+  colSizes: string[];
+  headers?: string[];
+  data: () => JSX.Element[][];
+}
+
+export function TableStatic(props: TableGridProps){
+  props.headers = props.headers ? props.headers  : [];
+  return (
+    <div class={styles["table-static"]}>
+      <div class={styles.row + " " + styles.head}>
+        <For each={props.headers}>
+          {
+            (cell,index) => (<div class={styles.cell} style={{width: props.colSizes[index()]}}>{cell}</div>)
+          }
+        </For>
+      </div>
+      <For each={props.data()}>
+        {(row) => (
+          <div class={styles.row}>
+            <For each={row}>
+              {
+                (cell,index) => (<div class={styles.cell} style={{width: props.colSizes[index()]}}>{cell}</div>)
+              }
+            </For>
+          </div>
+        )}
+      </For>
+    </div>
+  )
+}

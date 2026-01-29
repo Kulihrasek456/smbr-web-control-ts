@@ -1,5 +1,5 @@
 import { apiMessageSimple } from "../../apiMessages/apiMessage"
-import { Table } from "../../common/Table/Table"
+import { TableStatic } from "../../common/Table/Table"
 import { Widget, WidgetHotbarValue } from "../common/Widget"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import type { JSX } from "solid-js/jsx-runtime"
@@ -14,7 +14,7 @@ import { getCountdownArray } from "../../common/other/utils"
 function createRow(icon: string, name: string, rowIndex: number, target: apiMessageSimple, subRowIndex?: number) {
     return [
         <Icon color={getColor(rowIndex)} name={icon}></Icon>,
-        <p>{name}</p>,
+        <p style={{"justify-content":"start"}}>{name}</p>,
         <ApiFetcher target={target} unit="°C"></ApiFetcher>
     ]
 }
@@ -58,8 +58,8 @@ export function Temperature(props:TemperatureProps) {
                     )
                 }}
             >
-                <Table data={tempData} headers={() => { return ["color", "name", "current"] }}></Table>
-                <div style={{flex:"1 1 auto"}}>
+                <TableStatic data={tempData} headers={["color", "name", "current"]} colSizes={["40px","100%","60px"]}></TableStatic>
+                <div style={{flex:"1 1 auto", "min-height": 0}}>
                     <LineChart labels={getCountdownArray(15)} datasets={[{data:getCountdownArray(15),label:"test"}]}></LineChart>
                 </div>
             </Widget>
