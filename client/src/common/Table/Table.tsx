@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, type JSXElement } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
 
 import styles from './Table.module.css'
@@ -34,13 +34,14 @@ export function Table(props: TableProps) {
 }
 
 
-interface TableGridProps {
+interface TableStaticProps<T> {
+  data: T[];
+  headers: string[];
   colSizes: string[];
-  headers?: string[];
-  data: () => JSX.Element[][];
+  renderRow: (item: T, index: number) => JSX.Element[];
 }
 
-export function TableStatic(props: TableGridProps){
+export function TableStatic<T>(props: TableStaticProps<T>){
   props.headers = props.headers ? props.headers  : [];
   return (
     <div class={styles["table-static"]}>
@@ -51,10 +52,10 @@ export function TableStatic(props: TableGridProps){
           }
         </For>
       </div>
-      <For each={props.data()}>
-        {(row) => (
+      <For each={props.data}>
+        {(rowData, index) => (
           <div class={styles.row}>
-            <For each={row}>
+            <For each={props.renderRow(rowData, index())}>
               {
                 (cell,index) => (<div class={styles.cell} style={{width: props.colSizes[index()]}}>{cell}</div>)
               }
