@@ -11,6 +11,7 @@ import { Scripts } from './panels/scripts/Scripts'
 import { Config } from './panels/config/Config'
 import { Device } from './panels/device/Device'
 import { Hotbar } from './panels/hotbar/Hotbar'
+import { RefreshProvider } from './common/other/RefreshProvider'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
 
@@ -43,36 +44,38 @@ function App() {
    ];
    return (
       <>
-         <header class={styles.hotbar}>
-            <button class={styles.logo}><img src={Public.images.minilogo} /></button>
-            <h1>Smart Modular Photo Bioreaktor</h1>
-            <div class={styles.hotbar_left}>
-               <Hotbar></Hotbar>
+         <RefreshProvider disabled={true} autoRefreshPeriod={5000}>
+            <header class={styles.hotbar}>
+               <button class={styles.logo}><img src={Public.images.minilogo} /></button>
+               <h1>Smart Modular Photo Bioreaktor</h1>
+               <div class={styles.hotbar_left}>
+                  <Hotbar></Hotbar>
+               </div>
+            </header>
+            <div class={styles.main}>
+               <ul class={styles.sidebar}>
+                  {items.map(item => (
+                     <Item
+                        text={item.text}
+                        iconName={item.iconName}
+                        active={activeItem}
+                        onClick={() => setActiveItem(item.text)}
+                     />
+                  ))}
+               </ul>
+               <div class={styles.content}>
+                  {items.map(item => {
+                     const ContentComponent = item.component;
+                     return (
+                        
+                        <div class={(activeItem() !== item.text)?styles.hidden:""}>
+                           <ContentComponent />
+                        </div>
+                     );
+                  })}
+               </div>
             </div>
-         </header>
-         <div class={styles.main}>
-            <ul class={styles.sidebar}>
-               {items.map(item => (
-                  <Item
-                     text={item.text}
-                     iconName={item.iconName}
-                     active={activeItem}
-                     onClick={() => setActiveItem(item.text)}
-                  />
-               ))}
-            </ul>
-            <div class={styles.content}>
-               {items.map(item => {
-                  const ContentComponent = item.component;
-                  return (
-                     
-                     <div class={(activeItem() !== item.text)?styles.hidden:""}>
-                        <ContentComponent />
-                     </div>
-                  );
-               })}
-            </div>
-         </div>
+         </RefreshProvider>
       </>
    )
 }
