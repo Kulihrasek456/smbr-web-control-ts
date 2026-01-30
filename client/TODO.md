@@ -1,11 +1,14 @@
+other
+ - [ ] better button visuals
+
 api fetchers
- - [ ] updater context
+ - [x] updater context
 
 dashboard
  - [x] grid system
  - widgets
-    - [ ] move handle as a smaller button
-    - [ ] refresh button
+    - [x] move handle as a smaller button
+    - [x] refresh button
  - [x] sliders
  - [x] value controls
  - [x] table
@@ -29,7 +32,7 @@ dashboard
 device
  - [ ] device info
  - [ ] loaded modules
- - [ ] CAN statisticks
+ - [ ] CAN statistics
 
 text editor
  - [ ] codemirror setup
