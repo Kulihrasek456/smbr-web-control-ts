@@ -3,7 +3,7 @@ import { children, createSignal, type JSXElement} from 'solid-js'
 import styles from './Button.module.css'
 
 export interface ButtonProps {
-    callback : () => Promise<boolean>;
+    callback? : () => Promise<boolean>;
     children?: JSXElement;
 };
 
@@ -14,7 +14,7 @@ export function Button(props: ButtonProps) {
     const [state, setState] = createSignal(true);
 
     const onclick = async () => {
-        if(await props.callback()){
+        if(await props.callback?.()){
             setState(true)
         }else{
             setState(false)

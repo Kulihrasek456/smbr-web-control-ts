@@ -43,8 +43,11 @@ export function Widget(props: WidgetProps) {
     return (
         <RefreshProvider>
             <div class={styles.container}>
-                <div class={styles.header + " resize-handle"}>
-                    <h2>{props.name}</h2>
+                <div class={styles.header}>
+                    <div class={styles["drag-handle"] + " drag-handle"}>
+                        <Icon name="open_with"></Icon>
+                    </div>
+                    <h2 class={styles.title}>{props.name}</h2>
                     <div class={styles.hotbarPanel}>
                         <Show when={props.hotbarTargets} fallback={<></>}>
                             {props.hotbarTargets?.()}

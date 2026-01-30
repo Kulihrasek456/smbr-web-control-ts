@@ -22,7 +22,7 @@ export function GridstackGrid(props: GridProps){
         margin: 5,
         float: true,
         draggable: {
-          handle: '.resize-handle',
+          handle: '.drag-handle',
         },
         columnOpts: {
           // number of collumns based on the width

@@ -21,14 +21,17 @@
 
     padding: 3px;
 
-    cursor: grab;
-
     flex: 0 0 auto;
 
+    gap: 5px;
 }
 
-.header:hover{
-    filter: brightness(0.7);
+.title{
+    flex: 1 0 auto;
+}
+
+.drag-handle{
+    cursor: grab;
 }
 
 .hotbarPanel{
