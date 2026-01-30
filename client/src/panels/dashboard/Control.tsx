@@ -19,19 +19,21 @@ export function Control(props : ControlProps){
                 <div style={{
                     display: "flex",
                     "flex-direction": "column",
-                    flex: "1 0 auto"
+                    flex: "1 0 auto",
+                    gap: "10px"
                 }}>
                     <Slider setter={setValue} getter={value} title="test" direction="H" bounds={{min: 0, max: 100}}></Slider>
                     <Slider setter={setValue} getter={value} title="test" direction="H" bounds={{min: 4, max: 15}}></Slider>
                     <div style={{
                         display: "flex",
                         "flex-direction" : "row",
-                        flex: "1 0 auto"
+                        flex: "1 0 auto",
+                        gap: "10px"
                     }}>
                         <Slider setter={setValue} getter={value} title="test" direction="V" bounds={{min: 4, max: 15}}></Slider>
                         <Slider setter={setValue} getter={value} title="test" direction="V" bounds={{min: 4, max: 15}}></Slider>
                         <Slider setter={setValue} getter={value} title="test" direction="V" bounds={{min: 4, max: 15, show: false}}></Slider>
-                        <Slider setter={setValue} getter={value} title="long long long text" direction="V" bounds={{min: 4, max: 15, show: false}}></Slider>
+                        <Slider setter={setValue} getter={value} title="long text" direction="V" bounds={{min: 4, max: 15, show: false}}></Slider>
                     </div>
 
                     <ValueController inputFilter={(value : string) => {return enforceMinMax(value, -15, 15)}} setter={setValue} getter={value} title="test" valueName="testval" buttonText="set"></ValueController>
