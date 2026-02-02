@@ -5,6 +5,7 @@ import styles from './Button.module.css'
 export interface ButtonProps {
     callback? : () => Promise<boolean>;
     children?: JSXElement;
+    class? : string;
 };
 
 
@@ -22,7 +23,7 @@ export function Button(props: ButtonProps) {
     }
 
     return (
-        <button class={`${state() ? "" : styles.error} ${styles.fetcher} button`} onClick={onclick}>
+        <button class={`${state() ? "" : styles.error} ${styles.fetcher} button ${props.class?props.class:""}`} onClick={onclick}>
             {c()}
         </button>
     );
