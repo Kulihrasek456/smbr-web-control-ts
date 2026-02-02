@@ -1,0 +1,26 @@
+.header{
+    padding: 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+
+    background-color: var(--bg-color-4);
+    border-bottom: 3px solid var(--acc-color-2) ;
+}
+
+.header.error{
+    border-bottom-color: var(--err-color-2);
+}
+
+.header.warning{
+    border-bottom-color: var(--warn-color-2);
+}
+
+
+.file-name{
+    flex: 1 1 auto;
+}
+.code-editor{
+
+}

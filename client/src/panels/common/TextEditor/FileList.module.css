@@ -1,0 +1,226 @@
+.container{
+    background-color: var(--bg-color-2);
+    padding: 3px;
+    width: 200px;
+    border-left: 1px solid var(--bg-color-4);
+}
+
+
+.search{
+    padding: 5px;
+    border-bottom: 2px solid var(--acc-color-1);
+}
+.search-field{
+    background: var(--bg-color-1);
+    border: var(--bg-color-3) 1px solid;
+    color: var(--bg-color-5);
+    width: 100%;
+    padding: 2px;
+}
+.search-field:focus{
+    color: var(--text-color-light);
+}
+
+
+
+.button-panel{
+    padding: 0 5px 0 5px;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: start;
+    flex-shrink: 1;
+
+    >*{
+        border-radius: 0;
+    }
+    >*:not(:hover):not(:active){
+        border-top-color: transparent;
+    }
+    >*:last-child{
+        border-radius: 0 0 5px 5px;
+    }
+}
+
+.panel-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-button-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+
+    border: 1px solid var(--bg-color-4);
+    padding: 3px;
+
+    background-color: var(--bg-color-1);
+
+    transition: gap 0.2s ease-in-out;
+    gap: 5px;
+}
+.create-button-container:not(.collapsed){
+    border-color: var(--acc-color-3) !important;
+    background-color: var(--bg-color-3);
+}
+.create-button-container.collapsed{
+    gap: 0px;
+    .create-button-inputs{
+        width: 0;
+    }
+    .create-button-handle{
+        rotate: 0deg;
+    }
+}
+
+
+.create-button-handle{
+    rotate: 45deg;
+    transition: rotate 0.2s ease-in-out;
+    border: none;
+    background: none;
+
+    font-size: 15px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: var(--acc-color-3);
+
+    cursor: pointer;
+}
+
+.create-button-handle:hover{
+    scale: 1.2;
+    color: var(--acc-color-4);
+}
+
+
+.create-button-inputs{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    overflow: hidden;
+
+    width: 150px; /*needed for the animation to work (cannot animate width:auto changes)*/
+
+    transition: width 0.2s ease-in-out;
+
+    .create-button-text-input{
+        flex: 1 1 auto;
+        min-width: 0;
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+        border-right: none;
+    }
+    .create-button-button-input{
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0;
+    }
+}
+
+
+
+.directory{
+    border-left: 2px solid var(--acc-color-2);
+    padding-left: 2px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+
+    transition: border-color 0.2s ease-in-out;
+
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.directory:has(.file:hover), .directory:has(.directory:hover), .directory:has(.file.active){
+    border-color: var(--acc-color-4);
+}
+
+.directory.collapsed{
+    >li, >ul{
+        display: none;
+    }
+    .collapse-arrow{
+        rotate: 180deg;
+    }
+}
+
+.directory-header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.create-file-specific-button,.collapse-button{
+    border: none;
+    border-radius: 0;
+    background: none;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+
+    padding: 0 3px 0 3px;
+}
+.create-file-specific-button:hover,.collapse-button:hover{
+    background-color: var(--acc-color-2) !important;
+}
+
+.collapse-button{
+    flex: 1 1 auto;
+    display: flex;
+    justify-content: space-between;
+
+    font-weight: bold;
+}
+
+.directory-name{
+    font-size: 15px;
+}
+
+.collapse-arrow{
+    position: relative;
+    font-size: 15px;
+    scale: 2;
+    transition: bottom 0.2s ease-in-out, rotate 0.2s ease-in-out;
+}
+
+.create-file-specific-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 15px;
+}
+
+
+.file:first-of-type{
+    border-top: 1px solid var(--bg-color-3);
+}
+.file{
+    border-bottom: 1px solid var(--bg-color-3);
+    padding: 5px;
+
+    font-size: 15px;
+
+    transition: background 0.2s ease-in-out;
+    cursor: pointer;
+}
+
+.file:hover{
+    background-color: var(--acc-color-2);
+}
+
+.list{
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+}
