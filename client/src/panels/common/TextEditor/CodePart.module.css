@@ -1,6 +1,7 @@
 .container{
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .header{
@@ -12,6 +13,28 @@
 
     background-color: var(--bg-color-4);
     border-bottom: 3px solid var(--acc-color-2) ;
+
+    h1{
+        font-size: x-large;
+    }
+
+    button{
+        height: 100%;
+        aspect-ratio: 1/1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        border-radius: 6px;
+        
+        background-color: var(--bg-color-2);
+        border: 1px solid var(--bg-color-5);
+
+        font-size: 100%;
+        >*{
+            scale: 2;
+        }
+    }
 }
 
 .header.error{

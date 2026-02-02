@@ -19,6 +19,25 @@
 
     h1{
         flex: 1 1 auto;
+        font-size: x-large;
+    }
+
+    button{
+        height: 100%;
+        aspect-ratio: 1/1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        
+        border-radius: 6px;
+
+        background-color: var(--acc-color-1);
+        border: 1px solid var(--bg-color-5);
+
+        font-size: 100%;
+        >*{
+            scale: 2;
+        }
     }
 }
 .body{
