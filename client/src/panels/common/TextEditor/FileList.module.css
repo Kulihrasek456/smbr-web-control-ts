@@ -185,6 +185,8 @@
 
 .directory-name{
     font-size: 15px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .collapse-arrow{
