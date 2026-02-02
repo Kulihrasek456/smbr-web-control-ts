@@ -52,6 +52,10 @@
         padding: 4px;
     }
 
+    >*:not(:hover):not(:active):not(:last-child){
+        border-right-color: transparent;
+    }
+
     >*:first-child:not(:last-child) {
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;

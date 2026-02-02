@@ -22,7 +22,7 @@ export function Button(props: ButtonProps) {
     }
 
     return (
-        <button class={`${state() ? "" : styles.error} ${styles.fetcher}`} onClick={onclick}>
+        <button class={`${state() ? "" : styles.error} ${styles.fetcher} button`} onClick={onclick}>
             {c()}
         </button>
     );

@@ -51,7 +51,7 @@ h1,h2,h3,h4,h5{
   white-space: nowrap;
 }
 
-button, .button{
+button.button, .button{
   background-color: var(--bg-color-1);
   cursor: pointer;
   border: var(--bg-color-4) 1px solid;
@@ -61,11 +61,11 @@ button, .button{
   color: var(--text-color-light);
 }
 
-button:hover:enabled, .button:hover:enabled{
+button.button:hover:enabled, .button:hover{
   background: var(--bg-color-3);
   border-color: var(--acc-color-3);
 }
 
-button:active, .button:active{
+button.button:active, .button:active{
   background: var(--bg-color-2);
 }
