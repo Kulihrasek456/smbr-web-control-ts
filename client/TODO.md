@@ -35,11 +35,14 @@ device
  - [ ] CAN statistics
 
 text editor
- - [ ] codemirror setup
- - [ ] visual
+ - [x] codemirror setup
+ - [x] visual - file list
+ - [x] visual - code part
+ - [ ] visual - runtime info
  - [ ] functionality
- - [ ] runtime info
+ - [ ] functionality - runtime info
  - file browser 
+     - [ ] create file buttons
      - [ ] recursive
      - [ ] two columns
 
