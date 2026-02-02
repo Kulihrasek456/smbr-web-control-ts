@@ -137,6 +137,8 @@
 
     margin-top: 5px;
     margin-bottom: 5px;
+
+    overflow: hidden;
 }
 
 .directory:has(.file:hover), .directory:has(.directory:hover), .directory:has(.file.active){

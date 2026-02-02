@@ -1,3 +1,8 @@
+.container{
+    display: flex;
+    flex-direction: column;
+}
+
 .header{
     padding: 5px;
     display: flex;
@@ -22,5 +27,6 @@
     flex: 1 1 auto;
 }
 .code-editor{
-
+    flex: 1 1 auto;
+    min-height: 0;
 }

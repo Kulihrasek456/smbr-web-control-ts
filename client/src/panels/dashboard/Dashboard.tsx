@@ -4,7 +4,7 @@ import { Temperature } from "./Temperature"
 
 export function Dashboard() {
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "20px", "overflow-x": "hidden", "overflow-y" : "scroll"}}>
       <GridstackGrid>
           <Temperature id="a"></Temperature>
 

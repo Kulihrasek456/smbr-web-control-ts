@@ -66,7 +66,11 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
   return (
     <div 
       ref={editorRef} 
-      class="border border-gray-700 rounded-md overflow-hidden h-full"
+      style={{
+        height: "100%",
+        width: "100%",
+        overflow: "hidden"
+      }}
     />
   );
 }

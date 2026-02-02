@@ -68,7 +68,7 @@ function App() {
                      const ContentComponent = item.component;
                      return (
                         
-                        <div class={(activeItem() !== item.text)?styles.hidden:""}>
+                        <div class={((activeItem() !== item.text)?styles.hidden:"") + " " + styles.container}>
                            <ContentComponent />
                         </div>
                      );
