@@ -4,6 +4,7 @@ import { CodeMirrorWrapper } from "./CodeMirrorWrapper";
 import codeStyles from "./CodePart.module.css";
 import fileListStyles from "./FileList.module.css";
 import runtimeInfoStyles from "./RuntimeInfo.module.css";
+import textEditorStyles from "./TextEditor.module.css"
 import { Button } from "../../../common/Button/Button";
 import { Icon } from "../../../common/Icon/Icon";
 import { TableStatic } from "../../../common/Table/Table";
@@ -335,11 +336,11 @@ function RuntimeInfo(props: RuntimeInfoProps) {
         <div class={runtimeInfoStyles.header2}>
           <div class={runtimeInfoStyles["selected-script"]}>
             <p>Selected script:</p>
-            <p class={runtimeInfoStyles["selected-script-name"]}>{selected()}</p>
+            <h2 class={runtimeInfoStyles["selected-script-name"]}>{selected()}</h2>
           </div>
           <div class={runtimeInfoStyles["selected-id"]}>
             <p>Process id:</p>
-            <p class={runtimeInfoStyles["selected-id-name"]}>{15235}</p>
+            <h2 class={runtimeInfoStyles["selected-id-name"]}>{15235}</h2>
           </div>
         </div>
         <div class={runtimeInfoStyles.body2}>
@@ -380,6 +381,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
 
 
 export function TextEditor() {
+  let runtimeInfo!: HTMLDivElement;
 
   return (
     <div style={{
@@ -414,7 +416,14 @@ export function TextEditor() {
       ]}></FileList>
       <FileList buttons={[() => (<p>test</p>)]} files={[]} createFileButton={{ onClick: val => { alert(val); return true; } }}></FileList>
       <CodePart></CodePart>
-      <RuntimeInfo></RuntimeInfo>
+      <button class={textEditorStyles["runtime-info-handle"] + " button"} onclick={e=>{if(runtimeInfo){runtimeInfo.classList.toggle(textEditorStyles.collapsed)}}}>
+        <div><Icon name="arrow_back_ios_new"></Icon></div>
+        <p>Runtime info</p>
+        <div><Icon name="arrow_back_ios_new"></Icon></div>
+      </button>
+      <div class={textEditorStyles["runtime-info"]} ref={runtimeInfo}>
+        <RuntimeInfo></RuntimeInfo>
+      </div>
     </div>
   )
 }

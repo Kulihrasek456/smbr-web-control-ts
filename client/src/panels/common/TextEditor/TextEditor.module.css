@@ -1,0 +1,45 @@
+button.runtime-info-handle{
+    display: flex;
+    flex-direction: column;
+    width: 30px;
+
+    margin-left: 5px;
+
+    padding: 2px;
+
+    justify-content: center;
+    align-items: center;
+
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+
+    p{
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+    }
+}
+.runtime-info{
+    flex: 0 0 auto;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    transition: width 0.5s ease-in-out,
+                min-width 0.5s ease-in-out,
+                max-width 0.5s ease-in-out;
+    
+    min-width: 0;
+
+    flex: 1 1 auto;
+}
+
+.runtime-info:not(.collapsed){
+    max-width: 700px;
+    min-width: 500px;
+}
+
+.runtime-info.collapsed{
+    max-width: 0;
+}
