@@ -332,9 +332,15 @@ function RuntimeInfo(props: RuntimeInfoProps) {
         </Button>
       </div>
       <div class={runtimeInfoStyles.body}>
-        <div class={runtimeInfoStyles["selected-script"]}>
-          <p>Selected script:</p>
-          <p class={runtimeInfoStyles["selected-script-name"]}>{selected()}</p>
+        <div class={runtimeInfoStyles.header2}>
+          <div class={runtimeInfoStyles["selected-script"]}>
+            <p>Selected script:</p>
+            <p class={runtimeInfoStyles["selected-script-name"]}>{selected()}</p>
+          </div>
+          <div class={runtimeInfoStyles["selected-id"]}>
+            <p>Process id:</p>
+            <p class={runtimeInfoStyles["selected-id-name"]}>{15235}</p>
+          </div>
         </div>
         <div class={runtimeInfoStyles.body2}>
           <div class={runtimeInfoStyles["info-panel"]}>
