@@ -12,20 +12,41 @@ import { LineChart } from "../../common/LineChart/LineChart"
 import { getCountdownArray } from "../../common/other/utils"
 import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
 
+// create subrows by setting icon as undefined
+// row indexes are then given automatically after generating the array
 type row = {
-    icon: string, 
+    icon?: string,
     name: string, 
     target: apiMessageSimple | undefined, 
-    instance: moduleInstancesType
+    instance: moduleInstancesType,
     subRowIndex?: number,
+    rowIndex? : number,
+    lastSubRow? : boolean
 }
 
 function createRow(data: row, index:number) : JSXElement[] {
     return [
-        <Icon color={getColor(index)} name={data.icon}></Icon>,
-            <p style={{
-                "justify-content":"start"
-            }}>{data.name}</p>,
+        <Icon 
+            color={
+                getColor(data.rowIndex || 0,data.subRowIndex || 0)
+            } 
+            name={
+                (data.icon)?(
+                    data.icon
+                ):(
+                    (data.lastSubRow)?(
+                        "┗"
+                    ):(
+                        "┣"
+                    )
+                )
+            }
+        ></Icon>,
+
+        <p style={{
+            "justify-content":"start"
+        }}>{data.name}</p>,
+
         (data.target)?(
             <ApiFetcher target={data.target} unit="°C"></ApiFetcher>
         ):(
@@ -44,6 +65,33 @@ export function Temperature(props:TemperatureProps) {
     const [rows, setRows] = createSignal<row[]>([]);
     const moduleListCntxt = useModuleListValue();
 
+    function assignIndexes(rows : row[]){
+        let rowI=-1;
+        let subRowI=0;
+        let lastRow : undefined | row;
+        for(let i=0;i<rows.length;i++){
+            let row = rows[i];
+            if(row.icon){
+                row.subRowIndex=undefined;
+                row.rowIndex=++rowI;
+                
+                subRowI = 0;
+            }else{
+                row.subRowIndex=++subRowI;
+                row.rowIndex=rowI;
+                row.lastSubRow = true;
+
+                if(lastRow){
+                    if(!lastRow.icon){
+                        lastRow.lastSubRow = false;
+                    }
+                }
+            }
+            lastRow = row;
+        }
+        return rows;
+    }
+
     function refreshRows(moduleList: Module[]) {
         if (moduleListCntxt) {
             let result: row[] = [];
@@ -56,12 +104,12 @@ export function Temperature(props:TemperatureProps) {
                         target:     new apiMessageSimple("/sensor/bottle/temperature","temperature"),
                         instance:   "Exclusive"
                     },{
-                        icon:       "┣", 
+                        icon:       undefined, 
                         name:       "Top", 
                         target:     new apiMessageSimple("/sensor/bottle/top/measured_temperature","temperature"),
                         instance:   "Exclusive"
                     },{
-                        icon:       "┗", 
+                        icon:       undefined, 
                         name:       "Bottom", 
                         target:     new apiMessageSimple("/sensor/bottle/bottom/measured_temperature","temperature"),
                         instance:   "Exclusive"
@@ -71,12 +119,12 @@ export function Temperature(props:TemperatureProps) {
                         target:     undefined,
                         instance:   "Exclusive"
                     },{
-                        icon:       "┣", 
+                        icon:       undefined, 
                         name:       "Detector", 
                         target:     new apiMessageSimple("/sensor/fluorometer/detector/temperature","temperature"),
                         instance:   "Exclusive"
                     },{
-                        icon:       "┗", 
+                        icon:       undefined, 
                         name:       "Emitor", 
                         target:     new apiMessageSimple("/sensor/fluorometer/emitor/temperature","temperature"),
                         instance:   "Exclusive"
@@ -113,6 +161,8 @@ export function Temperature(props:TemperatureProps) {
                     instance: instance
                 })
             }
+
+            result=assignIndexes(result);
 
             setRows(result);
         }
