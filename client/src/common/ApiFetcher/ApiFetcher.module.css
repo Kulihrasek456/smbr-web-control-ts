@@ -1,5 +1,11 @@
 .fetcher{
-
+    white-space: nowrap;
+    font-weight: bold;
+    
+}
+.fetcher_unit{
+    font-weight: normal;
+    opacity: .75;
 }
 
 .error{

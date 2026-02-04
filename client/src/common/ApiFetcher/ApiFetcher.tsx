@@ -1,4 +1,4 @@
-import { createEffect, createSignal, onCleanup, onMount } from 'solid-js'
+import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 import { apiMessageSimple } from '../../apiMessages/apiMessage'
 
 import styles from './ApiFetcher.module.css'
@@ -16,7 +16,7 @@ export function ApiFetcher({
     interval = 5000,
     unit,
 }: ApiFetcherProps) {
-    const [value, setValue] = createSignal<string | undefined>(" ");
+    const [value, setValue] = createSignal<string | undefined>("---");
     const refreshValue = useRefreshValue
 
     createEffect(async () => {
@@ -34,7 +34,10 @@ export function ApiFetcher({
 
     return (
         <span class={`${value() ? "" : styles.error} ${styles.fetcher}`}>
-            {value() ? value() + (unit ?? "") : "err"}
+            <Show when={value()} fallback="err">
+                {value()}
+                <span class={styles.fetcher_unit}>{unit}</span>
+            </Show>
         </span>
     );
 }
