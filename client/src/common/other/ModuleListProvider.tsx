@@ -4,6 +4,7 @@ export const moduleTypes = [
   "core",
   "sensor",
   "pump",
+  "control",
   "undefined"
 ] as const;
 
