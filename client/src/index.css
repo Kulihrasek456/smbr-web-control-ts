@@ -28,6 +28,10 @@ html,body,#root{
   padding: 0;  
 }
 
+option{
+  background-color: var(--bg-color-1);
+}
+
 p{
   font-size: small;
   white-space: nowrap;
