@@ -1,4 +1,4 @@
-import { createSignal, type Accessor } from 'solid-js'
+import { createSignal, Show, type Accessor } from 'solid-js'
 import './common/css/colors.css'
 import './common/css/global.css'
 import styles from './App.module.css'
@@ -12,6 +12,9 @@ import { Config } from './panels/config/Config'
 import { Device } from './panels/device/Device'
 import { Hotbar } from './panels/hotbar/Hotbar'
 import { RefreshProvider } from './common/other/RefreshProvider'
+import { isDebug } from './common/other/debugFlag'
+import { DebugModuleEditor } from './common/other/Debug'
+import { ModuleListProvider } from './common/other/ModuleListProvider'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
 
@@ -44,38 +47,46 @@ function App() {
    ];
    return (
       <>
-         <RefreshProvider disabled={true} autoRefreshPeriod={5000}>
-            <header class={styles.hotbar}>
-               <button class={styles.logo}><img src={Public.images.minilogo} /></button>
-               <h1>Smart Modular Photo Bioreaktor</h1>
-               <div class={styles.hotbar_left}>
-                  <Hotbar></Hotbar>
-               </div>
-            </header>
-            <div class={styles.main}>
-               <ul class={styles.sidebar}>
-                  {items.map(item => (
-                     <Item
-                        text={item.text}
-                        iconName={item.iconName}
-                        active={activeItem}
-                        onClick={() => setActiveItem(item.text)}
-                     />
-                  ))}
-               </ul>
-               <div class={styles.content}>
-                  {items.map(item => {
-                     const ContentComponent = item.component;
-                     return (
-                        
-                        <div class={((activeItem() !== item.text)?styles.hidden:"") + " " + styles.container}>
-                           <ContentComponent />
+         <ModuleListProvider>
+            <RefreshProvider disabled={true} autoRefreshPeriod={5000}>
+               <header class={styles.hotbar}>
+                  <button class={styles.logo}><img src={Public.images.minilogo} /></button>
+                  <h1>Smart Modular Photo Bioreaktor</h1>
+                  <div class={styles.hotbar_left}>
+                     <Hotbar></Hotbar>
+                  </div>
+               </header>
+               <div class={styles.main}>
+                  <ul class={styles.sidebar}>
+                     {items.map(item => (
+                        <Item
+                           text={item.text}
+                           iconName={item.iconName}
+                           active={activeItem}
+                           onClick={() => setActiveItem(item.text)}
+                        />
+                     ))}
+                     <Show when={isDebug}>
+                        <div class={styles.debug}>
+                           <button onclick={e=>e.currentTarget.parentElement?.classList.toggle(styles.collapsed)}>Debug mode</button>
+                           <DebugModuleEditor></DebugModuleEditor>
                         </div>
-                     );
-                  })}
+                     </Show>
+                  </ul>
+                  <div class={styles.content}>
+                     {items.map(item => {
+                        const ContentComponent = item.component;
+                        return (
+                           
+                           <div class={((activeItem() !== item.text)?styles.hidden:"") + " " + styles.container}>
+                              <ContentComponent />
+                           </div>
+                        );
+                     })}
+                  </div>
                </div>
-            </div>
-         </RefreshProvider>
+            </RefreshProvider>
+         </ModuleListProvider>
       </>
    )
 }
