@@ -54,7 +54,7 @@ export type Module = {
   readonly instance: moduleInstancesType;
 }
 
-export type ThemeContextValue = {
+export type ModuleListContextValue = {
   state: () => Module[],
   actions: {
     setModuleList: (newList: Module[]) => void;
@@ -64,7 +64,7 @@ export type ThemeContextValue = {
 interface ModuleListProviderProps{
   children: any;
 }
-const ModuleListContext = createContext<ThemeContextValue>();
+const ModuleListContext = createContext<ModuleListContextValue>();
 
 export function ModuleListProvider(props : ModuleListProviderProps){
   const [moduleList, setModuleList] = createSignal<Module[]>([])
@@ -86,3 +86,31 @@ export function ModuleListProvider(props : ModuleListProviderProps){
 }
 
 export const useModuleListValue = () => useContext(ModuleListContext);
+
+export function getInstancesForType(moduleList : Module[],type : moduleTypesType, includeInvalid = false){
+  let result : moduleInstancesType[] = []
+  moduleList.forEach(element => {
+    if(element.type == type){
+      if ((
+        element.instance != "Undefined"
+        && element.instance != "Exclusive"
+        && element.instance != "All"
+        && element.instance != "Reserved")
+        || includeInvalid
+      ) {
+        result.push(element.instance);
+      }
+    }
+  });
+  return result
+}
+
+export function countInstancesOfType(moduleList : Module[], type: moduleTypesType, instance: moduleInstancesType){
+  let result : number = 0;
+  moduleList.forEach(element => {
+    if(element.type == type && element.instance == instance){
+      result++;
+    }
+  });
+  return result;
+}
