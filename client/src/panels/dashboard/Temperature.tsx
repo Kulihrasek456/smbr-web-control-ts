@@ -44,7 +44,9 @@ function createRow(data: row, index:number) : JSXElement[] {
         ></Icon>,
 
         <p style={{
-            "justify-content":"start"
+            "justify-content":"start",
+            "border-left": (data.instance != "Exclusive")?`3px solid ${moduleInstanceColors[data.instance]}`:undefined,
+            "padding-left": (data.instance != "Exclusive")?"5px":undefined
         }}>{data.name}</p>,
 
         (data.target)?(
