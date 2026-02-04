@@ -134,6 +134,7 @@ li{
     padding: 0;
 }
 
+
 @media (width <= 500px) {
     .main{
         flex-direction: column;
