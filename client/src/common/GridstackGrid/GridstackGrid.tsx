@@ -1,4 +1,4 @@
-import { onMount, onCleanup, type JSX } from "solid-js";
+import { onMount, onCleanup, type JSX, createEffect } from "solid-js";
 import { GridStack } from "gridstack";
 import "gridstack/dist/gridstack.css";
 import styles from "./GridstackGrid.module.css"
@@ -71,8 +71,23 @@ interface GridElementProps {
 }
 
 export function GridElement(props: GridElementProps){
+  let gridElement: HTMLDivElement | undefined;
+
+  createEffect(() => {
+    const w = props.w;
+    const h = props.h;
+
+    // gridstack puts the grid into the gridstack property
+    const grid = (gridElement?.parentElement as any).gridstack;
+
+    if (grid && gridElement) {
+      grid.update(gridElement, { w, h });
+    }
+  });
+  
   return (
     <div 
+      ref={gridElement}
       class="grid-stack-item" 
       gs-id={props.id}
       gs-x={props.x} 
