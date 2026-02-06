@@ -63,7 +63,7 @@
 
 .container.V{
     flex-direction: column;
-    min-width: 100px;
+    min-width: 10px;
 
     .body{
         flex-direction: row;
