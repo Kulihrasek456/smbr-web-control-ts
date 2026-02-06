@@ -18,6 +18,7 @@ function chromeFix_Slider(element : HTMLInputElement, vertical : boolean){
 interface SliderProps{
     title : string,
     direction : "H"|"V",
+    class? : string,
     setter : (value: number) => void,
     getter : () => number,
     bounds : {
@@ -45,7 +46,7 @@ export function Slider(props : SliderProps){
     }
 
     return (
-        <div class={styles.container + " " + styles[props.direction]}>
+        <div class={styles.container + " " + styles[props.direction] + " "+props.class}>
             <div class={styles.header}>
                 <p class={styles.label}>{props.title}</p>
                 <p class={styles.value}>{props.getter() + (props.unit || "")}</p>
