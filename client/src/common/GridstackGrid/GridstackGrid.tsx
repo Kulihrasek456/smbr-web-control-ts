@@ -65,24 +65,57 @@ interface GridElementProps {
   id: string;
   x?: number;
   y?: number;
-  w?: number;
-  h?: number;
+  w: number;
+  h: number;
   children: JSX.Element;
 }
 
 export function GridElement(props: GridElementProps){
   let gridElement: HTMLDivElement | undefined;
+  let grid : GridStack | undefined;
+
+  onMount(() => {
+    if(gridElement){
+      let gridParent = gridElement.parentElement || undefined
+      
+      if(!gridParent){
+        return
+      }
+
+      //check if the parent is a gridstack grid
+      if(!(gridParent as any).gridstack){
+        gridParent=undefined;
+        return 
+      }
+
+      // check if the grid element needs to be initializated manually
+      if(!(gridElement as any).gridstackNode){
+        grid = (gridParent as any).gridstack;
+        grid?.makeWidget(gridElement);
+      }
+    }
+  })
+
+  onCleanup(()=>{
+    if(gridElement && grid){
+      grid.removeWidget(gridElement)
+    }
+  })
 
   createEffect(() => {
     const w = props.w;
     const h = props.h;
 
-    // gridstack puts the grid into the gridstack property
-    const grid = (gridElement?.parentElement as any).gridstack;
-
-    if (grid && gridElement) {
-      grid.update(gridElement, { w, h });
+    try {
+      // gridstack puts the grid into the gridstack property
+      const grid = (gridElement?.parentElement as any).gridstack;
+      if (grid && gridElement) {
+        grid.update(gridElement, { w, h });
+      }
+    } catch (error) {
+      
     }
+
   });
   
   return (
