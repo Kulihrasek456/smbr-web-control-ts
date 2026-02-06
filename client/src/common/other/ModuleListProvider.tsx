@@ -57,7 +57,7 @@ export type Module = {
 export type ModuleListContextValue = {
   state: () => Module[],
   actions: {
-    setModuleList: (newList: Module[]) => void;
+    setModuleList: (newList: Module[]) => void; //#TODO type control
   }
 };
 

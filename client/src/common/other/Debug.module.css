@@ -15,11 +15,23 @@
         border: 1px solid var(--acc-color-2);
         border-radius: 3px;
         background: none;
+        cursor: pointer;
     }
 }
 .module{
     background: var(--bg-color-3);
     border-radius: 5px;
+
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+
+    >div{
+        flex: 1 1 auto;
+    }
+    >button{
+        flex: 0 0 auto;
+    }
 }
 .input_line{
     display: flex;
