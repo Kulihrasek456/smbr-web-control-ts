@@ -149,3 +149,16 @@ export function downloadCanvas(canvasElement : HTMLCanvasElement, filename = 'im
 export function sleep(ms : number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+
+export function isObject(target : any){
+    // Source - https://stackoverflow.com/a/8511350
+    // Posted by Chuck, modified by community. See post 'Timeline' for change history
+    // Retrieved 2026-02-06, License - CC BY-SA 4.0
+
+    return typeof target === 'object' && !Array.isArray(target) && target !== null
+}
+
+export function isArray(target : any){
+    return target && target.constructor === Array
+}
