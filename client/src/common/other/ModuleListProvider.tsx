@@ -105,7 +105,10 @@ export function getInstancesForType(moduleList : Module[],type : moduleTypesType
   return result
 }
 
-export function countInstancesOfType(moduleList : Module[], type: moduleTypesType, instance: moduleInstancesType){
+export function countInstancesOfType(moduleList: Module[] | undefined, type: moduleTypesType, instance: moduleInstancesType){
+  if(!moduleList){
+    return 0;
+  }
   let result : number = 0;
   moduleList.forEach(element => {
     if(element.type == type && element.instance == instance){
