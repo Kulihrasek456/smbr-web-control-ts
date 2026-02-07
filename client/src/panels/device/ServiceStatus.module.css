@@ -1,0 +1,13 @@
+
+p.error{
+    color: red;
+}
+p.ok{
+    color: var(--acc-color-3);
+}
+p.warning{
+    color: var(--warn-color-3);
+}
+.service_status{
+    font-weight: bold;
+}
