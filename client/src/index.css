@@ -70,9 +70,10 @@ button.button:hover:enabled, .button:hover{
   border-color: var(--acc-color-3);
 }
 
-button.button:active, .button:active{
-  background: var(--bg-color-2);
+button.button:active:enabled, .button:active{
+  background: var(--acc-color-2);
 }
+
 
 ::-webkit-scrollbar {
   width: 10px;

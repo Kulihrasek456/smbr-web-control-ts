@@ -13,3 +13,19 @@
         font-weight: bold;
     }
 }
+
+.state_display{
+    border: 3px solid var(--err-color-3);
+    border-style: none none solid solid;
+    background: var(--err-color-2);
+    width: 110px;
+    align-items: stretch;
+    padding: 0 5px;
+    border-bottom-left-radius: 15px;
+}
+
+.flex_row{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}

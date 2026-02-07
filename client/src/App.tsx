@@ -52,7 +52,7 @@ function App() {
                <header class={styles.hotbar}>
                   <button class={styles.logo}><img src={Public.images.minilogo} /></button>
                   <h1>Smart Modular Photo Bioreaktor</h1>
-                  <div class={styles.hotbar_left}>
+                  <div class={styles.hotbar_right}>
                      <Hotbar></Hotbar>
                   </div>
                </header>

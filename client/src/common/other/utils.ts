@@ -97,7 +97,8 @@ export function mapRangeToRange(number : number, inMin : number,inMax : number, 
     return ((number - inMin) * (outMax - outMin)) / (inMax - inMin) + outMin;
 }
 
-export function formatTime(formatString : String,timestamp =new Date()){
+
+export function formatTime(formatString : string,timestamp =new Date()){
     const seconds = timestamp.getSeconds()
     const minutes = timestamp.getMinutes()
     const hours   = timestamp.getHours()
@@ -162,3 +163,4 @@ export function isObject(target : any){
 export function isArray(target : any){
     return target && target.constructor === Array
 }
+
