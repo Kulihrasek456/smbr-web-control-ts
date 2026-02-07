@@ -1,5 +1,6 @@
 other
  - [ ] better button visuals
+ - [ ] fix sliders on IOS
 
 api fetchers
  - [x] updater context
@@ -14,19 +15,20 @@ dashboard
  - [x] table
  - [x] Chartjs Charts
  - Spectrophotometer
-     - [ ] visual
+     - [x] visual
      - [ ] functionality
  - KinematicFluorometer
-     - [ ] visual
+     - [x] visual
      - [ ] functionality
+     - [ ] zoom functionality
  - LED panel
-     - [ ] visual
+     - [x] visual
      - [ ] functionality
  - Temperature widget
      - [x] visual
      - [ ] functionality
  - Control widget
-     - [ ] visual
+     - [x] visual
      - [ ] functionality
 
 device
@@ -38,9 +40,10 @@ text editor
  - [x] codemirror setup
  - [x] visual - file list
  - [x] visual - code part
- - [ ] visual - runtime info
+ - [x] visual - runtime info
  - [ ] functionality
  - [ ] functionality - runtime info
+ - [ ] remove ctrl+s alert placeholder
  - file browser 
      - [ ] create file buttons
      - [ ] recursive
