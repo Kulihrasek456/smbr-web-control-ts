@@ -13,14 +13,10 @@ export function Dashboard() {
 
 
   return (
-    <div style={{ padding: "20px", "overflow-x": "hidden", "overflow-y" : "scroll"}}>
+    <div style={{ padding: "8px", "overflow-x": "hidden", "overflow-y" : "scroll"}}>
       <GridstackGrid>
           <Temperature id="temperature"></Temperature>
 
-          <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive") > 0}>
-            <QuickLaunch id="quick launch"></QuickLaunch>
-          </Show>
-          
           <Show when={countInstancesOfType(moduleListCntxt?.state(),"sensor","Exclusive") > 0}>
             <TransSpectrophotometer id="transmissive spectrophotometer"></TransSpectrophotometer>
             <KinematicFluorometer id="kinematic fluorometer"></KinematicFluorometer>
@@ -29,6 +25,10 @@ export function Dashboard() {
           <Show when={countInstancesOfType(moduleListCntxt?.state(),"control","Exclusive") > 0}>
             <LEDPanel id="led panel"></LEDPanel>
             <Control id="control"></Control>
+          </Show>
+          
+          <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive") > 0}>
+            <QuickLaunch id="quick launch"></QuickLaunch>
           </Show>
 
       </GridstackGrid>

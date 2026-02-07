@@ -4,7 +4,7 @@ import { Temperature } from "../dashboard/Temperature.tsx";
 
 export function Device() {
   return (
-    <div style={{ padding: "20px" }}>
+    <div style={{ padding: "8px" }}>
       <GridstackGrid>
           <Temperature id="a"></Temperature>
 

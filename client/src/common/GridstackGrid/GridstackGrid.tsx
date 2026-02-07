@@ -19,7 +19,7 @@ export function GridstackGrid(props: GridProps){
       gridInstance = GridStack.init({
         cellHeight: props.cellHeight || "100px",
         styleInHead: true,
-        margin: 5,
+        margin: 12,
         float: true,
         draggable: {
           handle: '.drag-handle',
