@@ -4,13 +4,14 @@ import { Widget, WidgetHotbarValue } from "../common/Widget"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import type { JSX } from "solid-js/jsx-runtime"
 import { Button } from "../../common/Button/Button"
-import { createEffect, createSignal, type JSXElement } from "solid-js"
+import { createEffect, createSignal, createUniqueId, type JSXElement } from "solid-js"
 import { Icon } from "../../common/Icon/Icon"
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
 import { getColor } from "../../common/other/colorGenerator"
 import { LineChart } from "../../common/LineChart/LineChart"
 import { getCountdownArray } from "../../common/other/utils"
 import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
+import { RadialSelect } from "../../common/RadialSelect/RadialSelect"
 
 // create subrows by setting icon as undefined
 // row indexes are then given automatically after generating the array
@@ -66,6 +67,7 @@ export function Temperature(props:TemperatureProps) {
     let i=0;
     const [rows, setRows] = createSignal<row[]>([]);
     const moduleListCntxt = useModuleListValue();
+    const scopeGroupName = createUniqueId()
 
     function assignIndexes(rows : row[]){
         let rowI=-1;
@@ -200,10 +202,27 @@ export function Temperature(props:TemperatureProps) {
                     )
                 }}
             >
-                <TableStatic renderRow={createRow} data={rows()} headers={["color", "name", "current"]} colSizes={["40px","100%","60px"]}></TableStatic>
+                <TableStatic 
+                    renderRow={createRow} 
+                    data={rows()} 
+                    headers={["color", "name", "current"]} 
+                    colSizes={["40px",undefined,"60px"]}
+                ></TableStatic>
+                <RadialSelect
+                    groupName={scopeGroupName}
+                    selections={[
+                        {value:"m",label:"minute"},
+                        {value:"s",label:"hour"},
+                        {value:"d",label:"day"}
+                    ]}
+                ></RadialSelect>
                 <div style={{flex:"1 1 auto", "min-height": 0}}>
-                    <LineChart labels={getCountdownArray(15)} datasets={[{data:getCountdownArray(15),label:"test"}]}></LineChart>
+                    <LineChart 
+                        labels={getCountdownArray(15)} 
+                        datasets={[{data:getCountdownArray(15),label:"test"}]}
+                    ></LineChart>
                 </div>
+                
             </Widget>
         </GridElement>
     )

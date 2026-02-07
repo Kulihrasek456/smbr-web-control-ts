@@ -115,13 +115,13 @@
 }
 
 .cell{
-    padding-left: 3px;
-    padding-right: 3px;
+    padding-left: 6px;
+    padding-right: 6px;
 
     >*{
         display: flex;
-    justify-content: center;
-    align-items: center;
+        justify-content: center;
+        align-items: center;
     }
 }
 
@@ -141,4 +141,9 @@
 
 .row.head  .cell:first-child{
     border-left: none;
+}
+
+.table-static.fill_height{
+    flex: 1 1 auto;
+    justify-content: space-between;   
 }

@@ -22,6 +22,27 @@ export interface LineChartProps{
         max : number,
         min : number
     }
+    legend?: {
+        position : 'top' 
+                 | 'left' 
+                 | 'bottom' 
+                 | 'right' 
+                 | 'chartArea'
+        show? : boolean
+    }
+}
+
+function getPlugins(props: LineChartProps) {
+    let result : {}
+
+    return {
+        ...{
+            legend: {
+                display: props.legend?.show ?? false,
+                position: props.legend?.position ?? "bottom"
+            }
+        }
+    };
 }
 
 export function LineChart(props : LineChartProps){
@@ -36,8 +57,8 @@ export function LineChart(props : LineChartProps){
 
   const chartOptions = {
     maintainAspectRatio: false,
-    responsive: props.responsive || true,
-    animations: props.animations || false,
+    responsive: props.responsive ?? true,
+    animations: props.animations ?? false,
     elements: {
         point:{
             radius: 1
@@ -48,19 +69,15 @@ export function LineChart(props : LineChartProps){
         axis: "xy",
         intersect: false
     },
-    plugins:{
-        legend:{
-            display: false
-        }
-    },
+    plugins:getPlugins(props),
     scales: {
         x: {
             display: true,
             ticks: {
                 display: props.xticks
             },
-            suggestedMax: (props.xbounds || {"max" : undefined}).max,
-            suggestedMin: (props.xbounds || {"min" : undefined}).min,
+            suggestedMax: (props.xbounds ?? {"max" : undefined}).max,
+            suggestedMin: (props.xbounds ?? {"min" : undefined}).min,
             grid:{
                 color: "rgb(50,50,50)"
             }
@@ -70,8 +87,8 @@ export function LineChart(props : LineChartProps){
             ticks: {
                 display: props.yticks
             },
-            suggestedMax: (props.ybounds || {"max" : undefined}).max,
-            suggestedMin: (props.ybounds || {"min" : undefined}).min,
+            suggestedMax: (props.ybounds ?? {"max" : undefined}).max,
+            suggestedMin: (props.ybounds ?? {"min" : undefined}).min,
             grid:{
                 color: "rgb(50,50,50)"
             }
@@ -81,6 +98,7 @@ export function LineChart(props : LineChartProps){
         color: "red"
     }
   }
+
 
   return <Line data={chartData} options={chartOptions} />;
 };

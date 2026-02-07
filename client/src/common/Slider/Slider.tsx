@@ -15,6 +15,32 @@ function chromeFix_Slider(element : HTMLInputElement, vertical : boolean){
     }
 }
 
+interface SliderSimpleProps{
+    direction : "H"|"V";
+    bounds : {
+        min : number,
+        max : number
+    };
+    setter : (value: number) => void;
+    getter : () => number;
+    step? : number
+}
+
+export function SliderSimple(props:SliderSimpleProps){
+    return (
+        <input 
+            class={styles.slider + " " + styles[props.direction]}
+            type="range"
+            min={props.bounds.min}
+            max={props.bounds.max}
+            value={props.getter()}
+            step={props.step}
+            onInput={e => {props.setter(+e.currentTarget.value); chromeFix_Slider(e.currentTarget,props.direction == "V")}}
+        ></input>
+    )
+}
+
+
 interface SliderProps{
     title : string,
     direction : "H"|"V",
@@ -65,6 +91,7 @@ export function Slider(props : SliderProps){
                     min={props.bounds.min}
                     max={props.bounds.max}
                     value={props.getter()}
+                    step={props.step}
                     onInput={e => {props.setter(+e.currentTarget.value)}}
                 ></input>
             </div>

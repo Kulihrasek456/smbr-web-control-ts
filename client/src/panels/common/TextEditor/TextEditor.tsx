@@ -380,7 +380,13 @@ function RuntimeInfo(props: RuntimeInfoProps) {
 }
 
 
-export function TextEditor() {
+interface TextEditorProps {
+  twoColFileList? : boolean;
+  runtimeInfo? : RuntimeInfoProps;
+  allowFileCreation? : boolean;
+}
+
+export function TextEditor(props : TextEditorProps) {
   let runtimeInfo!: HTMLDivElement;
 
   return (
@@ -389,41 +395,45 @@ export function TextEditor() {
       "min-width": 0,
       flex: "1 1 auto"
     }}>
-      <FileList files={[
-        {
-          name: "test_head", children: [
-            { name: "test_1", children: [] },
-            { name: "test_2", children: [] },
-            { name: "test_3", children: [] },
-            { name: "test_4", children: [] },
-            {
-              name: "test_5", children: [{
-                name: "test_head", children: [
-                  { name: "test_1", children: [] },
-                  { name: "test_2", children: [] },
-                  { name: "test_3", children: [] },
-                  { name: "test_4", children: [] },
-                  { name: "test_5", children: [] }
-                ]
-              }]
-            }
-          ]
-        },
-        { name: "test_6", children: [] },
-        { name: "test_7", children: [] },
-        { name: "test_8", children: [] },
-        { name: "test_9", children: [] }
-      ]}></FileList>
+      <Show when={props.twoColFileList}>
+        <FileList files={[
+          {
+            name: "test_head", children: [
+              { name: "test_1", children: [] },
+              { name: "test_2", children: [] },
+              { name: "test_3", children: [] },
+              { name: "test_4", children: [] },
+              {
+                name: "test_5", children: [{
+                  name: "test_head", children: [
+                    { name: "test_1", children: [] },
+                    { name: "test_2", children: [] },
+                    { name: "test_3", children: [] },
+                    { name: "test_4", children: [] },
+                    { name: "test_5", children: [] }
+                  ]
+                }]
+              }
+            ]
+          },
+          { name: "test_6", children: [] },
+          { name: "test_7", children: [] },
+          { name: "test_8", children: [] },
+          { name: "test_9", children: [] }
+        ]}></FileList>
+      </Show>
       <FileList buttons={[() => (<p>test</p>)]} files={[]} createFileButton={{ onClick: val => { alert(val); return true; } }}></FileList>
       <CodePart></CodePart>
-      <button class={textEditorStyles["runtime-info-handle"] + " button"} onclick={e=>{if(runtimeInfo){runtimeInfo.classList.toggle(textEditorStyles.collapsed)}}}>
+      <Show when={props.runtimeInfo}>
+      <button class={textEditorStyles["runtime-info-handle"] + " button"} onclick={e => { if (runtimeInfo) { runtimeInfo.classList.toggle(textEditorStyles.collapsed) } }}>
         <div><Icon name="arrow_back_ios_new"></Icon></div>
         <p>Runtime info</p>
         <div><Icon name="arrow_back_ios_new"></Icon></div>
       </button>
-      <div class={textEditorStyles["runtime-info"]} ref={runtimeInfo}>
-        <RuntimeInfo></RuntimeInfo>
-      </div>
+        <div class={textEditorStyles["runtime-info"]} ref={runtimeInfo}>
+          <RuntimeInfo></RuntimeInfo>
+        </div>
+      </Show>
     </div>
   )
 }

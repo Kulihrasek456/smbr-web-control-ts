@@ -1,3 +1,5 @@
+import { TextEditor } from "../common/TextEditor/TextEditor";
+
 export function Config(){
-    return (<p>config</p>)
+    return <TextEditor twoColFileList={true}></TextEditor>
 }
