@@ -11,7 +11,7 @@
         font-size: x-small;
     }
     
-    button, select{
+    button, select, input{
         border: 1px solid var(--acc-color-2);
         border-radius: 3px;
         background: none;
@@ -45,4 +45,17 @@
         width: 40%;
         flex: 0 0 auto;
     }  
+}
+
+.horflex{
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    min-width: 0;
+
+    gap: 5px;
+    *{
+        flex: 1 1 auto;
+    }
 }

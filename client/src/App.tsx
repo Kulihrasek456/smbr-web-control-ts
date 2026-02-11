@@ -13,7 +13,7 @@ import { Device } from './panels/device/Device'
 import { Hotbar } from './panels/hotbar/Hotbar'
 import { RefreshProvider } from './common/other/RefreshProvider'
 import { isDebug } from './common/debug/debugFlag'
-import { DebugModuleEditor } from './common/debug/Debug'
+import { DebugApiMessageHostnameEditor, DebugModuleEditor } from './common/debug/Debug'
 import { ModuleListProvider } from './common/other/ModuleListProvider'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
@@ -70,6 +70,7 @@ function App() {
                         <div class={styles.debug}>
                            <button onclick={e=>e.currentTarget.parentElement?.classList.toggle(styles.collapsed)}>Debug mode</button>
                            <DebugModuleEditor></DebugModuleEditor>
+                           <DebugApiMessageHostnameEditor></DebugApiMessageHostnameEditor>
                         </div>
                      </Show>
                   </ul>

@@ -1,3 +1,5 @@
+import { smbr_apiMessageConfig } from "./apiMessageConfig";
+
 export interface apiMessageOptions{
     url : string;
 
@@ -28,7 +30,7 @@ export class ApiInvalidStatusCodeError extends Error {
 export async function sendApiMessage(options:apiMessageOptions){
     const url = options.url
     const port = options.port ?? 8089
-    const hostname = options.hostname ?? window.location.hostname
+    const hostname = options.hostname ?? smbr_apiMessageConfig.defaultHostname
     const method = options.method ?? "GET"
     const returnCodes = options.validStatusCodes ?? [200]
 

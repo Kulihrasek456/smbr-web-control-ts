@@ -3,6 +3,7 @@ import styles from "./Debug.module.css"
 import { moduleInstances, moduleTypes, useModuleListValue, type Module, type moduleInstancesType, type moduleTypesType } from "../other/ModuleListProvider";
 import { createServerCookie } from "@solid-primitives/cookies";
 import { isArray, isObject } from "../other/utils";
+import { smbr_apiMessageConfig } from "../../apiMessages/apiMessageConfig";
 
 interface DebugModuleEditorProps{
     class?: string;
@@ -103,6 +104,28 @@ export function DebugModuleEditor(props : DebugModuleEditorProps){
                     newList
                 )
             }}>Add module</button>
+        </div>
+    )
+}
+
+interface DebugApiMessageHostnameEditor{
+    class?: string;
+}
+export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEditor){
+    let inputEl !: HTMLInputElement
+
+    return (
+        <div class={styles.HostnameEditor + " " + styles.container + " " + props.class}>
+            <p>Api message target:</p>
+            <div class={styles.horflex}>
+                <input ref={inputEl} style={{"max-width": "80%"}}></input>
+                <button onclick={()=>{
+                    if(inputEl){
+                        smbr_apiMessageConfig.defaultHostname = inputEl.value;
+                        inputEl.value = ""
+                    }
+                }}>set</button>
+            </div>
         </div>
     )
 }
