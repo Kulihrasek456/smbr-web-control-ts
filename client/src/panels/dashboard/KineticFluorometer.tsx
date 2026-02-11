@@ -100,6 +100,12 @@ export function KinematicFluorometer(props: KinematicFluorometerProps){
                             min:0,
                             max:1
                         }}
+                        zoom={{
+                            min:0,
+                            max:100,
+                            mode:"x",
+                            pan:"x"
+                        }}
                     ></LineChart>
                     <p class={styles.chart_comment}>use [shift] + scroll wheel to zoom</p>
                 </div>

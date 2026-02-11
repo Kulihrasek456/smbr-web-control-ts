@@ -1,4 +1,5 @@
 import { Chart, Title, Tooltip, Legend, Colors } from 'chart.js';
+import zoomPlugin from 'chartjs-plugin-zoom';
 import { Line } from 'solid-chartjs';
 import { onMount } from 'solid-js';
 
@@ -30,24 +31,48 @@ export interface LineChartProps{
                  | 'chartArea'
         show? : boolean
     }
+    zoom?:{
+        mode: "x" | "y" | "xy",
+        min:number,
+        max:number
+        pan?: "x" | "y" | "xy"
+    }
 }
 
 function getPlugins(props: LineChartProps) {
-    let result : {}
+    let result : {} = {};
 
-    return {
-        ...{
-            legend: {
-                display: props.legend?.show ?? false,
-                position: props.legend?.position ?? "bottom"
+    (result as any).legend = {
+        display: props.legend?.show ?? false,
+        position: props.legend?.position ?? "bottom"
+    }
+    if(props.zoom){
+        (result as any).zoom={
+            zoom: {
+                mode: props.zoom.mode,
+                wheel: {
+                    enabled: true,
+                    modifierKey: "shift",
+                },
+                pinch: {
+                    enabled: true,
+                },
+            },
+            limits: {
+                x: {min: props.zoom.min, max: props.zoom.max}
+            },
+            pan:{
+                enabled : props.zoom.pan != undefined,
+                mode: props.zoom.pan
             }
         }
-    };
+    }
+    return result;
 }
 
 export function LineChart(props : LineChartProps){
   onMount(() => {
-    Chart.register(Title, Tooltip, Legend, Colors);
+    Chart.register(Title, Tooltip, Legend, Colors, zoomPlugin);
   });
 
   const chartData = {
