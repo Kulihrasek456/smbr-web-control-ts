@@ -1,8 +1,8 @@
 import { For, onMount } from "solid-js";
 import styles from "./Debug.module.css"
-import { moduleInstances, moduleTypes, useModuleListValue, type Module, type moduleInstancesType, type moduleTypesType } from "./ModuleListProvider";
+import { moduleInstances, moduleTypes, useModuleListValue, type Module, type moduleInstancesType, type moduleTypesType } from "../other/ModuleListProvider";
 import { createServerCookie } from "@solid-primitives/cookies";
-import { isArray, isObject } from "./utils";
+import { isArray, isObject } from "../other/utils";
 
 interface DebugModuleEditorProps{
     class?: string;

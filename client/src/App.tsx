@@ -12,8 +12,8 @@ import { Config } from './panels/config/Config'
 import { Device } from './panels/device/Device'
 import { Hotbar } from './panels/hotbar/Hotbar'
 import { RefreshProvider } from './common/other/RefreshProvider'
-import { isDebug } from './common/other/debugFlag'
-import { DebugModuleEditor } from './common/other/Debug'
+import { isDebug } from './common/debug/debugFlag'
+import { DebugModuleEditor } from './common/debug/Debug'
 import { ModuleListProvider } from './common/other/ModuleListProvider'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
