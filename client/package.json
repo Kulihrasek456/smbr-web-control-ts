@@ -14,6 +14,7 @@
     "@solid-primitives/cookies": "^0.0.3",
     "@solid-primitives/platform": "^0.2.1",
     "chart.js": "^4.5.1",
+    "chartjs-plugin-zoom": "^2.2.0",
     "codemirror": "^6.0.2",
     "colord": "^2.9.3",
     "gridstack": "^12.4.2",
