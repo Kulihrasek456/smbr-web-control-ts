@@ -51,7 +51,7 @@ function createRow(data: row, index:number) : JSXElement[] {
         }}>{data.name}</p>,
 
         (data.target)?(
-            <ApiFetcher target={data.target} unit="°C"></ApiFetcher>
+            <ApiFetcher target={data.target} unit="°C" numberOnly={{decimalPlaces: 2}}></ApiFetcher>
         ):(
             <p></p>
         )
@@ -110,7 +110,7 @@ export function Temperature(props:TemperatureProps) {
                     },{
                         icon:       undefined, 
                         name:       "Top", 
-                        target:     { url: "/sensor/bottle/top/measured_temperature", key: "temperature" },
+                        target:     { url: "/sensor/bottle/top/measured_temperature", key: "temperature"},
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 

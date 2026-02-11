@@ -19,10 +19,10 @@ function renderRow(value : row, index: number){
         <p>{value.name}</p>,
         <p>{value.id}</p>,
         <p>{value.instance}</p>,
-        <ApiFetcher target={{url: value.name+"/ping" ,key: "time_ms"}} unit="ms"></ApiFetcher>,
-        <ApiFetcher target={{url: value.name+"/core_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
-        <ApiFetcher target={{url: value.name+"/board_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
-        <ApiFetcher target={{url: value.name+"/load" ,key: "load"}} unit="%"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/ping" ,key: "time_ms"}} unit="ms"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/core_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/board_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/load" ,key: "load"}} unit="%"></ApiFetcher>,
         <Button>
             <Icon name="refresh"></Icon>
         </Button>

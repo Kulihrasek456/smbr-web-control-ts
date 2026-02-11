@@ -12,13 +12,20 @@ interface DeviceInformationProps{
 type row = {
     label:string,
     value: apiMessageSimple,
-    unit? : string
+    unit? : string,
+    numberOnly? : boolean
 }
 
 function renderRow(value : row, index : number){
     return ([
         <p style={{"justify-content":"left"}}>{value.label}</p>,
-        <ApiFetcher target={value.value} unit={value.unit}></ApiFetcher>
+        <p style={{"justify-content":"right"}}>
+            <ApiFetcher 
+                numberOnly={(value.numberOnly)?{decimalPlaces:2}:undefined} 
+                target={value.value} 
+                unit={value.unit}
+            ></ApiFetcher>
+        </p>
     ])
 }
 
@@ -39,23 +46,28 @@ export function DeviceInformation(props:DeviceInformationProps){
         },{
             label: "Supply voltage",
             value: { url: "/core/supply/5v", key: "voltage" },
-            unit: "V"
+            unit: "V",
+            numberOnly: true
         },{
             label: "Supply vin",
             value: { url: "/core/supply/vin", key: "voltage" },
-            unit: "V"
+            unit: "V",
+            numberOnly: true
         },{
             label: "Supply poe",
             value: { url: "/core/supply/poe", key: "voltage" },
-            unit: "V"
+            unit: "V",
+            numberOnly: true
         },{
             label: "Supply current",
             value: { url: "/core/supply/current", key: "current" },
-            unit: "A"
+            unit: "A",
+            numberOnly: true
         },{
             label: "Supply power_draw",
             value: { url: "/core/supply/power_draw", key: "power_draw" },
-            unit: "W"
+            unit: "W",
+            numberOnly: true
         }
     ])
 
@@ -65,7 +77,7 @@ export function DeviceInformation(props:DeviceInformationProps){
                 <TableStatic
                     data={rows()}
                     headers={["field","value"]}
-                    colSizes={[undefined,"100px"]}
+                    colSizes={[undefined,"150px"]}
                     renderRow={renderRow}
                     fillHeight={true}
                 ></TableStatic>
