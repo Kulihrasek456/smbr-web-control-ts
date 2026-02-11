@@ -1,4 +1,3 @@
-import { apiMessageSimple } from "../../apiMessages/apiMessage"
 import { TableStatic } from "../../common/Table/Table"
 import { Widget, WidgetHotbarValue } from "../common/Widget"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
@@ -12,6 +11,7 @@ import { LineChart } from "../../common/LineChart/LineChart"
 import { getCountdownArray } from "../../common/other/utils"
 import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
 import { RadialSelect } from "../../common/RadialSelect/RadialSelect"
+import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
 
 // create subrows by setting icon as undefined
 // row indexes are then given automatically after generating the array
@@ -105,17 +105,17 @@ export function Temperature(props:TemperatureProps) {
                     {
                         icon:       "water_full", 
                         name:       "Bottle", 
-                        target:     new apiMessageSimple("/sensor/bottle/temperature","temperature"),
+                        target:     { url: "/sensor/bottle/temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 
                         name:       "Top", 
-                        target:     new apiMessageSimple("/sensor/bottle/top/measured_temperature","temperature"),
+                        target:     { url: "/sensor/bottle/top/measured_temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 
                         name:       "Bottom", 
-                        target:     new apiMessageSimple("/sensor/bottle/bottom/measured_temperature","temperature"),
+                        target:     { url: "/sensor/bottle/bottom/measured_temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },{
                         icon:       "water_lux", 
@@ -125,22 +125,22 @@ export function Temperature(props:TemperatureProps) {
                     },{
                         icon:       undefined, 
                         name:       "Detector", 
-                        target:     new apiMessageSimple("/sensor/fluorometer/detector/temperature","temperature"),
+                        target:     { url: "/sensor/fluorometer/detector/temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 
                         name:       "Emitor", 
-                        target:     new apiMessageSimple("/sensor/fluorometer/emitor/temperature","temperature"),
+                        target:     { url: "/sensor/fluorometer/emitor/temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },{
                         icon:       "wb_incandescent", 
                         name:       "Spectrophotometer", 
-                        target:     new apiMessageSimple("/sensor/spectrophotometer/emitor/temperature", "temperature"),
+                        target:     { url: "/sensor/spectrophotometer/emitor/temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },{
                         icon:       "wb_twilight", 
                         name:       "LED panel", 
-                        target:     new apiMessageSimple("/control/led_panel/temperature", "temperature"),
+                        target:     { url: "/control/led_panel/temperature", key: "temperature" },
                         instance:   "Exclusive"
                     },
                 )
@@ -151,7 +151,7 @@ export function Temperature(props:TemperatureProps) {
                     {
                         icon:       "mode_heat", 
                         name:       "Heater plate", 
-                        target:     new apiMessageSimple("/control/heater/plate_temperature", "temperature"),
+                        target:     {url: "/control/heater/plate_temperature", key:"temperature"},
                         instance:   "Exclusive"
                     }
                 )
@@ -161,7 +161,7 @@ export function Temperature(props:TemperatureProps) {
                 result.push({
                     icon: "water_full",
                     name: "test",
-                    target: new apiMessageSimple("/sensor/bottle/temperature", "temperature"),
+                    target: {url: "/sensor/bottle/temperature", key:"temperature"},
                     instance: instance
                 })
             }
@@ -193,7 +193,7 @@ export function Temperature(props:TemperatureProps) {
                             <WidgetHotbarValue
                                 name="API value:"
                                 apiFetcherProps={{
-                                    target: new apiMessageSimple("", ""),
+                                    target: {url: "",key:""},
                                     interval: 3000,
                                     unit: " ms",
                                 }}></WidgetHotbarValue>

@@ -1,10 +1,10 @@
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
-import { apiMessageSimple } from '../../apiMessages/apiMessage'
 import { ApiFetcher } from '../../common/ApiFetcher/ApiFetcher'
 import { formatTime } from '../../common/other/utils';
 
 import styles from './Hotbar.module.css'
 import { countInstancesOfType, useModuleListValue } from '../../common/other/ModuleListProvider';
+import type { apiMessageSimple } from '../../apiMessages/apiMessageSimple';
 
 
 type SimpleDisplayProps = {
@@ -46,9 +46,9 @@ export function Hotbar() {
                 <p>{formatTime("dd.mo. yyyy",time())}</p>
             </div>      
             <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive")}>
-                <SimpleDisplay name='hostname' target={new apiMessageSimple("/core/hostname", "hostname")}></SimpleDisplay>
-                <SimpleDisplay name='IP adress' target={new apiMessageSimple("/core/ip_address", "ipAdress")}></SimpleDisplay>
-                <SimpleDisplay name='short ID' target={new apiMessageSimple("/core/sid", "sid")}></SimpleDisplay>
+                <SimpleDisplay name='hostname' target={{url: "/core/hostname", key: "hostname"}}></SimpleDisplay>
+                <SimpleDisplay name='IP adress' target={{url: "/core/ip_address", key: "ipAdress"}}></SimpleDisplay>
+                <SimpleDisplay name='short ID' target={{url: "/core/sid", key: "sid"}}></SimpleDisplay>
             </Show>  
         </>
     )

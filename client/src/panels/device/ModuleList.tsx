@@ -6,7 +6,6 @@ import { Widget } from "../common/Widget";
 import { Button } from "../../common/Button/Button";
 import { Icon } from "../../common/Icon/Icon";
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher";
-import { apiMessageSimple } from "../../apiMessages/apiMessage";
 
 
 type row = {
@@ -20,10 +19,10 @@ function renderRow(value : row, index: number){
         <p>{value.name}</p>,
         <p>{value.id}</p>,
         <p>{value.instance}</p>,
-        <ApiFetcher target={new apiMessageSimple(value.name+"/ping","time_ms")} unit="ms"></ApiFetcher>,
-        <ApiFetcher target={new apiMessageSimple(value.name+"/core_temp","temperature")} unit="°C"></ApiFetcher>,
-        <ApiFetcher target={new apiMessageSimple(value.name+"/board_temp","temperature")} unit="°C"></ApiFetcher>,
-        <ApiFetcher target={new apiMessageSimple(value.name+"/load","load")} unit="%"></ApiFetcher>,
+        <ApiFetcher target={{url: value.name+"/ping" ,key: "time_ms"}} unit="ms"></ApiFetcher>,
+        <ApiFetcher target={{url: value.name+"/core_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
+        <ApiFetcher target={{url: value.name+"/board_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
+        <ApiFetcher target={{url: value.name+"/load" ,key: "load"}} unit="%"></ApiFetcher>,
         <Button>
             <Icon name="refresh"></Icon>
         </Button>

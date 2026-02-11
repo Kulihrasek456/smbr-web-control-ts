@@ -1,9 +1,9 @@
-import { apiMessageSimple } from "../../apiMessages/apiMessage"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import { Widget } from "../common/Widget"
 import { TableStatic } from "../../common/Table/Table"
 import { createSignal } from "solid-js"
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
+import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
 
 interface DeviceInformationProps{
     id:string
@@ -24,37 +24,37 @@ function renderRow(value : row, index : number){
 
 export function DeviceInformation(props:DeviceInformationProps){
     const [rows,setRows] = createSignal<row[]>([
-        {
+       {
             label: "SID",
-            value: new apiMessageSimple("/core/sid", "sid")
+            value: { url: "/core/sid", key: "sid" }
         },{
             label: "IP address",
-            value: new apiMessageSimple("/core/ip_address", "ipAddress")
+            value: { url: "/core/ip_address", key: "ipAddress" }
         },{
             label: "Hostname",
-            value: new apiMessageSimple("/core/hostname", "hostname")
+            value: { url: "/core/hostname", key: "hostname" }
         },{
             label: "Serial number",
-            value: new apiMessageSimple("/core/serial", "serial")
+            value: { url: "/core/serial", key: "serial" }
         },{
             label: "Supply voltage",
-            value: new apiMessageSimple("/core/supply/5v", "voltage"),
+            value: { url: "/core/supply/5v", key: "voltage" },
             unit: "V"
         },{
             label: "Supply vin",
-            value: new apiMessageSimple("/core/supply/vin", "voltage"),
+            value: { url: "/core/supply/vin", key: "voltage" },
             unit: "V"
         },{
             label: "Supply poe",
-            value: new apiMessageSimple("/core/supply/poe", "voltage"),
+            value: { url: "/core/supply/poe", key: "voltage" },
             unit: "V"
         },{
             label: "Supply current",
-            value: new apiMessageSimple("/core/supply/current", "current"),
+            value: { url: "/core/supply/current", key: "current" },
             unit: "A"
         },{
             label: "Supply power_draw",
-            value: new apiMessageSimple("/core/supply/power_draw", "power_draw"),
+            value: { url: "/core/supply/power_draw", key: "power_draw" },
             unit: "W"
         }
     ])

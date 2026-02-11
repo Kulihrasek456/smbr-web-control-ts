@@ -1,4 +1,3 @@
-import { apiMessageSimple } from "../../apiMessages/apiMessage"
 import styles from "./Slider.module.css"
 import { createEffect, createSignal, Show } from "solid-js"
 import { mapRangeToRange } from "../other/utils"

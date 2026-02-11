@@ -1,8 +1,8 @@
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
-import { apiMessageSimple } from '../../apiMessages/apiMessage'
 
 import styles from './ApiFetcher.module.css'
 import { useRefreshValue } from '../other/RefreshProvider';
+import { sendApiMessageSimple, type apiMessageSimple } from '../../apiMessages/apiMessageSimple';
 
 export interface ApiFetcherProps{
     target: apiMessageSimple;
@@ -11,11 +11,7 @@ export interface ApiFetcherProps{
 };
 
 
-export function ApiFetcher({
-    target,
-    interval = 5000,
-    unit,
-}: ApiFetcherProps) {
+export function ApiFetcher(props: ApiFetcherProps) {
     const [value, setValue] = createSignal<string | undefined>("---");
     const refreshValue = useRefreshValue
 
@@ -25,10 +21,10 @@ export function ApiFetcher({
             return
         }
         try {
-            await target.send()
-            setValue(target.getValue().toString());
+            setValue(((await sendApiMessageSimple(props.target)).toString()));
         } catch (e) {
             setValue(undefined);
+            console.error(e);
         }
     })
 
@@ -36,7 +32,9 @@ export function ApiFetcher({
         <span class={`${value() ? "" : styles.error} ${styles.fetcher}`}>
             <Show when={value()} fallback="err">
                 {value()}
-                <span class={styles.fetcher_unit}>{unit}</span>
+                <Show when={props.unit}>
+                    <span class={styles.fetcher_unit}>{props.unit}</span>
+                </Show>
             </Show>
         </span>
     );
