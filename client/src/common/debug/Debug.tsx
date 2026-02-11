@@ -112,17 +112,115 @@ interface DebugApiMessageHostnameEditor{
     class?: string;
 }
 export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEditor){
+    const [cookie, setCookie] = createServerCookie("SMBR-defaultHostname");
     let inputEl !: HTMLInputElement
 
+    function setHostname(value : string){
+        if(value!=""){
+            console.log("changing hostname to: ",value);
+            smbr_apiMessageConfig.defaultHostname = value
+        }else{
+            console.log("changing hostname back to default");
+            smbr_apiMessageConfig.defaultHostname = window.location.hostname
+        }
+    }
+
+    onMount(()=>{
+        let cookieData = cookie()
+        if(cookieData){
+            console.log(cookieData)
+            setHostname(cookieData)
+        }
+    })
+
     return (
-        <div class={styles.HostnameEditor + " " + styles.container + " " + props.class}>
+        <div class={styles.container + " " + props.class}>
             <p>Api message target:</p>
             <div class={styles.horflex}>
-                <input ref={inputEl} style={{"max-width": "80%"}}></input>
+                <input class={styles.grow}  ref={inputEl}></input>
                 <button onclick={()=>{
                     if(inputEl){
-                        smbr_apiMessageConfig.defaultHostname = inputEl.value;
+                        setHostname(inputEl.value);
+                        setCookie(inputEl.value);
                         inputEl.value = ""
+                    }
+                }}>set</button>
+            </div>
+        </div>
+    )
+}
+
+
+interface DebugRefreshProviderIntervalProps{
+    class?: string;
+    interval:{
+        getter: () => number;
+        setter: (value: number) => void;
+    }
+    disabled:{
+        getter: () => boolean;
+        setter: (value: boolean) => void;
+    }
+}
+export function DebugRefreshProviderInterval(props: DebugRefreshProviderIntervalProps){
+    const [intervalCookie, setIntervalCookie] = createServerCookie("SMBR-updateInterval");
+    const [disabledCookie, setDisabledCookie] = createServerCookie("SMBR-updateDisabled");
+    let inputEl !: HTMLInputElement
+
+    function setDisabled(value : boolean, save:boolean){
+        console.log("changing refresh provider disabled to: ",value);
+        props.disabled.setter(value)
+        if(save){
+            setDisabledCookie((value)?"true":"false");
+        }
+    }
+    function setInterval(value : number, save:boolean){
+        console.log("changing refresh provider interval to: ",value);
+        props.interval.setter(value)
+        if(save){
+            setIntervalCookie(value.toString());
+        }
+    }
+
+    onMount(()=>{
+        let cookieDataInt = intervalCookie()
+        let cookieDataDis = disabledCookie()
+        if(cookieDataInt){
+            console.log(cookieDataInt)
+            if(Number(cookieDataInt)){
+                setInterval(Number(cookieDataInt),false);
+            }
+        }
+        if(cookieDataDis){
+            console.log(cookieDataDis)
+            if(cookieDataDis=="true"){
+                setDisabled(true,false);
+            }
+            if(cookieDataDis=="false"){
+                setDisabled(false,false);
+            }
+        }
+    })
+
+    return (
+        <div class={styles.container + " " + props.class}>
+            <p>Api message target:</p>
+            <div class={styles.horflex}>
+                <p>Do updates: </p>
+                <input checked={!props.disabled.getter()} type="checkbox" onchange={e => setDisabled(!e.currentTarget.checked,true)}></input>
+            </div>
+            <div class={styles.horflex}>
+                <input 
+                    class={styles.grow} 
+                    placeholder={props.interval.getter().toString()}
+                    ref={inputEl}
+                ></input>
+                <button onclick={()=>{
+                    if(inputEl){
+                        if(Number(inputEl.value)){
+                            setInterval(Number(inputEl.value),true);
+                            inputEl.value = ""
+                        }
                     }
                 }}>set</button>
             </div>

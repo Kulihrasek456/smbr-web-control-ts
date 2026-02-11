@@ -13,6 +13,7 @@ interface RefreshProviderProps{
   autoRefreshPeriod?: number,
   disabled?: boolean
 }
+  let mountCount = 0;
 
 
 export function RefreshProvider(props: RefreshProviderProps) {
@@ -44,16 +45,43 @@ export function RefreshProvider(props: RefreshProviderProps) {
       setLastRefresh({_ts:Date.now(),forced:false});
     }
   }
-  
-  if(props.autoRefreshPeriod){
-    onMount(() => {
-      softRefresh()
-  
-      let id = setInterval(softRefresh,props.autoRefreshPeriod)
 
-      onCleanup(() => clearInterval(id));
-    })
+  let intervalId : number | undefined = undefined;
+
+  function stopInterval(){
+    if(intervalId){
+      clearInterval(intervalId);
+      intervalId = undefined;
+    }
   }
+
+  function startInterval(period : number){
+    stopInterval()
+    intervalId = setInterval(softRefresh,period)
+  }
+  onMount(() => {
+    if(!props.disabled){
+      console.warn("doing initial refresh because: ",props.disabled);
+      if(props.autoRefreshPeriod){
+        softRefresh()
+
+        startInterval(props.autoRefreshPeriod)
+      }
+    }
+  })
+
+  onCleanup(() => stopInterval());
+
+  createEffect(()=>{
+    if(!props.disabled && props.autoRefreshPeriod){
+      softRefresh()
+      startInterval(props.autoRefreshPeriod)
+    }else{
+      stopInterval()
+    }
+  })
+
+
 
   return (
     <RefreshContext.Provider value={trigger}>

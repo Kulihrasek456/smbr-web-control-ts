@@ -13,7 +13,7 @@ import { Device } from './panels/device/Device'
 import { Hotbar } from './panels/hotbar/Hotbar'
 import { RefreshProvider } from './common/other/RefreshProvider'
 import { isDebug } from './common/debug/debugFlag'
-import { DebugApiMessageHostnameEditor, DebugModuleEditor } from './common/debug/Debug'
+import { DebugApiMessageHostnameEditor, DebugModuleEditor, DebugRefreshProviderInterval } from './common/debug/Debug'
 import { ModuleListProvider } from './common/other/ModuleListProvider'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
@@ -36,6 +36,9 @@ function Item({ text, iconName,onClick,active}: ItemProps) {
 
 function App() {
    const [activeItem, setActiveItem] = createSignal("Dashboard");
+   
+   const [updateDisabled, setUpdateDisabled] = createSignal(isDebug);
+   const [updateInterval, setUpdateInterval] = createSignal(5000);
 
    console.debug("update")
 
@@ -48,7 +51,7 @@ function App() {
    return (
       <>
          <ModuleListProvider>
-            <RefreshProvider disabled={true} autoRefreshPeriod={5000}>
+            <RefreshProvider disabled={updateDisabled()} autoRefreshPeriod={updateInterval()}>
                <header class={styles.hotbar}>
                   <button class={styles.logo}><img src={Public.images.minilogo} /></button>
                   <h1>Smart Modular Photo Bioreaktor</h1>
@@ -71,6 +74,16 @@ function App() {
                            <button onclick={e=>e.currentTarget.parentElement?.classList.toggle(styles.collapsed)}>Debug mode</button>
                            <DebugModuleEditor></DebugModuleEditor>
                            <DebugApiMessageHostnameEditor></DebugApiMessageHostnameEditor>
+                           <DebugRefreshProviderInterval
+                              interval={{
+                                 getter: updateInterval,
+                                 setter: setUpdateInterval
+                              }}
+                              disabled={{
+                                 getter: updateDisabled,
+                                 setter: setUpdateDisabled
+                              }}
+                           ></DebugRefreshProviderInterval>
                         </div>
                      </Show>
                   </ul>
