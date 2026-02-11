@@ -47,7 +47,7 @@ export function Hotbar() {
             </div>      
             <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive")}>
                 <SimpleDisplay name='hostname' target={{url: "/core/hostname", key: "hostname"}}></SimpleDisplay>
-                <SimpleDisplay name='IP adress' target={{url: "/core/ip_address", key: "ipAdress"}}></SimpleDisplay>
+                <SimpleDisplay name='IP adress' target={{ url: "/core/ip_address", key: "ipAddress" }}></SimpleDisplay>
                 <SimpleDisplay name='short ID' target={{url: "/core/sid", key: "sid"}}></SimpleDisplay>
             </Show>  
         </>
