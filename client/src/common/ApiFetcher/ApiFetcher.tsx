@@ -8,11 +8,16 @@ export interface ApiFetcherProps{
     target: apiMessageSimple;
     unit?: string,
     interval?: number,
+    numberOnly?: {
+        decimalPlaces :number
+    }
 };
 
 
 export function ApiFetcher(props: ApiFetcherProps) {
-    const [value, setValue] = createSignal<string | undefined>("---");
+    const undefinedPlaceholder = "---"
+
+    const [value, setValue] = createSignal<string | undefined>(undefinedPlaceholder);
     const refreshValue = useRefreshValue
 
     createEffect(async () => {
@@ -28,14 +33,28 @@ export function ApiFetcher(props: ApiFetcherProps) {
         }
     })
 
+    function renderValue(val : string | undefined) : string{
+        if(!val){
+            return undefinedPlaceholder
+        }
+        if(props.numberOnly){
+            let result : number = Number(val)
+            if(isNaN(result)){
+                return undefinedPlaceholder
+            }
+            return result.toFixed(props.numberOnly.decimalPlaces)
+        }
+        return val;
+    }
+
     return (
-        <span class={`${value() ? "" : styles.error} ${styles.fetcher}`}>
+        <p class={`${value() ? "" : styles.error} ${styles.fetcher}`}>
             <Show when={value()} fallback="err">
-                {value()}
+                {renderValue(value())}
                 <Show when={props.unit}>
                     <span class={styles.fetcher_unit}>{props.unit}</span>
                 </Show>
             </Show>
-        </span>
+        </p>
     );
 }
