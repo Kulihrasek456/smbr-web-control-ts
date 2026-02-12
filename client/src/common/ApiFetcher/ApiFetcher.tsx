@@ -1,8 +1,8 @@
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 
-import styles from './ApiFetcher.module.css'
 import { useRefreshValue } from '../other/RefreshProvider';
 import { sendApiMessageSimple, type apiMessageSimple } from '../../apiMessages/apiMessageSimple';
+import { ValueDisplay } from './ValueDisplay';
 
 export interface ApiFetcherProps{
     target: apiMessageSimple;
@@ -33,28 +33,11 @@ export function ApiFetcher(props: ApiFetcherProps) {
         }
     })
 
-    function renderValue(val : string | undefined) : string{
-        if(!val){
-            return undefinedPlaceholder
-        }
-        if(props.numberOnly){
-            let result : number = Number(val)
-            if(isNaN(result)){
-                return undefinedPlaceholder
-            }
-            return result.toFixed(props.numberOnly.decimalPlaces)
-        }
-        return val;
-    }
-
     return (
-        <p class={`${value() ? "" : styles.error} ${styles.fetcher}`}>
-            <Show when={value()} fallback="err">
-                {renderValue(value())}
-                <Show when={props.unit}>
-                    <span class={styles.fetcher_unit}>{props.unit}</span>
-                </Show>
-            </Show>
-        </p>
+         <ValueDisplay
+            value={value()??undefinedPlaceholder}
+            unit={props.unit}
+            numberOnly={props.numberOnly}
+         ></ValueDisplay>
     );
 }
