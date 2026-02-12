@@ -2,6 +2,8 @@ import styles from "./Slider.module.css"
 import { createEffect, createSignal, Show } from "solid-js"
 import { mapRangeToRange } from "../other/utils"
 import { isChromium, isSafari } from "@solid-primitives/platform";
+import { useRefreshValue } from "../other/RefreshProvider";
+import { sendApiMessageSimple, sendApiMessageSimplePost, type apiMessageSimple } from "../../apiMessages/apiMessageSimple";
 
 function chromeFix_Slider(element : HTMLInputElement, vertical : boolean){
     if((window.webkitURL != null)){
@@ -55,7 +57,7 @@ interface SliderProps{
     unit? : string,
     onChange? : (value : number)=>void,
     onInput? : (value : number)=>void,
-    displayModifier? : (apiResult : number|string|null)=>string
+    displayModifier? : (value : number)=>number
 }
 
 export function Slider(props : SliderProps){
@@ -70,11 +72,21 @@ export function Slider(props : SliderProps){
         })
     }
 
+    
+
     return (
         <div class={styles.container + " " + styles[props.direction] + " "+props.class}>
             <div class={styles.header}>
                 <p class={styles.label}>{props.title}</p>
-                <p class={styles.value}>{props.getter() + (props.unit || "")}</p>
+                <p class={styles.value}>{
+                    (props.displayModifier)?(
+                        props.displayModifier(props.getter()).toString()
+                    ):(
+                        props.getter().toString()
+                    )
+                    
+                    + (props.unit ?? " ")
+                }</p>
             </div>
             <div class={styles.body}>
                 <Show when={props.bounds.show!=undefined?props.bounds.show:true}>
@@ -91,9 +103,86 @@ export function Slider(props : SliderProps){
                     max={props.bounds.max}
                     value={props.getter()}
                     step={props.step}
-                    onInput={e => {props.setter(+e.currentTarget.value)}}
+                    onInput={e => {props.setter(+e.currentTarget.value); props.onInput?.(+e.currentTarget.value)}}
+                    onChange={e=>{props.onChange?.(+e.currentTarget.value)}}
                 ></input>
             </div>
         </div>
+    )
+}
+
+interface SliderApiControlProps{
+    title: string,
+    direction: "H"|"V"
+    target:{
+        getter: apiMessageSimple
+        setter: apiMessageSimple
+    }
+    class?:string,
+    bounds : {
+        min : number,
+        max : number,
+        show? : boolean
+    }
+    step?:number,
+    unit?:string,
+    minInterval:number,
+    imidiateStops?:number[]
+    displayModifier? : (value : number)=>number
+}
+
+export function SliderApiControl(props : SliderApiControlProps){
+    const [value,setValue] = createSignal<number>(0);
+    const refreshCntx = useRefreshValue()
+
+    let currentState : "setting" | "idle" = "idle"
+    let lastChange = 0;
+
+    createEffect(async ()=>{
+        if(!refreshCntx || refreshCntx()._ts == 0){
+            return
+        }
+        if(currentState==="idle"){
+            let response = await sendApiMessageSimple(props.target.getter);
+    
+            setValue(+response);
+        }
+    })
+
+    async function sendValue(value : number){
+        await sendApiMessageSimplePost(props.target.setter,value);
+    }
+
+    function onInput(value : number){
+        setValue(value);
+
+        if(Date.now() > props.minInterval+lastChange){
+            lastChange = Date.now();
+            sendValue(value);
+        }else{
+            if((props.imidiateStops??[props.bounds.min,props.bounds.max]).includes(value)){
+                sendValue(value);
+            }
+        }
+    }
+    function onChange(value : number){
+        sendValue(value)
+    }
+
+    return (
+        <Slider
+            title={props.title}
+            direction={props.direction}
+            class={props.class}
+            bounds={props.bounds}
+            step={props.step}
+            unit={props.unit}
+            displayModifier={props.displayModifier}
+            getter={value}
+            setter={setValue}
+
+            onChange={onChange}
+            onInput={onInput}
+        ></Slider>
     )
 }
