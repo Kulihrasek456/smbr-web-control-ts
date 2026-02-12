@@ -53,6 +53,7 @@ interface SliderProps{
         max : number,
         show? : boolean
     }
+    decimals?:number,
     step? : number,
     unit? : string,
     onChange? : (value : number)=>void,
@@ -72,18 +73,16 @@ export function Slider(props : SliderProps){
         })
     }
 
-    
-
     return (
         <div class={styles.container + " " + styles[props.direction] + " "+props.class}>
             <div class={styles.header}>
                 <p class={styles.label}>{props.title}</p>
                 <p class={styles.value}>{
-                    (props.displayModifier)?(
-                        props.displayModifier(props.getter()).toString()
+                    ((props.displayModifier)?(
+                        props.displayModifier(props.getter())
                     ):(
-                        props.getter().toString()
-                    )
+                        props.getter()
+                    )).toFixed(props.decimals??2)
                     
                     + (props.unit ?? " ")
                 }</p>
@@ -116,7 +115,7 @@ interface SliderApiControlProps{
     direction: "H"|"V"
     target:{
         getter: apiMessageSimple
-        setter: apiMessageSimple
+        setter?: apiMessageSimple
     }
     class?:string,
     bounds : {
@@ -124,9 +123,10 @@ interface SliderApiControlProps{
         max : number,
         show? : boolean
     }
+    decimals?:number,
     step?:number,
     unit?:string,
-    minInterval:number,
+    minInterval?:number,
     imidiateStops?:number[]
     displayModifier? : (value : number)=>number
 }
@@ -150,13 +150,13 @@ export function SliderApiControl(props : SliderApiControlProps){
     })
 
     async function sendValue(value : number){
-        await sendApiMessageSimplePost(props.target.setter,value);
+        await sendApiMessageSimplePost(props.target.setter ?? props.target.getter,value);
     }
 
     function onInput(value : number){
         setValue(value);
 
-        if(Date.now() > props.minInterval+lastChange){
+        if(Date.now() > (props.minInterval??100)+lastChange){
             lastChange = Date.now();
             sendValue(value);
         }else{
@@ -180,6 +180,8 @@ export function SliderApiControl(props : SliderApiControlProps){
             displayModifier={props.displayModifier}
             getter={value}
             setter={setValue}
+
+            decimals={props.decimals}
 
             onChange={onChange}
             onInput={onInput}

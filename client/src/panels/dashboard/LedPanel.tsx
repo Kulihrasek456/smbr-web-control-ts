@@ -47,6 +47,8 @@ export function LEDPanel(props: LEDPanelProps){
                                 minInterval={100}
                                 unit="%"
                                 displayModifier={value=>(Math.round(value*100))}
+
+                                decimals={0}
                                 
                                 target={{
                                     getter:{url:"/control/led_panel/intensity/"+el,key:"intensity"},
