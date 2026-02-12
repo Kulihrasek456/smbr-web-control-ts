@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
-import { Slider } from "../../common/Slider/Slider"
+import { Slider, SliderApiControl } from "../../common/Slider/Slider"
 import { Widget } from "../common/Widget"
 import { ValueController } from "../../common/ValueController/ValueControlller"
 
@@ -26,31 +26,35 @@ export function Control(props : ControlProps){
                         gap: "10px"
                     }}
                 >
-                    <Slider 
-                        setter={setValue} 
-                        getter={value} 
+                    <SliderApiControl 
+                        target={{
+                            getter: {url:"/control/aerator/speed", key:"speed"}
+                        }}
                         title="Aerator" 
                         direction="H"
                         bounds={{min: 0, max: 1}} 
                         step={0.05}
-                    ></Slider>
+                    ></SliderApiControl>
                     
-                    <Slider setter={setValue} 
-                        getter={value} 
+                    <SliderApiControl
+                        target={{
+                            getter: {url:"/control/mixer/speed", key:"speed"}
+                        }}
                         title="Mixer" 
                         direction="H" 
                         bounds={{min: 0, max: 1}} 
                         step={0.05}
-                    ></Slider>
+                    ></SliderApiControl>
                     
-                    <Slider 
-                        setter={setValue} 
-                        getter={value} 
+                    <SliderApiControl 
+                        target={{
+                            getter: {url:"/control/cuvette_pump/speed", key:"speed"}
+                        }}
                         title="Cuvette pump" 
                         direction="H" 
                         bounds={{min: -1, max: 1}} 
                         step={0.05}
-                    ></Slider>
+                    ></SliderApiControl>
 
                     <ValueController
                         title="Mixer target rpm"
@@ -61,14 +65,15 @@ export function Control(props : ControlProps){
                         setter={setValue}
                     ></ValueController>
 
-                    <Slider 
-                        setter={setValue} 
-                        getter={value} 
+                    <SliderApiControl 
+                        target={{
+                            getter: {url:"/control/heater/intensity", key:"intensity"}
+                        }}
                         title="Heater" 
                         direction="H" 
                         bounds={{min: -1, max: 1}} 
                         step={0.05}
-                    ></Slider>
+                    ></SliderApiControl>
 
                     <ValueController
                         title="Heater target temperature"
