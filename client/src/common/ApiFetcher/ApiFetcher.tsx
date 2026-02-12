@@ -35,7 +35,7 @@ export function ApiFetcher(props: ApiFetcherProps) {
 
     return (
          <ValueDisplay
-            value={value()??undefinedPlaceholder}
+            value={value()}
             unit={props.unit}
             numberOnly={props.numberOnly}
          ></ValueDisplay>

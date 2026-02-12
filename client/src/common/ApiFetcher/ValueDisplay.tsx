@@ -1,8 +1,9 @@
 import { Show } from "solid-js";
 import styles from "./ValueDisplay.module.css"
+import { isNumber } from "../other/utils";
 
 interface ValueDisplayProps{
-    value: string
+    value: string | undefined
     unit?: string,
     numberOnly?: {
         decimalPlaces :number
@@ -18,10 +19,15 @@ export function ValueDisplay(props:ValueDisplayProps){
         }
         if(props.numberOnly){
             let result : number = Number(val)
-            if(isNaN(result)){
+            if(!isNumber(result)){
+                console.warn("value: ",val," is not a number!");
                 return undefinedPlaceholder
             }
-            return result.toFixed(props.numberOnly.decimalPlaces)
+            if(props.numberOnly.decimalPlaces == 0){
+                return Math.round(result).toString()
+            }else{
+                return result.toFixed(props.numberOnly.decimalPlaces)
+            }
         }
         return val;
     }
