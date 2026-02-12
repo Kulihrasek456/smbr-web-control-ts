@@ -13,31 +13,39 @@ export interface apiMessageOptions{
 
 
 export class ApiMessageError extends Error{
-  constructor(message : string){
-    super(message)
+  constructor(options: apiMessageOptions ,message : string){
+    const fullUrl = "http://" + options.hostname + ":" + options.port?.toString() + options.url;
+    super(`${fullUrl} [${options.method}]: ${message}`)
     this.stack=""
+    this.name = "ApiMessageError";
   }
 }
 
 export class ApiConnectionError extends ApiMessageError {
-  constructor(fullUrl : string, method : string) {
-    super(`Error occured while connecting to: ${fullUrl} [${method}]`);
+  constructor(options: apiMessageOptions) {
+    super(options,`connection failed`);
     this.name = "ApiConnectionError";
   }
 }
 
 export class ApiInvalidStatusCodeError extends ApiMessageError {
-  constructor(fullUrl : string, method : string, status : number) {
-    super(`${fullUrl} [${method}] returned an invalid status code: ${status}`);
+  constructor(options: apiMessageOptions, status : number) {
+    super(options,`invalid status code: ${status}`);
     this.name = "ApiInvalidStatusCodeError";
   }
 }
 
 export class ApiUnparsableJsonBody extends ApiMessageError{
   constructor(options:apiMessageOptions){
-    const fullUrl = "http://" + options.hostname + ":" + options.port?.toString() + options.url;
-    super(`${fullUrl} [${options.method}] returned an unparsable body (should be JSON)`);
+    super(options,`unparsable body (should be JSON)`);
     this.name = "ApiUnparsableJsonBody";
+  }
+}
+
+export class ApiUnparsableBody extends ApiMessageError{
+  constructor(options:apiMessageOptions, message:string){
+    super(options,"unparsable body");
+    this.name = "ApiUnparsableBody";
   }
 }
 
@@ -71,13 +79,13 @@ export async function sendApiMessage(options:apiMessageOptions){
             signal: AbortSignal.timeout( 10000 )  
         });
     } catch(error){
-        throw new ApiConnectionError(url_full,method);
+        throw new ApiConnectionError(options);
     }
 
     if(returnCodes.includes(response.status)){
         return response;
     }else{
-        throw new ApiInvalidStatusCodeError(url_full,method,response.status);
+        throw new ApiInvalidStatusCodeError(options,response.status);
     }
 }
 
