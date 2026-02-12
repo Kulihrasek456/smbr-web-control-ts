@@ -57,9 +57,16 @@ export function TransSpectrophotometer(props: TransSpectrophotometerProps){
             <p style={{"justify-content":"left"}}>{value.name}</p>,
             <ValueDisplay
                 value={value.absolue_value}
+                numberOnly={{
+                    decimalPlaces: 0
+                }}
             ></ValueDisplay>,
             <ValueDisplay
                 value={value.relative_value}
+                unit="%"
+                numberOnly={{
+                    decimalPlaces: 1
+                }}
             ></ValueDisplay>
         ])
     }
