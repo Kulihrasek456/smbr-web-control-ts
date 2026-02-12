@@ -1,4 +1,4 @@
-import { sendApiMessage } from "./apiMessageBase"
+import { ApiMessageError, sendApiMessage, sendJsonApiMessage } from "./apiMessageBase"
 
 export type apiMessageSimple = {
     url : string,
@@ -6,7 +6,7 @@ export type apiMessageSimple = {
     port? : number,
 }
 
-export class ApiMessageSimpleMissingKey extends Error {
+export class ApiMessageSimpleMissingKey extends ApiMessageError {
   constructor(message: string) {
     super(message);
     this.name = "ApiMessageSimpleMissingKey";
@@ -16,14 +16,12 @@ export class ApiMessageSimpleMissingKey extends Error {
 export type apiMessageSimpleResult = string | number | boolean
 
 export async function sendApiMessageSimple(options : apiMessageSimple) : Promise<apiMessageSimpleResult>{
-    let response = await (
-        await sendApiMessage({
-            url: options.url,
-            port: options.port
-        })
-    ).json()
+    let response = await sendJsonApiMessage({
+        url: options.url,
+        port: options.port
+    });
 
-    let result = response[options.key]
+    let result = response.jsonValue[options.key]
     if(result != undefined){
         return (result).toString()
     }else{

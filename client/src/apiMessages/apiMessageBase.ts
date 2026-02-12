@@ -12,20 +12,39 @@ export interface apiMessageOptions{
 }
 
 
-export class ApiConnectionError extends Error {
+export class ApiMessageError extends Error{
+  constructor(message : string){
+    super(message)
+    this.stack=""
+  }
+}
+
+export class ApiConnectionError extends ApiMessageError {
   constructor(fullUrl : string, method : string) {
     super(`Error occured while connecting to: ${fullUrl} [${method}]`);
     this.name = "ApiConnectionError";
   }
 }
 
-export class ApiInvalidStatusCodeError extends Error {
+export class ApiInvalidStatusCodeError extends ApiMessageError {
   constructor(fullUrl : string, method : string, status : number) {
     super(`${fullUrl} [${method}] returned an invalid status code: ${status}`);
     this.name = "ApiInvalidStatusCodeError";
   }
 }
 
+export class ApiUnparsableJsonBody extends ApiMessageError{
+  constructor(options:apiMessageOptions){
+    const fullUrl = "http://" + options.hostname + ":" + options.port?.toString() + options.url;
+    super(`${fullUrl} [${options.method}] returned an unparsable body (should be JSON)`);
+    this.name = "ApiUnparsableJsonBody";
+  }
+}
+
+export type apiMessageJsonResult = {
+  response: Response,
+  jsonValue: any
+}
 
 export async function sendApiMessage(options:apiMessageOptions){
     const url = options.url
@@ -59,5 +78,18 @@ export async function sendApiMessage(options:apiMessageOptions){
         return response;
     }else{
         throw new ApiInvalidStatusCodeError(url_full,method,response.status);
+    }
+}
+
+export async function sendJsonApiMessage(options:apiMessageOptions) : Promise<apiMessageJsonResult>{
+    let response = await sendApiMessage(options)
+    try {
+      let jsonParsed = await response.json();
+      return {
+        response: response,
+        jsonValue: jsonParsed
+      };
+    } catch (error) {
+      throw new ApiUnparsableJsonBody(options);
     }
 }
