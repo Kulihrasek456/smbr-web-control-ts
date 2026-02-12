@@ -164,3 +164,6 @@ export function isArray(target : any){
     return target && target.constructor === Array
 }
 
+export function isNumber(target: any): target is number {
+    return typeof target === 'number' && !isNaN(target);
+}
