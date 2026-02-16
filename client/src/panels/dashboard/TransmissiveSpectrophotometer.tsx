@@ -22,7 +22,12 @@ type row = {
 }
 
 
-export function TransSpectrophotometer(props: TransSpectrophotometerProps){
+function TransSpectrophotometerBody(
+    props : {
+        widgetProps: TransSpectrophotometerProps, 
+        rowNumSetter : (value: number)=>void
+    }
+){
     const channelDictionary = [
         {color:"#6F00FF",frequency:430,name:"UV"},
         {color:"#007FFF",frequency:480,name:"Blue"},
@@ -32,7 +37,7 @@ export function TransSpectrophotometer(props: TransSpectrophotometerProps){
         {color:"#800000",frequency:870,name:"IR"},
     ];
     const [rows, setRows] = createSignal<row[]>([])
-    const refreshCntx = useRefreshValue()
+    const refreshValue = useRefreshValue
     
     if(isDebug){
         let newRows = []
@@ -72,7 +77,8 @@ export function TransSpectrophotometer(props: TransSpectrophotometerProps){
     }
 
     createEffect(async ()=>{
-        if(!refreshCntx || refreshCntx()._ts == 0){
+        let val = refreshValue();
+        if(!val || val()._ts == 0){
             return
         }
         let response = await ApiMessages.Sensor.Spectrophotometer.sendMeasureAll({});
@@ -90,27 +96,45 @@ export function TransSpectrophotometer(props: TransSpectrophotometerProps){
         setRows(newRows);
     })
 
-    return (
-        <GridElement id={props.id} w={1} h={Math.round(rows().length/3)+1}>
-            <Widget name="Transmissive spectrophotometer">
-                <TableStatic
-                    data={rows()}
-                    headers={["color","frequency","name","absolute","relative"]}
-                    colSizes={["35px","70px",undefined,"50px","50px"]}
-                    renderRow={renderRow}
-                    fillHeight={true}
+    createEffect(()=>{
+        props.rowNumSetter(rows().length);
+    })
 
-                ></TableStatic>
-                <div style={{
-                    flex: "0 0 auto",
-                    display: "flex",
-                    "justify-content": "end",
-                    "align-items": "end",
-                    "flex-direction": "column",
-                    "padding-top": 0
-                }}>
-                    <Button >set reference</Button>
-                </div>
+    return (
+        <>
+            <TableStatic
+                data={rows()}
+                headers={["color","frequency","name","absolute","relative"]}
+                colSizes={["35px","70px",undefined,"50px","50px"]}
+                renderRow={renderRow}
+                fillHeight={true}
+
+            ></TableStatic>
+            <div style={{
+                flex: "0 0 auto",
+                display: "flex",
+                "justify-content": "end",
+                "align-items": "end",
+                "flex-direction": "column",
+                "padding-top": 0
+            }}>
+                <Button >set reference</Button>
+            </div>
+        </>
+    )
+}
+
+
+export function TransSpectrophotometer(props: TransSpectrophotometerProps) {
+    const [rowNum, setRowNum] = createSignal(1);
+
+    return (
+        <GridElement id={props.id} w={1} h={Math.round(rowNum() / 3) + 1}>
+            <Widget name="Transmissive spectrophotometer">
+                <TransSpectrophotometerBody
+                    widgetProps={props}
+                    rowNumSetter={setRowNum}
+                ></TransSpectrophotometerBody>
             </Widget>
         </GridElement>
     )
