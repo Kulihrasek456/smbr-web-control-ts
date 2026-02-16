@@ -1,5 +1,5 @@
 import { isArray, isNumber } from "../../../common/other/utils"
-import { ApiUnparsableBody, sendJsonApiMessage, type apiMessageOptions } from "../../apiMessageBase"
+import { ApiUnparsableBody, checkArray, checkNumber, sendJsonApiMessage, type apiMessageOptions } from "../../apiMessageBase"
 
 export namespace ApiMessages{
     export namespace Sensor{
@@ -23,33 +23,22 @@ export namespace ApiMessages{
                 }
                 let result = await sendJsonApiMessage(opts)
 
-                let channels = result.jsonValue["samples"]
+                let data: {
+                    samples: {
+                        channel: number,
+                        relative_value: number,
+                        absolute_value: number
+                    }[]
+                } = result.jsonValue
 
-                if(!isArray(channels)){
-                    throw new ApiUnparsableBody(opts,"should contain samples array")
-                }
+                checkArray(data,"samples",(element : any)=>{
+                    checkNumber(element,"channel",opts);
+                    checkNumber(element,"relative_value",opts);
+                    checkNumber(element,"absolute_value",opts);
+                    return true;
+                },opts)
 
-                for(let i = 0; i<(channels as any[]).length; i++){
-                    let channel : {
-                        channel?:number,
-                        relative_value?:number,
-                        absolute_value?:number
-                    } = channels[i];
-
-                    if(!isNumber(channel.channel)){
-                        throw new ApiUnparsableBody(opts,"channel shoud contain channel index")
-                    }
-                    if(!isNumber(channel.relative_value)){
-                        throw new ApiUnparsableBody(opts,"channel should contain relative_value")
-                    }
-                    if(!isNumber(channel.absolute_value)){
-                        throw new ApiUnparsableBody(opts,"channel should contain absolute_value")
-                    }
-                }
-
-                return {
-                    samples: channels
-                }
+                return data
             }
         }
     }
