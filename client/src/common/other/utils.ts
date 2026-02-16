@@ -160,10 +160,18 @@ export function isObject(target : any){
     return typeof target === 'object' && !Array.isArray(target) && target !== null
 }
 
-export function isArray(target : any){
+export function isArray(target : any): target is Array<any>{
     return target && target.constructor === Array
 }
 
 export function isNumber(target: any): target is number {
     return typeof target === 'number' && !isNaN(target);
+}
+
+export function isBoolean(target: any): target is boolean {
+    return typeof target === 'boolean';
+}
+
+export function isString(target: any): target is string {
+    return typeof target === 'string';
 }
