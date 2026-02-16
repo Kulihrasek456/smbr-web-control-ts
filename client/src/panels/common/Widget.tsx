@@ -32,16 +32,27 @@ function WidgetRefreshButton() {
     )
 }
 
+function RefreshProviderWrapper(props : {wrap : boolean, children : any}){
+    return(
+        <Show when={props.wrap} fallback={props.children}>
+            <RefreshProvider>
+                {props.children}
+            </RefreshProvider>
+        </Show>
+    )
+}
+
 
 interface WidgetProps {
     children?: JSX.Element;
     hotbarTargets?: () => JSXElement;
     name: string;
+    customRefreshProvider?: boolean;
 }
 
 export function Widget(props: WidgetProps) {
     return (
-        <RefreshProvider>
+        <RefreshProviderWrapper wrap={props.customRefreshProvider ?? true}>
             <div class={styles.container}>
                 <div class={styles.header}>
                     <div class={styles["drag-handle"] + " drag-handle"}>
@@ -61,6 +72,6 @@ export function Widget(props: WidgetProps) {
                     {props.children}
                 </div>
             </div>
-        </RefreshProvider>
+        </RefreshProviderWrapper>
     );
 }
