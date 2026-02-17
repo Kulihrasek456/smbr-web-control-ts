@@ -212,11 +212,12 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
         }
     }
     
-    
+    let lastUpdate = 0;
     createEffect(async () => {
-        if(!refreshValueUpdate(refreshValue())){
+        if(!refreshValueUpdate(refreshValue(),{length:5000,lastUpdate:lastUpdate})){
             return
         }
+        lastUpdate = Date.now();
         
         let response = await Sensor_Fluorometer.sendReadLast();
         renderMeasurement(response.measurement);
