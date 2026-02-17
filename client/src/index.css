@@ -74,6 +74,11 @@ button.button:active:enabled, .button:active{
   background: var(--acc-color-2);
 }
 
+button.button:disabled,  .button:disabled{
+  cursor:not-allowed;
+  background: var(--bg-color-3);
+  border-color: var(--bg-color-4);
+}
 
 ::-webkit-scrollbar {
   width: 10px;
