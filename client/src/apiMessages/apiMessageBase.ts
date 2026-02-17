@@ -138,7 +138,7 @@ export function checkString(value: any, key:string, options : apiMessageOptions)
 
 export function checkStringEnum(value: any, key:string, possibleValues: readonly string[], options : apiMessageOptions){
     checkString(value,key,options);
-    if(!possibleValues.includes((value as string))){
+    if(!possibleValues.includes((value[key] as string))){
         throw new ApiUnparsableBody(options,`response should contain an enum: ${key}`)
     }
 }
