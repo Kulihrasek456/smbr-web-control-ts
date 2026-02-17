@@ -8,6 +8,7 @@ import { refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshP
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import { isDebug } from "../../common/debug/debugFlag";
 import { Sensor_Spectrophotometer } from "../../apiMessages/sensor/spectrophotometer";
+import { sendApiMessage } from "../../apiMessages/apiMessageBase";
 
 interface TransSpectrophotometerProps{
     id: string;
@@ -125,7 +126,10 @@ function TransSpectrophotometerBody(
                 "flex-direction": "column",
                 "padding-top": 0
             }}>
-                <Button >set reference</Button>
+                <Button callback={async ()=>{
+                    await sendApiMessage({url:"/sensor/spectrophotometer/calibrate",method:"POST",data:"{}"});
+                    return true;
+                }}>set reference</Button>
             </div>
         </>
     )
