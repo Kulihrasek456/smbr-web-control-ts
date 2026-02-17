@@ -52,7 +52,7 @@ interface WidgetProps {
 
 export function Widget(props: WidgetProps) {
     return (
-        <RefreshProviderWrapper wrap={props.customRefreshProvider ?? true}>
+        <RefreshProviderWrapper wrap={!(props.customRefreshProvider ?? false)}>
             <div class={styles.container}>
                 <div class={styles.header}>
                     <div class={styles["drag-handle"] + " drag-handle"}>
