@@ -1,4 +1,4 @@
-import { For, onMount } from "solid-js";
+import { createSignal, For, onMount } from "solid-js";
 import styles from "./Debug.module.css"
 import { moduleInstances, moduleTypes, useModuleListValue, type Module, type moduleInstancesType, type moduleTypesType } from "../other/ModuleListProvider";
 import { createServerCookie } from "@solid-primitives/cookies";
@@ -113,6 +113,7 @@ interface DebugApiMessageHostnameEditor{
 }
 export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEditor){
     const [cookie, setCookie] = createServerCookie("SMBR-defaultHostname");
+    const [currHost, setCurrHost] = createSignal("---");
     let inputEl !: HTMLInputElement
 
     function setHostname(value : string){
@@ -123,6 +124,7 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
             console.log("changing hostname back to default");
             smbr_apiMessageConfig.defaultHostname = window.location.hostname
         }
+        setCurrHost(smbr_apiMessageConfig.defaultHostname);
     }
 
     onMount(()=>{
@@ -136,6 +138,7 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
     return (
         <div class={styles.container + " " + props.class}>
             <p>Api message target:</p>
+            <p>Current: {currHost()}</p>
             <div class={styles.horflex}>
                 <input class={styles.grow}  ref={inputEl}></input>
                 <button onclick={()=>{
