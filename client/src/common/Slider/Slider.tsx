@@ -28,6 +28,17 @@ interface SliderSimpleProps{
 }
 
 export function SliderSimple(props:SliderSimpleProps){
+    let slider : HTMLInputElement | undefined = undefined;
+
+    if(isChromium || isSafari){
+        createEffect(() => {
+            if(slider){
+                props.getter();
+                chromeFix_Slider(slider,props.direction == "V");
+            }
+        })
+    }
+
     return (
         <input 
             class={styles.slider + " " + styles[props.direction]}
@@ -36,6 +47,7 @@ export function SliderSimple(props:SliderSimpleProps){
             max={props.bounds.max}
             value={props.getter()}
             step={props.step}
+            ref={slider}
             onInput={e => {props.setter(+e.currentTarget.value); chromeFix_Slider(e.currentTarget,props.direction == "V")}}
         ></input>
     )
