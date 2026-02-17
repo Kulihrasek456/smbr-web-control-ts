@@ -175,3 +175,12 @@ export function isBoolean(target: any): target is boolean {
 export function isString(target: any): target is string {
     return typeof target === 'string';
 }
+
+// Warning, Date() sometimes adds a lot of missing information.
+export function isValidDateTime(target: any): boolean {
+    if(isString(target)){
+        const date = new Date(target);
+        return !isNaN(date.getTime());
+    }
+    return false;
+}
