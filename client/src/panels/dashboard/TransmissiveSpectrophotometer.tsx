@@ -4,7 +4,7 @@ import { Widget } from "../common/Widget";
 import { Icon } from "../../common/Icon/Icon";
 import { createEffect, createSignal } from "solid-js";
 import { Button } from "../../common/Button/Button";
-import { useRefreshValue } from "../../common/other/RefreshProvider";
+import { refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import { isDebug } from "../../common/debug/debugFlag";
 import { Sensor_Spectrophotometer } from "../../apiMessages/sensor/spectrophotometer";
@@ -76,24 +76,31 @@ function TransSpectrophotometerBody(
         ])
     }
 
+    let inProgress = false;
+
     createEffect(async ()=>{
-        let val = refreshValue();
-        if(!val || val()._ts == 0){
+        if(!refreshValueUpdate(refreshValue()) || inProgress){
             return
         }
-        let response = await Sensor_Spectrophotometer.sendMeasureAll();
-        let newRows : row[] = []
-        for(let channel of response.samples){
-            let channelDictRes = channelDictionary[channel.channel]
-            newRows.push({
-                color: channelDictRes.color,
-                frequency: channelDictRes.frequency,
-                name: channelDictRes.name,
-                absolue_value: channel.absolute_value.toString(),
-                relative_value: channel.relative_value.toString()
-            })
+        inProgress = true;
+        try {
+            let response = await Sensor_Spectrophotometer.sendMeasureAll();
+            let newRows : row[] = []
+            for(let channel of response.samples){
+                let channelDictRes = channelDictionary[channel.channel]
+                newRows.push({
+                    color: channelDictRes.color,
+                    frequency: channelDictRes.frequency,
+                    name: channelDictRes.name,
+                    absolue_value: channel.absolute_value.toString(),
+                    relative_value: channel.relative_value.toString()
+                })
+            }
+            setRows(newRows);
+        } catch (error) {
+            console.error(error);
         }
-        setRows(newRows);
+        inProgress = false;
     })
 
     createEffect(()=>{
