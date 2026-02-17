@@ -1,29 +1,31 @@
-import { createSignal } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import type { moduleInstancesType } from "../../common/other/ModuleListProvider";
+import { useModuleListValue, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
 import { TableStatic } from "../../common/Table/Table";
 import { Widget } from "../common/Widget";
 import { Button } from "../../common/Button/Button";
 import { Icon } from "../../common/Icon/Icon";
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher";
+import { sendApiMessageSimplePost } from "../../apiMessages/apiMessageSimple";
+import { refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
+import { System } from "../../apiMessages/system/_";
 
 
-type row = {
-    name: string,
-    id: string,
-    instance: moduleInstancesType
+async function restartModule(moduleType: moduleTypesType, uid: string){
+    await sendApiMessageSimplePost({url:"/"+moduleType+"/restart",key:"uid"},uid);
+    return true
 }
 
-function renderRow(value : row, index: number){
+function renderRow(value : System.module, index: number){
     return([
-        <p>{value.name}</p>,
-        <p>{value.id}</p>,
+        <p>{value.module_type}</p>,
+        <p>{value.uid}</p>,
         <p>{value.instance}</p>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/ping" ,key: "time_ms"}} unit="ms"></ApiFetcher>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/core_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/board_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.name+"/load" ,key: "load"}} unit="%"></ApiFetcher>,
-        <Button>
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/ping" ,key: "time_ms"}} unit="ms"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/core_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/board_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
+        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/load" ,key: "load"}} unit="%"></ApiFetcher>,
+        <Button callback={()=>restartModule(value.module_type,value.uid)}>
             <Icon name="refresh"></Icon>
         </Button>
     ])
@@ -33,35 +35,52 @@ interface ModuleListDisplayProps{
     id : string
 }
 
-export function ModuleListDisplay(props : ModuleListDisplayProps){
-    const [rows, setRows] = createSignal<row[]>([
-        {
-            name: "core",
-            id: "0x0123456789ab",
-            instance: "Exclusive"
-        },
-        {
-            name: "control",
-            id: "0xfedcba987654",
-            instance: "Instance_12"
-        },
-        {
-            name: "sensor",
-            id: "0xfedcba987655",
-            instance: "Exclusive"
+interface ModuleListDisplayBodyProps extends ModuleListDisplayProps{
+    rowNumSetter : (value:number)=>void
+}
+
+export function ModuleListDisplayBody(props : ModuleListDisplayBodyProps){
+    const [rows, setRows] = createSignal<System.module[]>([]);
+    const moduleListCntxt = useModuleListValue();
+
+    createEffect(()=>{
+        if(moduleListCntxt){
+            let new_rows : System.module[] = [];
+            for(let module of moduleListCntxt.state()){
+                new_rows.push({
+                    module_type: module.type,
+                    uid: module.uid,
+                    instance: module.instance
+                })
+            }
+            setRows(new_rows);
         }
-    ]);
+    })
+
+    createEffect(()=>{
+        props.rowNumSetter(rows().length);
+    })
+
+    
 
     return (
-        <GridElement id={props.id} h={2} w={2}>
+        <TableStatic
+            headers={["name","id","instance","ping","core temperature","module temperature","CPU load","reset"]}
+            data={rows()}
+            colSizes={["90px","150px","130px",undefined,undefined,undefined,undefined,"35px"]}
+            renderRow={renderRow}
+            fillHeight={true}
+        ></TableStatic>
+    )
+}
+
+export function ModuleListDisplay(props : ModuleListDisplayProps){
+    const [rowNum, setRowNum] = createSignal(0);
+
+    return (
+        <GridElement id={props.id} h={1 + Math.round(rowNum()/3)} w={2}>
             <Widget name="Module list">
-                <TableStatic
-                    headers={["name","id","instance","ping","core temperature","module temperature","CPU load","reset"]}
-                    data={rows()}
-                    colSizes={["90px","150px","130px",undefined,undefined,undefined,undefined,"35px"]}
-                    renderRow={renderRow}
-                    fillHeight={true}
-                ></TableStatic>
+                <ModuleListDisplayBody rowNumSetter={setRowNum} {...props}></ModuleListDisplayBody>
             </Widget>
         </GridElement>
     )
