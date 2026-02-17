@@ -7,6 +7,7 @@ interface RadialOptionProps{
     label: string;
     checked?:boolean;
     class?:string;
+    onChange?: (value : string) => void;
 }
 
 export function RadialOption(props : RadialOptionProps) {
@@ -20,6 +21,7 @@ export function RadialOption(props : RadialOptionProps) {
         name={props.groupName} 
         value={props.value} 
         checked={props.checked}
+        onChange={e => props.onChange?.(e.currentTarget.value)}
       />
       <label for={id}>{props.label}</label>
     </div>
@@ -38,6 +40,9 @@ interface RadialSelectProps{
 }
 
 export function RadialSelect(props : RadialSelectProps){
+    function updateSelection(value : string){
+        props.setter(value);
+    }
     return(
         <div class={styles.container}>
             <For each={props.selections}>
@@ -47,6 +52,7 @@ export function RadialSelect(props : RadialSelectProps){
                         value={selection.value}
                         label={selection.label}
                         checked={index() == (props.defaultSelectedIndex ?? 0) || props.getter() == selection.value}
+                        onChange={updateSelection}
                     ></RadialOption>
                 )}
             </For>
