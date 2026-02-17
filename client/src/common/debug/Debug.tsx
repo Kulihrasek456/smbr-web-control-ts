@@ -50,9 +50,18 @@ export function DebugModuleEditor(props : DebugModuleEditorProps){
         if(moduleListCntx){
             let newList : Module[] =[...moduleListCntx.state()];
             newList.splice(index,1);
+            moduleListCntx.actions.setModuleList(newList)
+            setCookie(JSON.stringify(newList));
+        }
+    }
+
+    function addModule(){
+        if(moduleListCntx){
+            let newList : Module[] =[...moduleListCntx.state(),{type:"undefined",instance:"Undefined",uid: "debug"}];
             moduleListCntx.actions.setModuleList(
                 newList
             )
+            setCookie(JSON.stringify(newList));
         }
     }
 
@@ -67,7 +76,7 @@ export function DebugModuleEditor(props : DebugModuleEditorProps){
                                 <p>Type: </p>
                                 <select value={module.type} onChange={(e)=>{
                                     let selectedValue = e.currentTarget.value
-                                    let newModule : Module = {instance: module.instance,type: selectedValue as moduleTypesType};
+                                    let newModule : Module = {instance: module.instance,type: selectedValue as moduleTypesType,uid: "debug"};
                                     changeModule(newModule,index());
                                 }}>
                                     <For each={moduleTypes}>
@@ -81,7 +90,7 @@ export function DebugModuleEditor(props : DebugModuleEditorProps){
                                 <p>Instance: </p>
                                 <select value={module.instance} onChange={(e)=>{
                                     let selectedValue = e.currentTarget.value
-                                    let newModule : Module = {instance: selectedValue as moduleInstancesType,type:module.type};
+                                    let newModule : Module = {instance: selectedValue as moduleInstancesType,type:module.type,uid: "debug"};
                                     changeModule(newModule,index());
                                 }}>
                                     <For each={moduleInstances}>
@@ -98,12 +107,7 @@ export function DebugModuleEditor(props : DebugModuleEditorProps){
                     </div>
                 )}
             </For>
-            <button onclick={e => {
-                let newList : Module[] =[...moduleListCntx.state(),{type:"undefined",instance:"Undefined"}];
-                moduleListCntx.actions.setModuleList(
-                    newList
-                )
-            }}>Add module</button>
+            <button onclick={addModule}>Add module</button>
         </div>
     )
 }
@@ -156,6 +160,7 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
 
 interface DebugRefreshProviderIntervalProps{
     class?: string;
+    title: string
     interval:{
         getter: () => number;
         setter: (value: number) => void;
@@ -166,8 +171,8 @@ interface DebugRefreshProviderIntervalProps{
     }
 }
 export function DebugRefreshProviderInterval(props: DebugRefreshProviderIntervalProps){
-    const [intervalCookie, setIntervalCookie] = createServerCookie("SMBR-updateInterval");
-    const [disabledCookie, setDisabledCookie] = createServerCookie("SMBR-updateDisabled");
+    const [intervalCookie, setIntervalCookie] = createServerCookie("SMBR-updateInterval-"+props.title);
+    const [disabledCookie, setDisabledCookie] = createServerCookie("SMBR-updateDisabled-"+props.title);
     let inputEl !: HTMLInputElement
 
     function setDisabled(value : boolean, save:boolean){
@@ -207,7 +212,7 @@ export function DebugRefreshProviderInterval(props: DebugRefreshProviderInterval
 
     return (
         <div class={styles.container + " " + props.class}>
-            <p>Api message target:</p>
+            <p>{props.title}</p>
             <div class={styles.horflex}>
                 <p>Do updates: </p>
                 <input checked={!props.disabled.getter()} type="checkbox" onchange={e => setDisabled(!e.currentTarget.checked,true)}></input>

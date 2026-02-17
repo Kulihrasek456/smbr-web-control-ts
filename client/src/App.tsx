@@ -89,6 +89,17 @@ function App() {
                                  setter: setUpdateDisabled
                               }}
                            ></DebugRefreshProviderInterval>
+                            <DebugRefreshProviderInterval
+                              title="module list refresh"
+                              interval={{
+                                 getter: moduleListUpdateInterval,
+                                 setter: setModuleListUpdateInterval
+                              }}
+                              disabled={{
+                                 getter: moduleListDisabled,
+                                 setter: setModuleListDisabled
+                              }}
+                           ></DebugRefreshProviderInterval>
                         </div>
                      </Show>
                   </ul>
