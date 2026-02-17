@@ -51,7 +51,8 @@ export interface LineChartProps{
         label: string,
         data : Array<number>,
         hidden? : boolean
-    }>
+    }>,
+    ref?: (methods: { getCanvas: () => HTMLCanvasElement | undefined }) => void;
     options? : CustomChartOptions
 }
 
@@ -150,12 +151,27 @@ export function LineChart(props: LineChartProps) {
         };
     };
 
+    let chartInstance: any;
+
+    const setInternalRef = (el: any) => {
+        chartInstance = el;
+        
+        if (props.ref) {
+            props.ref({
+                getCanvas: () => {
+                    return chartInstance;
+                }
+            });
+        }
+    };
+
     return (
         <Line 
             data={{
                 labels: props.labels,
                 datasets: props.datasets,
             }} 
+            ref={setInternalRef}
             options={getOptions()} 
         />
     );
