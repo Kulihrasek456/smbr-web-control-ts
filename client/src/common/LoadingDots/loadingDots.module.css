@@ -1,0 +1,36 @@
+.loading_dots::after {
+    content: ".";
+    display: inline-block;
+    font-family: monospace;
+    white-space: pre;
+    animation: dots 0.8s infinite step-start;
+}
+
+@keyframes dots {
+    0%  {
+        content: "   ";
+    }
+    10% {
+        content: ".  ";
+    }
+
+    20% {
+        content: ".. ";
+    }
+
+    30% {
+        content: "...";
+    }
+
+    40% {
+        content: " ..";
+    }
+
+    50% {
+        content: "  .";
+    }
+
+    100% {
+        content: "   ";
+    }
+}

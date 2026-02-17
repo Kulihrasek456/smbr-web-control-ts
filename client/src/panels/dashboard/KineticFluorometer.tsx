@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onMount, type JSXElement } from "solid-js";
+import { createEffect, createSignal, For, onMount, Show, type JSXElement } from "solid-js";
 import { Button } from "../../common/Button/Button";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
 import { LineChart, type CustomChartOptions } from "../../common/LineChart/LineChart";
@@ -17,6 +17,7 @@ import { Sensor_Fluorometer } from "../../apiMessages/sensor/fluorometer";
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import type { TooltipItem } from "chart.js";
 import { sendApiMessageSimple } from "../../apiMessages/apiMessageSimple";
+import { LoadingDots } from "../../common/LoadingDots/loadingDots";
 
 type statRow = {
     name: string;
@@ -164,6 +165,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     const [chartOpts, setChartOpts] = createSignal<CustomChartOptions>(getChartOpts(chartData()));
     const [currentMeasurement, setCurrentMeasurement] = createSignal<Sensor_Fluorometer.Measurement | undefined>();
     const [popupMessage, setPopupMessage] = createSignal<string | undefined>("no data");
+    const [popupMessageLoading, setPopupMessageLoading] = createSignal<boolean>(false);
     
     let chartMethods : { getCanvas: () => HTMLCanvasElement | undefined } | undefined;
     let lastMeasurementId = -1;
@@ -199,12 +201,14 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
             }
             
             lastMeasurementId = measurement.measurement_id;
+            setPopupMessageLoading(false);
             setPopupMessage(undefined);
             setCurrentMeasurement(measurement)
             setStats(renderStats(measurement))
             setChartData(parseSamples(measurement.samples))
         }else{
             lastMeasurementId = -1;
+            setPopupMessageLoading(false);
             setPopupMessage("no measurement loaded");
             setCurrentMeasurement(undefined);
             setStats([]);
@@ -230,7 +234,8 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     
     async function doCapture(){
         renderMeasurement();
-        setPopupMessage("capturing...");
+        setPopupMessage("capturing");
+        setPopupMessageLoading(true);
         try {
             let response = await Sensor_Fluorometer.sendCapture({
                 detectorGain: gain(),
@@ -248,6 +253,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                 lastMeasurementId = -1;
             },1000);
             setPopupMessage("error occured");
+            setPopupMessageLoading(false);
             return false;
         }
     }
@@ -344,7 +350,11 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                     ></LineChart>
                     <p class={styles.chart_comment}>use [shift] + scroll wheel to zoom</p>
                     <div classList={{[styles.chart_popup]:true,[styles.hidden]:(popupMessage() == undefined)}}>
-                        <p>{popupMessage()}</p>
+                        <p>{popupMessage()}
+                            <Show when={popupMessageLoading()}>
+                                <LoadingDots></LoadingDots>
+                            </Show>
+                        </p>
                     </div>
                 </div>
                 <div class={styles.panel}>
