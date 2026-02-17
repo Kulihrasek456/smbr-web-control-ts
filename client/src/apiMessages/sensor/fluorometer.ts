@@ -1,4 +1,4 @@
-import { checkArray, checkBoolean, checkNumber, checkStringEnum, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
+import { checkArray, checkBoolean, checkNumber, checkString, checkStringEnum, checkTimestamp, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
 
 export namespace Sensor_Fluorometer{
     const detectorGainsValues = ["x1", "x10", "x50", "Auto"] as const
@@ -25,6 +25,7 @@ export namespace Sensor_Fluorometer{
         required_samples: number,
         captured_samples: number,
         missing_samples: number,
+        timestamp: Date,
         samples: Sample[]
     }
     
@@ -39,6 +40,7 @@ export namespace Sensor_Fluorometer{
         checkNumber(data,"required_samples",opts);
         checkNumber(data,"captured_samples",opts);
         checkNumber(data,"missing_samples",opts);
+        checkTimestamp(data,"timestamp",opts);
         checkArray(data,"samples",(element:  any)=>{
             checkNumber(element,"absolute_value",opts);
             checkNumber(element,"relative_value",opts);
@@ -127,5 +129,17 @@ export namespace Sensor_Fluorometer{
         return {
             measurement: data
         }
+    }
+
+    export async function sendCalibrate() : Promise<void> {
+        let opts: apiMessageOptions = {
+            url: "/sensor/fluorometer/calibrate",
+            method: "POST",
+            data: "{}"
+        }
+    
+        let response = await sendJsonApiMessage(opts);
+
+        return
     }
 }
