@@ -1,6 +1,6 @@
 other
  - [ ] better button visuals
- - [ ] fix sliders on IOS
+ - [x] fix sliders on IOS
 
 api fetchers
  - [x] updater context
@@ -16,24 +16,28 @@ dashboard
  - [x] Chartjs Charts
  - Spectrophotometer
      - [x] visual
-     - [ ] functionality
+     - [x] functionality
  - KinematicFluorometer
      - [x] visual
-     - [ ] functionality
-     - [ ] zoom functionality
+     - [x] functionality
+     - [x] zoom functionality
  - LED panel
      - [x] visual
-     - [ ] functionality
+     - [x] functionality
  - Temperature widget
      - [x] visual
-     - [ ] functionality
+     - [x] functionality - table
+     - [ ] functionality - chart
  - Control widget
+     - [x] visual
+     - [x] functionality
+ - Quick launch
      - [x] visual
      - [ ] functionality
 
 device
- - [ ] device info
- - [ ] loaded modules
+ - [x] device info
+ - [x] loaded modules
  - [ ] CAN statistics
 
 text editor
@@ -46,10 +50,9 @@ text editor
  - [ ] remove ctrl+s alert placeholder
  - file browser 
      - [ ] create file buttons
-     - [ ] recursive
+     - [x] recursive
      - [ ] two columns
 
 hotbar
  - [ ] better clock
  - [ ] title overflow on small screens
- - [ ] 
