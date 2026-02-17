@@ -97,11 +97,18 @@ export const useRefreshTrigger = () => useContext(RefreshContext);
 // for only subscribing to changes, use this context as normal
 export const useRefreshValue = () => useContext(RefreshValueContext);
 
-export function refreshValueUpdate(refreshCntxt : (() => RefreshPayload) | undefined , minInterval : number =0): boolean {
+export function refreshValueUpdate(refreshCntxt : (() => RefreshPayload) | undefined , minInterval ?: { length : number, lastUpdate : number}): boolean {
     let val = refreshCntxt?.();
     if (val) {
         if(val._ts != 0){
-            if(Date.now() - val._ts > minInterval || val.forced){
+            if(val.forced){
+                return true;
+            }
+            if(minInterval){
+                if(Date.now() - minInterval.lastUpdate > minInterval.length){
+                    return true
+                }
+            }else{
                 return true;
             }
         }
