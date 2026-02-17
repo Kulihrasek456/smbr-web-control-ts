@@ -163,6 +163,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     const [chartData, setChartData] = createSignal<ChartData>(parseSamples([]))
     const [chartOpts, setChartOpts] = createSignal<CustomChartOptions>(getChartOpts(chartData()));
     const [currentMeasurement, setCurrentMeasurement] = createSignal<Sensor_Fluorometer.Measurement | undefined>();
+    const [popupMessage, setPopupMessage] = createSignal<string | undefined>("no data");
     
     let chartMethods : { getCanvas: () => HTMLCanvasElement | undefined } | undefined;
     let lastMeasurementId = -1;
@@ -191,14 +192,23 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
         throw Error("no measurement loaded")
     }
     
-    function renderMeasurement(measurement : Sensor_Fluorometer.Measurement){
-        if(lastMeasurementId == measurement.measurement_id){
-            return
+    function renderMeasurement(measurement ?: Sensor_Fluorometer.Measurement){
+        if(measurement){
+            if(lastMeasurementId == measurement.measurement_id){
+                return
+            }
+            
+            lastMeasurementId = measurement.measurement_id;
+            setPopupMessage(undefined);
+            setCurrentMeasurement(measurement)
+            setStats(renderStats(measurement))
+            setChartData(parseSamples(measurement.samples))
+        }else{
+            setPopupMessage("no measurement loaded");
+            setCurrentMeasurement(undefined);
+            setStats([]);
+            setChartData(parseSamples([]));
         }
-        lastMeasurementId = measurement.measurement_id;
-        setCurrentMeasurement(measurement)
-        setStats(renderStats(measurement))
-        setChartData(parseSamples(measurement.samples))
     }
     
     
@@ -217,16 +227,23 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     })
     
     async function doCapture(){
-        let response = await Sensor_Fluorometer.sendCapture({
-            detectorGain: gain(),
-            emitorIntensity: intensity()/100,
-            lengthMs: length()*1000,
-            timebase: "logarithmic",
-            sampleCount: 1000
-        });
-        
-        renderMeasurement(response.measurement);
-        return true;
+        renderMeasurement();
+        setPopupMessage("capturing...");
+        try {
+            let response = await Sensor_Fluorometer.sendCapture({
+                detectorGain: gain(),
+                emitorIntensity: intensity()/100,
+                lengthMs: length()*1000,
+                timebase: "logarithmic",
+                sampleCount: 1000
+            });
+            
+            renderMeasurement(response.measurement);
+            return true;
+        } catch (error) {
+            setPopupMessage("error occured");
+            return false;
+        }
     }
 
     function getChartOpts(data : ChartData): CustomChartOptions {
@@ -312,7 +329,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                 }
             
             >
-                <div class={styles.chart}>
+                <div  class={styles.chart}>
                     <LineChart 
                         labels={chartData().lables}
                         datasets={chartData().datasets}
@@ -320,6 +337,9 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                         ref={(methods) => chartMethods = methods}
                     ></LineChart>
                     <p class={styles.chart_comment}>use [shift] + scroll wheel to zoom</p>
+                    <div classList={{[styles.chart_popup]:true,[styles.hidden]:(popupMessage() == undefined)}}>
+                        <p>{popupMessage()}</p>
+                    </div>
                 </div>
                 <div class={styles.panel}>
                     <div class={styles.stats_panel}>
