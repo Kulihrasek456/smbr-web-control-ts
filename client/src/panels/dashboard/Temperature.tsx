@@ -66,6 +66,7 @@ interface TemperatureProps{
 export function Temperature(props:TemperatureProps) {
     let i=0;
     const [rows, setRows] = createSignal<row[]>([]);
+    const [scope, setScope] = createSignal<string>("minute");
     const moduleListCntxt = useModuleListValue();
     const scopeGroupName = createUniqueId()
 
@@ -215,6 +216,8 @@ export function Temperature(props:TemperatureProps) {
                         {value:"s",label:"hour"},
                         {value:"d",label:"day"}
                     ]}
+                    getter={scope}
+                    setter={setScope}
                 ></RadialSelect>
                 <div style={{flex:"1 1 auto", "min-height": 0}}>
                     <LineChart 
