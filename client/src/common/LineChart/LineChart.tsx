@@ -1,55 +1,82 @@
-import { Chart, Title, Tooltip, Legend, Colors } from 'chart.js';
+import { Chart, Title, Tooltip, Legend, Colors, type TooltipItem, LogarithmicScale, type ChartOptions, type ChartType, type ScaleChartOptions } from 'chart.js';
+import { isNumber } from 'chart.js/helpers';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { Line } from 'solid-chartjs';
-import { onMount } from 'solid-js';
+import { createEffect, createSignal, mergeProps, onMount } from 'solid-js';
+
+interface chartScaleOptions {
+    showTicks ?: boolean,
+    bounds?: {
+        min: number,
+        max: number
+    }
+    beginAtZero?: boolean
+    type?: "logarithmic" | "linear" | "time" | "category" | "timeseries" | undefined
+    labelCallback?: (value : any, index : number, ticks : any[]) => string
+}
+
+export interface CustomChartOptions {
+    responsive? : boolean,
+    animations? : boolean,
+    x?: chartScaleOptions
+    y?: chartScaleOptions
+
+    plugins?: {
+        legend?: {
+            position : 'top' 
+                     | 'left' 
+                     | 'bottom' 
+                     | 'right' 
+                     | 'chartArea'
+            show? : boolean
+        }
+        zoom?:{
+            mode: "x" | "y" | "xy",
+            min:number,
+            max:number
+            pan?: "x" | "y" | "xy"
+        }
+        tooltip?:{
+            labelCallback?: (item : TooltipItem<any>) => string
+            titleCallback?: (items : TooltipItem<any>[]) => string
+        }
+    }
+
+    raw?: ChartOptions<'line'> //used for applying any chartJS options
+}
 
 export interface LineChartProps{
     labels : Array<string | number>,
     datasets : Array<{
         label: string,
-        data : Array<number>
+        data : Array<number>,
+        hidden? : boolean
     }>
-    responsive? : boolean,
-    animations? : boolean,
-    xticks? : boolean,
-    yticks? : boolean,
-    xlogarithmic? : boolean,
-    ylogarithmic? : boolean,
-    xbounds? : {
-        max : number,
-        min : number
-    },
-    ybounds? : {
-        max : number,
-        min : number
-    }
-    legend?: {
-        position : 'top' 
-                 | 'left' 
-                 | 'bottom' 
-                 | 'right' 
-                 | 'chartArea'
-        show? : boolean
-    }
-    zoom?:{
-        mode: "x" | "y" | "xy",
-        min:number,
-        max:number
-        pan?: "x" | "y" | "xy"
-    }
+    options? : CustomChartOptions
 }
 
-function getPlugins(props: LineChartProps) {
-    let result : {} = {};
+function getPlugins(options?: CustomChartOptions) {
+    let result : any = {
+        tooltip: {
+            callbacks: {
+                title: function(context: TooltipItem<any>[]){
+                    if(context.length>0){
+                        return context[0].label + ' µs';
+                    }
+                }
+            },
+        },
+    };
 
-    (result as any).legend = {
-        display: props.legend?.show ?? false,
-        position: props.legend?.position ?? "bottom"
+    result.legend = {
+        display: options?.plugins?.legend?.show ?? false,
+        position: options?.plugins?.legend?.position ?? "bottom"
     }
-    if(props.zoom){
+    if(options?.plugins?.zoom){
+        let zoomOpts = options?.plugins?.zoom;
         (result as any).zoom={
             zoom: {
-                mode: props.zoom.mode,
+                mode: zoomOpts.mode,
                 wheel: {
                     enabled: true,
                     modifierKey: "shift",
@@ -59,71 +86,77 @@ function getPlugins(props: LineChartProps) {
                 },
             },
             limits: {
-                x: {min: props.zoom.min, max: props.zoom.max}
+                x: {min: zoomOpts.min, max: zoomOpts.max}
             },
             pan:{
-                enabled : props.zoom.pan != undefined,
-                mode: props.zoom.pan
+                enabled : zoomOpts.pan != undefined,
+                mode: zoomOpts.pan
             }
         }
     }
     return result;
 }
 
-export function LineChart(props : LineChartProps){
-  onMount(() => {
-    Chart.register(Title, Tooltip, Legend, Colors, zoomPlugin);
-  });
+function getScale(options? : chartScaleOptions){
+    return {
+        display: true,
+        type: options?.type,
+        beginAtZero: options?.beginAtZero ?? false,
+        ticks: {
+            display: options?.showTicks ?? true,
 
-  const chartData = {
-    labels: props.labels,
-    datasets: props.datasets,
-  };
-
-  const chartOptions = {
-    maintainAspectRatio: false,
-    responsive: props.responsive ?? true,
-    animations: props.animations ?? false,
-    elements: {
-        point:{
-            radius: 1
+            callback: options?.labelCallback
+        },
+        suggestedMax: options?.bounds?.max,
+        suggestedMin: options?.bounds?.min,
+        grid: {
+            color: "rgb(50,50,50)"
         }
-    },
-    interaction:{
-        mode: "nearest",
-        axis: "xy",
-        intersect: false
-    },
-    plugins:getPlugins(props),
-    scales: {
-        x: {
-            display: true,
-            ticks: {
-                display: props.xticks
-            },
-            suggestedMax: (props.xbounds ?? {"max" : undefined}).max,
-            suggestedMin: (props.xbounds ?? {"min" : undefined}).min,
-            grid:{
-                color: "rgb(50,50,50)"
+    }
+}
+
+function getDefaultOptions(options?: CustomChartOptions): ChartOptions<'line'> {
+    return {
+        maintainAspectRatio: false,
+        responsive: options?.responsive ?? true,
+        animation: (options?.animations ?? false) ? undefined : false,
+        elements: {
+            point: {
+                radius: 1
             }
         },
-        y: {
-            display: true,
-            ticks: {
-                display: props.yticks
-            },
-            suggestedMax: (props.ybounds ?? {"max" : undefined}).max,
-            suggestedMin: (props.ybounds ?? {"min" : undefined}).min,
-            grid:{
-                color: "rgb(50,50,50)"
-            }
+        interaction: {
+            mode: "nearest",
+            axis: "xy",
+            intersect: false
+        },
+        plugins: getPlugins(options),
+        scales: {
+            x: getScale(options?.x),
+            y: getScale(options?.y)
         }
-    },
-    grid: {
-        color: "red"
     }
-  }
+}
 
+Chart.register(Title, Tooltip, Legend, Colors, zoomPlugin, LogarithmicScale);
+export function LineChart(props: LineChartProps) {
+    
+    const getOptions = () => {
+        const defaults = getDefaultOptions(props.options);
+        
+        return {
+            ...defaults,
+            ...(props.options?.raw || {})
+        };
+    };
 
-  return <Line data={chartData} options={chartOptions} />;
-};
+    return (
+        <Line 
+            data={{
+                labels: props.labels,
+                datasets: props.datasets,
+            }} 
+            options={getOptions()} 
+        />
+    );
+}
