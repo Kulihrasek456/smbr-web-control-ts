@@ -1,4 +1,4 @@
-import { isArray, isBoolean, isNumber, isString } from "../common/other/utils";
+import { isArray, isBoolean, isNumber, isString, isValidDateTime } from "../common/other/utils";
 import { smbr_apiMessageConfig } from "./apiMessageConfig";
 
 export interface apiMessageOptions{
@@ -140,5 +140,11 @@ export function checkStringEnum(value: any, key:string, possibleValues: readonly
     checkString(value,key,options);
     if(!possibleValues.includes((value[key] as string))){
         throw new ApiUnparsableBody(options,`response should contain an enum: ${key}`)
+    }
+}
+
+export function checkTimestamp(value: any, key:string, options: apiMessageOptions){
+    if(!isValidDateTime(value[key])){
+        throw new ApiUnparsableBody(options,`response should contain a timestamp: ${key}`)
     }
 }
