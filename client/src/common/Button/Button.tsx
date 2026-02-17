@@ -10,21 +10,25 @@ export interface ButtonProps {
 
 
 export function Button(props: ButtonProps) {
-    const c = children(() => props.children);
-    
-    const [state, setState] = createSignal(true);
+    const [disabled, setDisabled] = createSignal<boolean>(false);
 
     const onclick = async () => {
-        if(await props.callback?.()){
-            setState(true)
-        }else{
-            setState(false)
+        setDisabled(true)
+        try {
+            await props.callback?.();
+        } catch (error) {
+            console.error(error);
         }
+
+        setDisabled(false);
     }
 
     return (
-        <button class={`${state() ? "" : styles.error} ${styles.fetcher} button ${props.class?props.class:""}`} onClick={onclick}>
-            {c()}
+        <button 
+        class={`${styles.fetcher} button ${props.class?props.class:""}`} 
+        disabled={disabled()}
+        onClick={onclick}>
+            {props.children}
         </button>
     );
 }
