@@ -1,4 +1,6 @@
-import { createContext, useContext, createSignal, createEffect, onMount, onCleanup } from "solid-js";
+import { createContext, useContext, createSignal, createEffect, onMount, onCleanup, children } from "solid-js";
+import { refreshValueUpdate, useRefreshValue } from "./RefreshProvider";
+import { System } from "../../apiMessages/system/_";
 
 export const moduleTypes = [
   "core",
@@ -52,6 +54,7 @@ export type moduleInstancesType = typeof moduleInstances[number]
 export type Module = {
   readonly type: moduleTypesType;
   readonly instance: moduleInstancesType;
+  readonly uid: string;
 }
 
 export type ModuleListContextValue = {
@@ -116,4 +119,55 @@ export function countInstancesOfType(moduleList: Module[] | undefined, type: mod
     }
   });
   return result;
+}
+
+
+
+export function ModuleListRefresher(props: { enabled: boolean, children?: any, min_interval: number}) {
+    const refreshCntx = useRefreshValue;
+    const moduleListCntx = useModuleListValue();
+    let lastUpdate = 0;
+    createEffect(async () => {
+        if (!props.enabled){
+            return
+        }
+        if (!refreshValueUpdate(refreshCntx(), { length: props.min_interval, lastUpdate })) {
+            return
+        }
+        if(!moduleListCntx){
+            return
+        }
+        lastUpdate = Date.now();
+        
+        let response = await System.sendModules();
+        let doUpdate = false;
+        
+        let lastRows = moduleListCntx.state()
+        if (lastRows.length == response.modules.length) {
+            for (let i = 0; i < lastRows.length; i++) {
+                if (lastRows[i].uid != response.modules[i].uid) {
+                    doUpdate = true;
+                    break;
+                }
+            }
+        } else {
+            doUpdate = true;
+        }
+        if (doUpdate) {
+            let newRows : Module[] = [];
+            for(let module of response.modules){
+                newRows.push({
+                    type: module.module_type,
+                    instance: module.instance,
+                    uid: module.uid
+                })
+            }
+
+            moduleListCntx.actions.setModuleList(newRows);
+        }
+    })
+
+    return (
+        <>{ children }</>
+    )
 }

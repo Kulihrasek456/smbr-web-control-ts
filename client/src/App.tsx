@@ -14,7 +14,7 @@ import { Hotbar } from './panels/hotbar/Hotbar'
 import { RefreshProvider } from './common/other/RefreshProvider'
 import { isDebug } from './common/debug/debugFlag'
 import { DebugApiMessageHostnameEditor, DebugModuleEditor, DebugRefreshProviderInterval } from './common/debug/Debug'
-import { ModuleListProvider } from './common/other/ModuleListProvider'
+import { ModuleListProvider, ModuleListRefresher } from './common/other/ModuleListProvider'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
 
@@ -39,6 +39,10 @@ function App() {
    
    const [updateDisabled, setUpdateDisabled] = createSignal(isDebug);
    const [updateInterval, setUpdateInterval] = createSignal(5000);
+
+
+   const [moduleListDisabled, setModuleListDisabled] = createSignal(isDebug);
+   const [moduleListUpdateInterval, setModuleListUpdateInterval] = createSignal(15000);
 
    console.debug("update")
 
@@ -75,6 +79,7 @@ function App() {
                            <DebugModuleEditor></DebugModuleEditor>
                            <DebugApiMessageHostnameEditor></DebugApiMessageHostnameEditor>
                            <DebugRefreshProviderInterval
+                              title="api refresh"
                               interval={{
                                  getter: updateInterval,
                                  setter: setUpdateInterval
@@ -99,6 +104,12 @@ function App() {
                      })}
                   </div>
                </div>
+            </RefreshProvider>
+            <RefreshProvider autoRefreshPeriod={moduleListUpdateInterval()}>
+               <ModuleListRefresher
+                  enabled={!moduleListDisabled()}
+                  min_interval={100}
+               ></ModuleListRefresher>
             </RefreshProvider>
          </ModuleListProvider>
       </>
