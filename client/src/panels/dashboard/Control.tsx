@@ -2,10 +2,11 @@ import { createSignal } from "solid-js"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import { Slider, SliderApiControl } from "../../common/Slider/Slider"
 import { Widget } from "../common/Widget"
-import { ValueController } from "../../common/ValueController/ValueControlller"
+import { ValueController, ValueControllerApiControl } from "../../common/ValueController/ValueControlller"
 
 import { enforceMinMax } from "../../common/other/inputFilters"
 import styles from "./Control.module.css"
+import { sendApiMessage } from "../../apiMessages/apiMessageBase"
 
 
 interface ControlProps{
@@ -56,14 +57,18 @@ export function Control(props : ControlProps){
                         step={0.05}
                     ></SliderApiControl>
 
-                    <ValueController
+                    <ValueControllerApiControl
                         title="Mixer target rpm"
                         valueName="current target"
                         buttonText="turn off"
-                        inputPlaceholder="0-10000 rpm"
-                        getter={value}
-                        setter={setValue}
-                    ></ValueController>
+                        min={0}
+                        max={10000}
+                        unit="rpm"
+                        getter={{url:"/control/mixer/rpm",key:"rpm"}}
+                        onClick={async (value : number | undefined)=>{
+                            sendApiMessage({url:"/control/mixer/stop"});
+                        }}
+                    ></ValueControllerApiControl>
 
                     <SliderApiControl 
                         target={{
@@ -75,14 +80,18 @@ export function Control(props : ControlProps){
                         step={0.05}
                     ></SliderApiControl>
 
-                    <ValueController
+                    <ValueControllerApiControl
                         title="Heater target temperature"
                         valueName="current target"
                         buttonText="turn off"
-                        inputPlaceholder="0-90 °C"
-                        getter={value}
-                        setter={setValue}
-                    ></ValueController>
+                        min={0}
+                        max={90}
+                        unit="°C"
+                        getter={{url:"/control/heater/target_temperature",key:"temperature"}}
+                        onClick={async (value : number | undefined)=>{
+                            sendApiMessage({url:"/control/heater/turn_off"});
+                        }}
+                    ></ValueControllerApiControl>
                 </div>
             </Widget>
         </GridElement>
