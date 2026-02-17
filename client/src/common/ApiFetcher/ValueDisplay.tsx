@@ -8,6 +8,7 @@ interface ValueDisplayProps{
     numberOnly?: {
         decimalPlaces :number
     }
+    class?: string
 }
 
 export function ValueDisplay(props:ValueDisplayProps){
@@ -33,7 +34,7 @@ export function ValueDisplay(props:ValueDisplayProps){
     }
 
     return (
-        <p class={`${props.value ? "" : styles.error} ${styles.fetcher}`}>
+        <p class={`${props.value ? "" : styles.error} ${styles.fetcher} ${props.class ?? ""}`}>
             <Show when={props.value} fallback="err">
                 {renderValue(props.value)}
                 <Show when={props.unit}>
