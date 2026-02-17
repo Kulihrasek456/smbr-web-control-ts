@@ -33,6 +33,8 @@ interface RadialSelectProps{
         label: string;
     }[];
     defaultSelectedIndex?:number;
+    getter: ()=>string;
+    setter: (value: string)=>void;
 }
 
 export function RadialSelect(props : RadialSelectProps){
@@ -44,7 +46,7 @@ export function RadialSelect(props : RadialSelectProps){
                         groupName={props.groupName}
                         value={selection.value}
                         label={selection.label}
-                        checked={index() == (props.defaultSelectedIndex ?? 0)}
+                        checked={index() == (props.defaultSelectedIndex ?? 0) || props.getter() == selection.value}
                     ></RadialOption>
                 )}
             </For>
