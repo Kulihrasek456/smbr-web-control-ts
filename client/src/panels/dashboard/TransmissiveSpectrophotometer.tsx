@@ -5,9 +5,9 @@ import { Icon } from "../../common/Icon/Icon";
 import { createEffect, createSignal } from "solid-js";
 import { Button } from "../../common/Button/Button";
 import { useRefreshValue } from "../../common/other/RefreshProvider";
-import { ApiMessages } from "../../apiMessages/sensor/spectrophotometer/measure_all";
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import { isDebug } from "../../common/debug/debugFlag";
+import { Sensor_Spectrophotometer } from "../../apiMessages/sensor/spectrophotometer";
 
 interface TransSpectrophotometerProps{
     id: string;
@@ -81,7 +81,7 @@ function TransSpectrophotometerBody(
         if(!val || val()._ts == 0){
             return
         }
-        let response = await ApiMessages.Sensor.Spectrophotometer.sendMeasureAll({});
+        let response = await Sensor_Spectrophotometer.sendMeasureAll();
         let newRows : row[] = []
         for(let channel of response.samples){
             let channelDictRes = channelDictionary[channel.channel]
