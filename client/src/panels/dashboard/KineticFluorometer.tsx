@@ -193,7 +193,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     }
     
     function renderMeasurement(measurement ?: Sensor_Fluorometer.Measurement){
-        if(measurement){
+        if(measurement != undefined){
             if(lastMeasurementId == measurement.measurement_id){
                 return
             }
@@ -204,6 +204,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
             setStats(renderStats(measurement))
             setChartData(parseSamples(measurement.samples))
         }else{
+            lastMeasurementId = -1;
             setPopupMessage("no measurement loaded");
             setCurrentMeasurement(undefined);
             setStats([]);
@@ -241,6 +242,10 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
             renderMeasurement(response.measurement);
             return true;
         } catch (error) {
+            //make sure that the popup stays there at least for 1 second
+            setTimeout(()=>{
+                lastMeasurementId = -1;
+            },1000);
             setPopupMessage("error occured");
             return false;
         }
