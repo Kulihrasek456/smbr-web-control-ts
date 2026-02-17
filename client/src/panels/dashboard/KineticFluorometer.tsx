@@ -1,8 +1,8 @@
-import { createSignal, For } from "solid-js";
+import { createEffect, createSignal, For, onMount, type JSXElement } from "solid-js";
 import { Button } from "../../common/Button/Button";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import { LineChart } from "../../common/LineChart/LineChart";
-import { getCountdownArray, getEmptyDatasets } from "../../common/other/utils";
+import { LineChart, type CustomChartOptions } from "../../common/LineChart/LineChart";
+import { downloadCanvas, downloadStringAsFile, getCountdownArray, getEmptyDatasets, isArray } from "../../common/other/utils";
 import { Widget, WidgetHotbarValue } from "../common/Widget";
 
 import styles from  "./KineticFluorometer.module.css"
@@ -12,10 +12,15 @@ import { RadialOption, RadialSelect } from "../../common/RadialSelect/RadialSele
 import { createUniqueId } from "solid-js";
 import { enforceMax, enforceMin, enforceMinMax } from "../../common/other/inputFilters";
 import { Icon } from "../../common/Icon/Icon";
+import { RefreshProvider, useRefreshValue } from "../../common/other/RefreshProvider";
+import { Sensor_Fluorometer } from "../../apiMessages/sensor/fluorometer";
+import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
+import type { TooltipItem } from "chart.js";
+import { sendApiMessageSimple } from "../../apiMessages/apiMessageSimple";
 
 type statRow = {
     name: string;
-    value:  string | number | undefined;
+    value:  string | number | undefined | JSXElement;
 }
 interface InputElementProps{
     unit : string;
@@ -25,7 +30,7 @@ interface InputElementProps{
     max : number;
 }
 
-function InputElement(props :InputElementProps){
+function InputElement(props :InputElementProps){ //#TODO make it a fully usable component
     return (
         <div class={styles.input_container}>
             <input
@@ -47,41 +52,260 @@ function InputElement(props :InputElementProps){
     )
 }
 
+function renderStats(measurement : Sensor_Fluorometer.Measurement) : statRow[]{
+    return [
+        {
+            name: "measurement id",
+            value: <ValueDisplay value={measurement.measurement_id.toString()}></ValueDisplay>
+        }, {
+            name: "timestamp",
+            value: <ValueDisplay value={measurement.timestamp.toString()}></ValueDisplay>
+        }, {
+            name: "read", 
+            value: <ValueDisplay value={measurement.read.toString()}></ValueDisplay>
+        }, {
+            name: "saturated",
+            value: <ValueDisplay value={measurement.saturated.toString()}></ValueDisplay>
+        }, {
+            name: "detector_gain",
+            value: <ValueDisplay value={measurement.detector_gain.toString()}></ValueDisplay>
+        }, {
+            name: "timebase",
+            value: <ValueDisplay value={measurement.timebase.toString()}></ValueDisplay>
+        }, {
+            name: "length_ms",
+            value: <ValueDisplay value={measurement.length_ms.toString()} unit="ms"></ValueDisplay>
+        }, {
+            name: "required_samples",
+            value: <ValueDisplay value={measurement.required_samples.toString()}></ValueDisplay>
+        }, {
+            name: "captured_samples",
+            value: <ValueDisplay value={measurement.captured_samples.toString()}></ValueDisplay>
+        }, {
+            name: "missing_samples",
+            value: <ValueDisplay value={measurement.missing_samples.toString()}></ValueDisplay>
+        }
+    ]
+}
+
+type ChartData = {
+    lables: number[],
+    datasets : {
+        data: number[],
+        label: string,
+        hidden?: boolean,
+    }[],
+    xBounds: {
+        min: number
+        max: number
+    }
+}
+
+function parseSamples(samples: Sensor_Fluorometer.Sample[]) : ChartData{
+
+    if(samples.length == 0){
+        return {
+            lables: [],
+            datasets: [],
+            xBounds:{
+                min:0,
+                max:1
+            }
+        }
+    }
+
+    let labels: number[] = [];
+    let relativeValues : number[] = [];
+    let absoluteValues : number[] = [];
+    let rawValues : number[] = [];
+
+
+    for(let i=0;i<samples.length;i++){
+        labels.push(Math.round(samples[i].time_ms*1000));
+        relativeValues.push(samples[i].relative_value);
+        absoluteValues.push(samples[i].absolute_value);
+        rawValues.push(samples[i].raw_value);
+    }
+
+    return {
+        lables: labels,
+        datasets: [{
+            data: relativeValues,
+            label: "relative"
+        },{
+            data: absoluteValues,
+            label: "absolute"
+        },{
+            data: rawValues,
+            label: "raw",
+            hidden: true,
+        }],
+        xBounds:{
+            min:labels[0],
+            max:labels[samples.length-1]
+        }
+    }
+}
+
+
 interface KinematicFluorometerProps{
     id: string;
 }
 
-export function KinematicFluorometer(props: KinematicFluorometerProps){
+export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     
-    const [stats, setStats] = createSignal<statRow[]>([
-        {name:"test",value: 1},
-        {name:"test",value: "ahoj"},
-        {name:"test",value: undefined},
-        {name:"test",value: undefined},
-        {name:"test",value: undefined},
-        {name:"test",value: undefined},
-        {name:"test",value: undefined},
-        {name:"test",value: 11564242}
-    ]);
+    const [stats, setStats] = createSignal<statRow[]>([]);
     
-    const [length,setLength] = createSignal<number>(0);
-    const [intensity,setIntensity] = createSignal<number>(0);
-    const gainGroupName = createUniqueId();
+    const [length,setLength] = createSignal<number>(1);
+    const [intensity,setIntensity] = createSignal<number>(50);
+    const [gain, setGain] = createSignal<Sensor_Fluorometer.detectorGainsType>("x1");
 
+    const [chartData, setChartData] = createSignal<ChartData>(parseSamples([]))
+    const [chartOpts, setChartOpts] = createSignal<CustomChartOptions>(getChartOpts(chartData()));
+    const [currentMeasurement, setCurrentMeasurement] = createSignal<Sensor_Fluorometer.Measurement | undefined>();
+    
+    let chartMethods : { getCanvas: () => HTMLCanvasElement | undefined } | undefined;
+    let lastMeasurementId = -1;
+    
+    const gainGroupName = createUniqueId();
+    const refreshValue = useRefreshValue;
+
+    async function getFileName() : Promise<string | undefined>{
+        let measurement = currentMeasurement();
+
+        if(measurement){
+            let filename = 'OJIP_';
+            try { 
+                //#TODO cache this
+                filename+= (await sendApiMessageSimple({url:"/core/hostname",key:"hostname"})).toString() + "_";
+                filename+= (await sendApiMessageSimple({url:"/core/sid",key:"sid"})).toString() + "_";
+            } catch (error) {
+                filename = 'OJIP_unknownDevice_';
+            }
+            filename+= measurement.measurement_id + "_";
+            let timestamp = new Date(measurement.timestamp);
+            filename+= timestamp.toISOString().replace(/[:.]/g, '-'); //ISO 8601
+            return filename;
+        }
+        
+        throw Error("no measurement loaded")
+    }
+    
+    function renderMeasurement(measurement : Sensor_Fluorometer.Measurement){
+        if(lastMeasurementId == measurement.measurement_id){
+            return
+        }
+        lastMeasurementId = measurement.measurement_id;
+        setCurrentMeasurement(measurement)
+        setStats(renderStats(measurement))
+        setChartData(parseSamples(measurement.samples))
+    }
+    
+    
+    createEffect(async () => {
+        let val = refreshValue();
+        if(!val || val?.()._ts == 0){
+            return
+        }
+        
+        let response = await Sensor_Fluorometer.sendReadLast();
+        renderMeasurement(response.measurement);
+    })
+
+    createEffect(()=>{
+        console.log("reloading options for chart: ",getChartOpts(chartData()))
+        setChartOpts(getChartOpts(chartData()))
+    })
+    
+    async function doCapture(){
+        let response = await Sensor_Fluorometer.sendCapture({
+            detectorGain: gain(),
+            emitorIntensity: intensity()/100,
+            lengthMs: length()*1000,
+            timebase: "logarithmic",
+            sampleCount: 1000
+        });
+        
+        renderMeasurement(response.measurement);
+        return true;
+    }
+
+    function getChartOpts(data : ChartData): CustomChartOptions {
+        return {
+            plugins: {
+                legend: { position: "bottom", show: true },
+                zoom: {
+                    min: data.xBounds.min,
+                    max: data.xBounds.max,
+                    mode: "x",
+                    pan: "x"
+                },
+                tooltip: {
+                    titleCallback: (items: TooltipItem<any>[]) => {
+                        if (items.length > 0) {
+                            return items[0].label + " µs";
+                        }
+                        return ""
+                    }
+                }
+            },
+            y: {
+                bounds: {
+                    min: 0,
+                    max: 1
+                }
+            },
+            x: {
+                type: "logarithmic",
+                bounds: data.xBounds,
+                labelCallback: function (value) {
+                    value = Math.round(value);
+                    var out = value + 'µs';
+                    if (value >= 1000) {
+                        out = (value / 1000) + 'ms';
+                    }
+                    if (value >= 1000000) {
+                        out = (value / 1000000) + 's';
+                    }
+                    return out;
+                },
+            }
+        }
+    }
+    
 
     return (
-        <GridElement id={props.id} w={2} h={8}>
             <Widget 
                 name="Kinematic fluorometer"
+                customRefreshProvider={true}
                 hotbarTargets={() => (
                         <>
-                            <Button callback={async () => { return true }} >
+                            <Button callback={async () => {
+                                await Sensor_Fluorometer.sendCalibrate();
+                                return true;
+                            }} >
                                 <p>calibrate</p>
                             </Button>
-                            <Button callback={async () => { return true }}>
+                            <Button callback={async () => {
+                                let filename= await getFileName() + ".png";
+                                if(chartMethods){
+                                    let canvas = chartMethods.getCanvas();
+                                    if(canvas){
+                                        downloadCanvas(canvas,filename);
+                                    }
+                                }
+                                return true
+                            }}>
                                 <Icon name="image_arrow_up"></Icon>
                             </Button>
-                            <Button callback={async () => { return true }}>
+                            <Button callback={async () => {
+                                let measurement = currentMeasurement();
+                                if(measurement) {
+                                    let filename= await getFileName() + ".json";
+                                    downloadStringAsFile(JSON.stringify(measurement, null, 2),filename);
+                                }
+                                return true;
+                            }}>
                                 <Icon name="upload_file"></Icon>
                             </Button>
                         </>
@@ -91,21 +315,10 @@ export function KinematicFluorometer(props: KinematicFluorometerProps){
             >
                 <div class={styles.chart}>
                     <LineChart 
-                        labels={getCountdownArray(15)}
-                        datasets={[{data:getCountdownArray(15),label:"test"}]}
-                        legend={{position:"bottom",show:true}}
-                        animations={false}
-                        xlogarithmic={true}
-                        ybounds={{
-                            min:0,
-                            max:1
-                        }}
-                        zoom={{
-                            min:0,
-                            max:100,
-                            mode:"x",
-                            pan:"x"
-                        }}
+                        labels={chartData().lables}
+                        datasets={chartData().datasets}
+                        options={chartOpts()}
+                        ref={(methods) => chartMethods = methods}
                     ></LineChart>
                     <p class={styles.chart_comment}>use [shift] + scroll wheel to zoom</p>
                 </div>
@@ -137,7 +350,7 @@ export function KinematicFluorometer(props: KinematicFluorometerProps){
                                         unit="s"
                                         setter={setLength}
                                         getter={length}
-                                        min={0.2}
+                                        min={2}
                                         max={4}
                                     ></InputElement>
                                 </div>
@@ -145,7 +358,7 @@ export function KinematicFluorometer(props: KinematicFluorometerProps){
                                     <p>Intensity: </p>
                                     <SliderSimple 
                                         direction="H"
-                                        bounds={{min:0,max:100}}
+                                        bounds={{min:20,max:100}}
                                         setter={setIntensity}
                                         getter={intensity}
                                     ></SliderSimple>
@@ -153,7 +366,7 @@ export function KinematicFluorometer(props: KinematicFluorometerProps){
                                         unit="%"
                                         setter={setIntensity}
                                         getter={intensity}
-                                        min={0}
+                                        min={20}
                                         max={100}
                                     ></InputElement>
                                 </div>
@@ -167,17 +380,29 @@ export function KinematicFluorometer(props: KinematicFluorometerProps){
                                                 {value:"x10",label:"10"},
                                                 {value:"x50",label:"50"}
                                             ]}
+                                            getter={gain}
+                                            setter={setGain}
                                         ></RadialSelect>
                                     </div>
                                 </div>
                             </div>
-                            <Button class={styles.begin_button}>
+                            <Button class={styles.begin_button} callback={doCapture}>
                                 begin capture
                             </Button>
                         </div>
                     </div>
                 </div>
             </Widget>
+    )
+}
+
+export function KinematicFluorometer(props: KinematicFluorometerProps){
+    return(
+        <GridElement id={props.id} w={2} h={8}>
+            <RefreshProvider>
+                <KinematicFluorometerBody {...props}
+                ></KinematicFluorometerBody>
+            </RefreshProvider>
         </GridElement>
     )
 }
