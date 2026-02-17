@@ -13,9 +13,7 @@ export class ApiMessageSimpleMissingKey extends ApiMessageError {
   }
 }
 
-export type apiMessageSimpleResult = string | number | boolean
-
-export async function sendApiMessageSimple(options : apiMessageSimple) : Promise<apiMessageSimpleResult>{
+export async function sendApiMessageSimple(options : apiMessageSimple) : Promise<string | number | boolean>{
     let opts : apiMessageOptions = {
         url: options.url,
         port: options.port,
