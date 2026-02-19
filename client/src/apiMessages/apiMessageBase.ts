@@ -4,7 +4,7 @@ import { smbr_apiMessageConfig } from "./apiMessageConfig";
 export interface apiMessageOptions{
     url : string;
 
-    method ?: "GET" | "POST";
+    method ?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
     port ?: number;
     hostname ?: string;
     data? : string;
