@@ -1,6 +1,7 @@
 other
  - [ ] better button visuals
  - [x] fix sliders on IOS
+ - [ ] add error display
 
 api fetchers
  - [x] updater context
@@ -33,7 +34,7 @@ dashboard
      - [x] functionality
  - Quick launch
      - [x] visual
-     - [ ] functionality
+     - [x] functionality
 
 device
  - [x] device info
