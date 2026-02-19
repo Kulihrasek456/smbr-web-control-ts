@@ -1,4 +1,4 @@
-import { isArray, isBoolean, isNumber, isString, isValidDateTime } from "../common/other/utils";
+import { isArray, isBoolean, isNull, isNumber, isString, isValidDateTime } from "../common/other/utils";
 import { smbr_apiMessageConfig } from "./apiMessageConfig";
 
 export interface apiMessageOptions{
@@ -147,4 +147,11 @@ export function checkTimestamp(value: any, key:string, options: apiMessageOption
     if(!isValidDateTime(value[key])){
         throw new ApiUnparsableBody(options,`response should contain a timestamp: ${key}`)
     }
+}
+
+
+export function checkNull(value: any, key: string, options: apiMessageOptions){
+    if(!isNull(value[key])){
+      throw new ApiUnparsableBody(options,`response should contain a null: ${key}`)
+    }  
 }
