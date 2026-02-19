@@ -43,6 +43,13 @@ export class ApiUnparsableJsonBody extends ApiMessageError{
   }
 }
 
+export class ApiUnparsableTextBody extends ApiMessageError{
+  constructor(options:apiMessageOptions){
+    super(options,`unparsable body (should be Text)`);
+    this.name = "ApiUnparsableTextBody";
+  }
+}
+
 export class ApiUnparsableBody extends ApiMessageError{
   constructor(options:apiMessageOptions, message:string){
     super(options,`unparsable body ${message}`);
@@ -100,6 +107,24 @@ export async function sendJsonApiMessage(options:apiMessageOptions) : Promise<ap
       };
     } catch (error) {
       throw new ApiUnparsableJsonBody(options);
+    }
+}
+
+export type apiMessageTextResult = {
+  response: Response,
+  textValue: string
+}
+
+export async function sendTextApiMessage(options: apiMessageOptions): Promise<apiMessageTextResult> {
+    let response = await sendApiMessage(options)
+    try {
+        let textParsed = await response.text();
+        return {
+            response: response,
+            textValue: textParsed
+        };
+    } catch (error) {
+        throw new ApiUnparsableTextBody(options);
     }
 }
 
