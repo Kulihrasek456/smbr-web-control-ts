@@ -184,3 +184,7 @@ export function isValidDateTime(target: any): boolean {
     }
     return false;
 }
+
+export function isNull(target: any): target is null {
+    return target === null;
+}
