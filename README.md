@@ -32,6 +32,8 @@ ___
 
 # how to host
 
+> __the server does not support the HTTPS protocol__
+
 NPM will automatically compile the client and server typescript files, and host them as a NodeJS server.
 
 to build and run the server, use: 
@@ -39,7 +41,12 @@ to build and run the server, use:
 npm run start
 ```
 
-> __the server does not support the HTTPS protocol__
+If you just want to try it out and don't have a SMBR reactor, run the server in debug mode:
+```
+npm run start:debug
+```
+
+This will allow you to simulate a connected reactor using the debug menu.
 
 ___
 
