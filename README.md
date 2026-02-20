@@ -12,20 +12,20 @@ ___
 
 # how to install
 clone this repository into you desired directory
-```
+```bash
 git clone #TODO when repo is created
 ```
 
-if you don't have npm installed, you can install it with:
-
-```
+if you don't have npm and newest versions of node installed, you can install them with:
+```bash
 sudo apt-get install npm
-sudo npm install -g n
-sudo n latest
+npm install -g n
+n latest
 ```
 
 then install all of the needed node modules:
-```
+```bash
+npm install
 npm run install:all
 ```
 ___
@@ -37,12 +37,12 @@ ___
 NPM will automatically compile the client and server typescript files, and host them as a NodeJS server.
 
 to build and run the server, use: 
-```
+```bash
 npm run start
 ```
 
 If you just want to try it out and don't have a SMBR reactor, run the server in debug mode:
-```
+```bash
 npm run start:debug
 ```
 
