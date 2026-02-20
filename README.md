@@ -16,12 +16,18 @@ clone this repository into you desired directory
 git clone #TODO when repo is created
 ```
 
-if you don't have npm and newest versions of node installed, you can install them with:
+if you don't have npm installed, you can install it with:
 ```bash
 sudo apt-get install npm
+```
+
+if you use debian repositories, you will also need to install a newer version of node than the one provided. For that you can use n, nvm or any other node version manager.
+Installing n and using it to install a newer version of node:
+```bash
 npm install -g n
 n latest
 ```
+
 
 then install all of the needed node modules:
 ```bash
