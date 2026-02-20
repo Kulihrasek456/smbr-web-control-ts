@@ -1,7 +1,10 @@
 other
  - [ ] better button visuals
- - [x] fix sliders on IOS
+ - [ ] fix vertical sliders on IOS (extremely thick)
  - [ ] add error display
+ - [ ] fix runtime info collpasing in favor of editor (width: 0 needed)
+ - [ ] fix gridstack grid not holding its width in device pannel
+ - [ ] sort modules by UID to reduce flickering
 
 api fetchers
  - [x] updater context
