@@ -1,5 +1,5 @@
 {
-  "name": "smbr-web-control-react",
+  "name": "smbr-web-control-ts-client",
   "private": true,
   "version": "0.0.0",
   "type": "module",
