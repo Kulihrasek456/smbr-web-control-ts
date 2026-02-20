@@ -1,0 +1,21 @@
+{
+  "name": "smbr-web-control-ts",
+  "version": "1.0.0",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "install:all": "npm install --prefix client && npm install --prefix server",
+    "build": "npm --prefix client run build",
+    "build:debug": "npm --prefix client run build:debug",
+    "start": "npm run build && npm --prefix server run start",
+    "start:debug": "npm run build:debug && npm --prefix server run start",
+    "dev": "concurrently \"npm --prefix client run dev\" \"npm --prefix server run dev\"",
+    "make:license" : "node generate-licenses.mjs"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "generate-license-file": "^4.1.1"
+  }
+}
