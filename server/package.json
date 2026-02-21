@@ -5,16 +5,20 @@
   "license": "GPL-3.0",
   "author": "David Radek",
   "type": "module",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
     "dev": "tsx watch server.ts",
     "build": "rimraf dist && tsc",
-    "start": "npm run build && node dist/server.js"
+    "start": "npm run build && node dist/src/server.js",
+    "start:debug": "npm run build && node dist/src/server.js -d"
   },
   "dependencies": {
+    "chalk": "^5.6.2",
+    "cors": "^2.8.6",
     "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^25.3.0",
     "rimraf": "^6.1.3",

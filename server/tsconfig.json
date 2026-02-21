@@ -6,6 +6,9 @@
     "verbatimModuleSyntax": true,
     "module": "nodenext",
     "strict": true,
+    "lib": [
+      "es2021"
+    ],
     "esModuleInterop": true,
     "sourceMap": true,
     "declaration": true,
@@ -18,7 +21,7 @@
     "skipLibCheck": true,
   },
   "include": [
-    "**/*.ts"
+    "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
