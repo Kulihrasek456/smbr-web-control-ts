@@ -1,5 +1,11 @@
 import { TextEditor } from "../common/TextEditor/TextEditor";
 
 export function Config(){
-    return <TextEditor twoColFileList={true}></TextEditor>
+    return (
+        <TextEditor 
+            twoColFileList={true}
+            targetEndpoint="/config-files"
+            target="webControlApi"
+        ></TextEditor>
+    )
 }

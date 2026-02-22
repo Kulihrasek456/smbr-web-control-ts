@@ -37,6 +37,12 @@
     }
 }
 
+.container.unsaved{
+    .header{
+        border-bottom-color: var(--warn-color-2);
+    }
+}
+
 .header.error{
     border-bottom-color: var(--err-color-2);
 }

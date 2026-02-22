@@ -12,7 +12,7 @@ export const customTheme = EditorView.theme({
         height: "100%"
     },
     ".cm-scroller": {
-        overflow: "auto", // Povolí scrollbar uvnitř editoru
+        overflow: "auto",
         flex: "1 1 auto"
     },
 

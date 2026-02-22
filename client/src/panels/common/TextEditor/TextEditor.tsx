@@ -1,5 +1,5 @@
-import { createSignal, For, Show, type JSXElement } from "solid-js";
-import { CodeMirrorWrapper } from "./CodeMirrorWrapper";
+import { createEffect, createSignal, For, Show, type JSXElement } from "solid-js";
+import { CodeMirrorWrapper, type CodeMirrorWrapperProps } from "./CodeMirrorWrapper";
 
 import codeStyles from "./CodePart.module.css";
 import fileListStyles from "./FileList.module.css";
@@ -8,185 +8,109 @@ import textEditorStyles from "./TextEditor.module.css"
 import { Button } from "../../../common/Button/Button";
 import { Icon } from "../../../common/Icon/Icon";
 import { TableStatic } from "../../../common/Table/Table";
-
-const testString =
-  `# template file from: https://www.ibm.com/docs/en/cloud-paks/cloudpak-data-system/2.0.0?topic=configuration-template-sample-yaml
-  all:
-    children:
-      control_nodes:
-        hosts:
-          node1:
-            custom_hostname: <VALUE>
-            management_network:
-              network1:
-                ip: <VALUE>
-          node2:
-            custom_hostname: <VALUE>
-            management_network:
-              network1:
-                ip: <VALUE>
-          node3:
-            custom_hostname: <VALUE>
-            management_network:
-              network1:
-                ip: <VALUE>
-      switches:
-      #BEGIN BGP
-        vars:
-          cp4d_asplain: <VALUE>
-          cp4d_network: <VALUE>
-          cp4d_network_vip: <VALUE>
-        hosts:
-          FabSw1a:
-            ansible_host: localhost
-            vrr_ip_addr: <VALUE>
-            cp4d_routerID: 9.0.62.1
-            isl_peer: 9.0.255.2
-            bgp_links:
-                link1:
-                swp: <VALUE>
-                neighbor: <VALUE>
-                ip_addr: <VALUE>
-                mtu: 9000
-                link_speed: 10000
-          FabSw1b:
-            ansible_host: localhost
-            vrr_ip_addr: <VALUE>
-            cp4d_routerID: 9.0.62.2
-            isl_peer: 9.0.255.1
-            bgp_links:
-              link1:
-                swp: <VALUE>
-                neighbor: <VALUE>
-                ip_addr: <VALUE>
-                mtu: 9000
-                link_speed: 10000
-      #END BGP
-
-      #BEGIN L2
-      switches:
-        hosts:
-          FabSw1a:
-            ansible_host: localhost
-            external_connection_config:
-              external_link1:
-                switch_ports: ['<VALUE>', '<VALUE>']
-                port_config:
-                  mtu: 9000
-                  link_speed: 10000
-                vlans: ['VALUE']
-                strict_vlan: <VALUE>
-                name: <VALUE>
-                lacp_link: True
-                lacp_rate: Fast
-                clag_id: 100
-                partner_switch: 'FabSw1b'
-      #END L2
-
-    vars:
-      app_fqdn: <VALUE>
-      #(pick from timedatectl list-timezones), default is EDT
-      timezone: "<OPTIONAL>"
-      #must begin with server or pool
-      time_servers: ["<OPTIONAL>"]
-      dns_servers: ["<VALUE>"]
-      dns_search_strings: ["<OPTIONAL>"]
-      smtp_servers: ["<OPTIONAL>"]
-      management_network:
-        network1:
-          subnet: <VALUE>
-          # just number, no slash 
-          prefix: <VALUE>
-          gateway: <VALUE>
-          floating_ip: <VALUE>
-          mtu: <OPTIONAL>
-          custom_routes: <OPTIONAL>
-      application_network_enabled: False
-      openshift_networking_enabled: False
-      policy_based_routing_enabled: True
-      application_network:
-        network1:
-          default_gateway: true
-          vlan: <VALUE>
-          # just number, no slash 
-          prefix: <VALUE>
-          gateway: <VALUE>
-          floating_ip: <VALUE>
-          mtu: <OPTIONAL>
-          custom_routes: <OPTIONAL>
-          additional_openshift_ipaddrs: ["<OPTIONAL>"]
-          additional_openshift_routes: ["<OPTIONAL>"]
-  `
+import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../../common/other/RefreshProvider";
+import { targets, type targetsType } from "../../../apiMessages/apiMessageBase";
+import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
 
 
-function CodePart() {
-  const [code, setCode] = createSignal(testString);
-  const [selected, setSelected] = createSignal("placeholder text");
+
+interface FileListElementProps {
+  data: FileListDirectory,
+  maxDepth?: number,
+
+  isRoot?: boolean,
+
+  // the full previous path
+  prefixPath?: string,
+
+  // gets the currently selected file
+  activeFileName : ()=>string | undefined
+
+  // callback called when a file is selected
+  onSelect: (fileName : string)=>void;
+}
+
+function FileListElement(props: FileListElementProps) {
+  let isRoot=(props.isRoot ?? true);
+  let self : HTMLUListElement | undefined;
+  
+  let prefixPath ="";
+  if(props.prefixPath !== undefined && !isRoot){
+    prefixPath = props.prefixPath + props.data.name + "|"
+  }
   return (
-    <div class={codeStyles.container} style={{ "flex": "1 1 auto", "min-width": 0, "min-height": 0 }}>
-      <div class={codeStyles.header}>
-        <Button>
-          <Icon name="delete"></Icon>
-        </Button>
-        <h1 class={codeStyles["file-name"]}>
-          {selected()}
-        </h1>
-        <Button>
-          <Icon name="upload"></Icon>
-        </Button>
-        <Button>
-          <Icon name="share_windows"></Icon>
-        </Button>
-      </div>
-      <div class={codeStyles["code-editor"]}>
-        <CodeMirrorWrapper onSave={() => { alert(code()) }} initialValue={testString} onChange={(code: string) => { setCode(code) }}></CodeMirrorWrapper>
-      </div>
-    </div>
-  )
-}
-
-type fileOrDirectory = {
-  name: string;
-  children: fileOrDirectory[]
-}
-
-interface FileListProps {
-  buttons?: ((index: number) => JSXElement)[],
-  createFileButton?: {
-    onClick: (fileName: string) => boolean
-  },
-  files: fileOrDirectory[]
-}
-
-function FileListElement(props: { data: fileOrDirectory }) {
-  return (
-    <Show when={props.data.children.length > 0} fallback={
-      <li class={fileListStyles["file"]}>{props.data.name}</li>
-    }>
-      <ul class={fileListStyles["directory"]}>
+    <ul 
+      classList={{
+        [fileListStyles["directory"]]:!isRoot,
+        [fileListStyles["root"]]:isRoot,
+        [fileListStyles["collapsed"]]:true
+      }}
+      ref={self}
+    >
+      <Show when={!isRoot}>
         <div class={fileListStyles["directory-header"]}>
-          <button class={fileListStyles["collapse-button"]}
-            onclick={e => { e.currentTarget.parentElement?.parentElement?.classList.toggle(fileListStyles["collapsed"]) }}>
+
+          <button
+            class={fileListStyles["collapse-button"]}
+            onclick={e => { 
+              self?.classList.toggle(fileListStyles["collapsed"]) 
+            }}
+          >
             <p class={fileListStyles["directory-name"]}>{props.data.name}</p>
             <div class={fileListStyles["collapse-arrow"]}>
               <Icon name="keyboard_arrow_down"></Icon>
             </div>
           </button>
+
           <button class={fileListStyles["create-file-specific-button"]}>
             <Icon name="add"></Icon>
           </button>
+
         </div>
-        <For each={props.data.children}>
-          {(child, index) => (
-            <FileListElement data={child}></FileListElement>
+      </Show>
+      <Show when={(props.maxDepth ?? 1)>0}>
+        <For each={Object.entries(props.data.subDirectories)}>
+          {(directory, index) => (
+            <FileListElement 
+              maxDepth={(props.maxDepth)?(props.maxDepth-1):(undefined)} 
+              data={directory[1]}
+              isRoot={false}
+              onSelect={props.onSelect}
+              prefixPath={prefixPath}
+              activeFileName={props.activeFileName}
+            ></FileListElement>
           )}
         </For>
-      </ul>
-    </Show>
+        <For each={props.data.files}>
+          {(fileName, index) => (
+            <li 
+              classList={{
+                [fileListStyles["file"]]:true,
+                [fileListStyles["active"]]: (props.activeFileName() === prefixPath+fileName)
+              }}
+              onclick={()=>{props.onSelect(prefixPath+fileName)}}
+            >{fileName}</li>
+          )}
+        </For>
+      </Show>
+    </ul>
   )
 }
 
+interface FileListProps {
+  buttons?: ((index: number) => JSXElement)[],
+  createFileButton?: {
+    onClick: (fileName: string) => Promise<boolean>
+  },
+  files: FileListDirectory
+
+  onSelect: (fileName : string) => void;
+  activeFileName: ()=>string | undefined;
+}
+
 function FileList(props: FileListProps) {
+  let newFileInput : HTMLInputElement | undefined;
+  let newFileContainer : HTMLDivElement | undefined;
   return (
     <div class={fileListStyles.container} style={{ flex: "0 0 auto" }}>
       <div class={fileListStyles.search}>
@@ -203,31 +127,51 @@ function FileList(props: FileListProps) {
           </For>
         </Show>
         <Show when={props.createFileButton}>
-          <div class={fileListStyles["create-button-container"] + " " + fileListStyles["collapsed"]}>
+          <div 
+            ref={newFileContainer}
+            class={fileListStyles["create-button-container"] + " " + fileListStyles["collapsed"]}
+          >
             <div class={fileListStyles["create-button-inputs"]}>
-              <input class={"button " + fileListStyles["create-button-text-input"]} placeholder="file name"></input>
-              <button class={"button " + fileListStyles["create-button-button-input"]}>create</button>
+              <input 
+                ref={newFileInput}
+                class={"button " + fileListStyles["create-button-text-input"]} 
+                placeholder="file name"
+              ></input>
+              <button 
+                class={"button " + fileListStyles["create-button-button-input"]}
+                onclick={async e => {
+                  if(newFileInput){
+                    if(await props.createFileButton?.onClick(newFileInput.value)){
+                      newFileContainer?.classList.toggle(fileListStyles["collapsed"]) ;
+                    }
+                  }
+                }}
+              >create</button>
             </div>
             <button class={fileListStyles["create-button-handle"]}
-              onclick={e => { e.currentTarget.parentElement?.classList.toggle(fileListStyles["collapsed"]) }}>
+
+              onclick={e => {
+                newFileContainer?.classList.toggle(fileListStyles["collapsed"])
+              }}>
+
               <Icon name="add_circle" filled={false}></Icon>
             </button>
           </div>
         </Show>
       </div>
       <div class={fileListStyles.list}>
-        <For each={props.files}>
-          {(file, index) => (
-            <FileListElement data={file}></FileListElement>
-          )}
-        </For>
+        <FileListElement 
+          data={props.files}
+          onSelect={props.onSelect}
+          activeFileName={props.activeFileName}
+        ></FileListElement>
       </div>
     </div>
   )
 }
 
 interface RuntimeInfoProps {
-
+  
 }
 
 function OutputContainer(props: { children?: JSXElement, title: string, info?: string, class?: string , style?: string}) {
@@ -315,6 +259,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
     { left: "3", right: "test2" },
     { left: "45", right: "test3" }
   ]);
+  const [scriptContent, setScriptContent] = createSignal("string");
 
   return (
     <div class={runtimeInfoStyles.container}>
@@ -370,7 +315,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
             </TwoColTable>
           </OutputContainer>
           <OutputContainer class={runtimeInfoStyles["script-preview"]} title="SELECTED SCRIPT PREVIEW" info="read-only view">
-            <CodeMirrorWrapper initialValue="test" onChange={() => { }} onSave={() => { }}>
+            <CodeMirrorWrapper initialValueGetter={scriptContent} readOnly={true}>
             </CodeMirrorWrapper>
           </OutputContainer>
         </div>
@@ -380,14 +325,164 @@ function RuntimeInfo(props: RuntimeInfoProps) {
 }
 
 
+type File = {
+  name: string,
+  content: string
+}
+
 interface TextEditorProps {
   twoColFileList? : boolean;
   runtimeInfo? : RuntimeInfoProps;
   allowFileCreation? : boolean;
+
+  targetEndpoint: string;
+  target?: targetsType
 }
 
 export function TextEditor(props : TextEditorProps) {
   let runtimeInfo!: HTMLDivElement;
+  const refreshCntxt = useRefreshValue;
+
+  // this is the currently edited, local version of a file
+  const [fileName,setFileName] = createSignal<string | undefined>();
+  const [fileContent,setFileContent] = createSignal<string | undefined>();
+  const [fileList, setFileList] = createSignal<FileListDirectory | undefined>();
+  const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
+  const [runtimeInfoPeriod, setRuntimeInfoPeriod] = createSignal<number | undefined>();
+
+  // this is the currently edited, original version of a files content.
+  const [downloadedScriptContent, setDownloadedScriptContent] = createSignal<string>("");
+  
+  async function loadFile(fileName : string) : Promise<boolean>{
+    try {
+      if(!dirtyFlag()){
+        let result = await sendApiMessageGetFileContent({
+          fileName: fileName,
+          url: props.targetEndpoint,
+          target: props.target
+        }) 
+  
+        setDownloadedScriptContent(result.content);
+        setFileName(fileName)
+        setFileContent(result.content)
+        return true;
+      }
+    } catch (error) {
+      setFileName(undefined)
+      setFileContent(undefined)
+      throw error;
+    }
+    return false;
+  }
+
+  async function uploadToServer() : Promise<boolean>{
+    let currFileName = fileName();
+    let currFileContent = fileContent();
+    if(currFileName !== undefined && currFileContent !== undefined){    
+      if(dirtyFlag()){
+        await sendApiMessageSetFileContent({
+          fileName: currFileName,
+          content: currFileContent,
+          url: props.targetEndpoint,
+          target: props.target
+        });
+  
+        setDirtyFlag(false);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function deleteFile() : Promise<boolean>{
+    let currFileName = fileName();
+    if(currFileName !== undefined){
+      if(!dirtyFlag()){
+        await sendApiMessageDeleteFile({
+          fileName: currFileName,
+          url: props.targetEndpoint,
+          target: props.target
+        })
+
+        setDownloadedScriptContent(" ");
+        setFileName(undefined);
+        setFileContent(undefined);
+        reloadFileList(true);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  
+
+  let lastFileList : string[] | undefined = undefined; 
+  async function reloadFileList(reloadFromFileSystem: boolean){
+    try {
+
+      let response = await sendApiMessageGetFileList({
+        url:props.targetEndpoint,
+        target: props.target,
+        reloadFromFileSystem: reloadFromFileSystem
+      })
+
+      if(lastFileList){
+        if(response.recipes.length == lastFileList.length){
+          let noChange = true;
+          for(let i =0; i< lastFileList.length;i++){
+            if(response.recipes[i] != lastFileList[i]){
+              noChange = false;
+              break;
+            }
+          }
+          if(noChange){
+            return;
+          }
+        }
+      }
+      lastFileList = response.recipes;
+      setFileList(parseApiMessageFileList(response.recipes));
+
+    } catch (error) {
+      setFileList(undefined);
+      throw error;
+    }
+  }
+
+  async function createFile(fileName : string) : Promise<boolean>{
+    let fileExists : boolean = false;
+    try {
+      await sendApiMessageGetFileContent({
+        fileName: fileName,
+        url: props.targetEndpoint,
+        target: props.target
+      })
+      fileExists = true;
+    } catch (error) {
+
+    }
+
+    if(fileExists){
+      return false;
+    }
+
+    await sendApiMessageSetFileContent({
+      fileName: fileName,
+      content: "",
+      url: props.targetEndpoint,
+      target: props.target
+    })
+
+    reloadFileList(true);
+    return true;
+  }
+
+  createEffect(async ()=>{
+    if(refreshValueUpdate(refreshCntxt())){
+      await reloadFileList(refreshCntxt()?.()?.forced ?? false);
+    }
+  })
+
 
   return (
     <div style={{
@@ -396,42 +491,89 @@ export function TextEditor(props : TextEditorProps) {
       flex: "1 1 auto"
     }}>
       <Show when={props.twoColFileList}>
-        <FileList files={[
-          {
-            name: "test_head", children: [
-              { name: "test_1", children: [] },
-              { name: "test_2", children: [] },
-              { name: "test_3", children: [] },
-              { name: "test_4", children: [] },
-              {
-                name: "test_5", children: [{
-                  name: "test_head", children: [
-                    { name: "test_1", children: [] },
-                    { name: "test_2", children: [] },
-                    { name: "test_3", children: [] },
-                    { name: "test_4", children: [] },
-                    { name: "test_5", children: [] }
-                  ]
-                }]
-              }
-            ]
-          },
-          { name: "test_6", children: [] },
-          { name: "test_7", children: [] },
-          { name: "test_8", children: [] },
-          { name: "test_9", children: [] }
-        ]}></FileList>
+        <FileList 
+          files={fileList() ?? {name:"root",files:[],subDirectories:{}}}
+          onSelect={(value:string)=>{}}
+          activeFileName={()=>""}
+        ></FileList>
       </Show>
-      <FileList buttons={[() => (<p>test</p>)]} files={[]} createFileButton={{ onClick: val => { alert(val); return true; } }}></FileList>
-      <CodePart></CodePart>
+
+      <FileList 
+        buttons={[() => (
+          <Button
+            callback={async ()=>(await reloadFileList(true))}
+          >reload from fileSystem</Button>
+        )]} 
+        files={
+          fileList() ?? {name:"root",files:[],subDirectories:{}}
+        } 
+        createFileButton={{
+          onClick: async val => (await createFile(val.replaceAll("/","|")))
+        }}
+        onSelect={(value:string)=>{
+          loadFile(value);
+        }}
+        activeFileName={fileName}
+      ></FileList>
+
+      <div
+        classList={{
+          [codeStyles.container]: true,
+          [codeStyles.unsaved]: dirtyFlag() ?? false
+        }}
+        style={{ "flex": "1 1 auto", "min-width": 0, "min-height": 0 }}
+      >
+        <div class={codeStyles.header}>
+
+          <Button
+            disabled={dirtyFlag() || fileName() === undefined}
+            callback={deleteFile}
+          >
+            <Icon name="delete"></Icon>
+          </Button>
+
+          <h1 class={codeStyles["file-name"]}>
+            {(fileName() ?? "No file loaded").replaceAll("|","/")}
+          </h1>
+          
+          <Button
+            disabled={(!dirtyFlag()) || fileName() === undefined}
+            callback={uploadToServer}
+          >
+            <Icon name="upload"></Icon>
+          </Button>
+
+          <Button
+            disabled={dirtyFlag() || fileName() === undefined}
+          >
+            <Icon name="share_windows"></Icon>
+          </Button>
+          
+        </div>
+        <div class={codeStyles["code-editor"]}>
+          <CodeMirrorWrapper
+            initialValueGetter={downloadedScriptContent}
+            onChange={(value: string)=>{
+              setFileContent(value);
+              setDirtyFlag(true);
+            }}
+            readOnly={fileName() === undefined}
+            onSave={uploadToServer}
+          ></CodeMirrorWrapper>
+        </div>
+      </div>
+
+
       <Show when={props.runtimeInfo}>
-      <button class={textEditorStyles["runtime-info-handle"] + " button"} onclick={e => { if (runtimeInfo) { runtimeInfo.classList.toggle(textEditorStyles.collapsed) } }}>
-        <div><Icon name="arrow_back_ios_new"></Icon></div>
-        <p>Runtime info</p>
-        <div><Icon name="arrow_back_ios_new"></Icon></div>
-      </button>
+        <button class={textEditorStyles["runtime-info-handle"] + " button"} onclick={e => { if (runtimeInfo) { runtimeInfo.classList.toggle(textEditorStyles.collapsed) } }}>
+          <div><Icon name="arrow_back_ios_new"></Icon></div>
+          <p>Runtime info</p>
+          <div><Icon name="arrow_back_ios_new"></Icon></div>
+        </button>
         <div class={textEditorStyles["runtime-info"]} ref={runtimeInfo}>
-          <RuntimeInfo></RuntimeInfo>
+          <RefreshProvider autoRefreshPeriod={runtimeInfoPeriod()}>
+            <RuntimeInfo></RuntimeInfo>
+          </RefreshProvider>
         </div>
       </Show>
     </div>
