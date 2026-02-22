@@ -223,13 +223,18 @@ function RuntimeInfo(props: RuntimeInfoProps) {
   const [scriptContent, setScriptContent] = createSignal("string");
   const [startedAt, setStartedAt] = createSignal<Date | undefined>(undefined);
 
+  async function updateScriptPreview(){
+    let result = await Scheduler.sendGetScheduled();
+
+    setSelected(result.fileName);
+    setScriptContent(result.content);
+  }
+
   let lastUpdate = 0;
   createEffect(async ()=>{
     if(refreshValueUpdate(refreshCntxt(),{length: 10000,lastUpdate:lastUpdate})){
       lastUpdate = Date.now();
-      let result = await Scheduler.sendGetScheduled();
-      
-      setScriptContent(result.content);
+      await updateScriptPreview();
     }
 
     if(refreshValueUpdate(refreshCntxt())){
@@ -252,9 +257,12 @@ function RuntimeInfo(props: RuntimeInfoProps) {
         })
       }
 
+      if(selected() != result.name){
+        await updateScriptPreview();
+      }
+
       setCallStack(newCallStack);
       setConsoleOut(newConsoleOut);
-      setSelected(result.name);
       setStatus(result.state);
       setProcessID(result.processId);
       setStartedAt(result.startedAt);
