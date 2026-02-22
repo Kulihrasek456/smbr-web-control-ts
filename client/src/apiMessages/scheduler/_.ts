@@ -71,9 +71,9 @@ export namespace Scheduler {
         name: string,
         finalMessage: string,
         stack: number[],
-        output: string[],
+        output: {timeStamp: string, output: string}[],
         state: "Running" | "Paused" | "Stopped" | "NeverStarted"
-        startedAt: Date
+        startedAt: Date | undefined
     }
 
     export async function sendRuntimeInfo() : Promise<runtimeInfoResult>{
@@ -83,6 +83,7 @@ export namespace Scheduler {
 
         let result = await sendJsonApiMessage(opts);
         let data = result.jsonValue;
+        let outputParsed : {timeStamp: string, output: string}[] = [];
 
         checkNumber(data,"processId",opts);
         checkString(data,"name",opts);
@@ -93,13 +94,26 @@ export namespace Scheduler {
         },opts);
         checkArray(data,"output",(el)=>{
             checkString({data:el},"data",opts);
+
+            let split = (el as string).split(" ");
+            if(split.length > 2){
+                outputParsed.push({
+                    timeStamp: split.slice(0,2).join(" "),
+                    output: split.slice(2).join(" ")
+                })
+            }else{
+                return false
+            }
             return true;
         },opts);
         checkBoolean(data,"started",opts);
         checkBoolean(data,"stopped",opts);
+        
+        let startedAtGiven = true;
         try {
             checkTimestamp(data,"startedAt",opts);
         } catch (error) {
+            startedAtGiven=false;
             checkNull(data,"startedAt",opts);
         }
 
@@ -119,9 +133,9 @@ export namespace Scheduler {
             name: data.name,
             finalMessage: data.finalMessage,
             stack: data.stack,
-            output: data.output,
+            output: outputParsed,
             state: state,
-            startedAt: new Date(data.startedAt)
+            startedAt: startedAtGiven?(new Date(data.startedAt)):(undefined) 
         }
     }
 }
