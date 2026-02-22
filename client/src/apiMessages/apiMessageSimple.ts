@@ -1,9 +1,9 @@
-import { ApiMessageError, sendApiMessage, sendJsonApiMessage, type apiMessageOptions } from "./apiMessageBase"
+import { ApiMessageError, sendApiMessage, sendJsonApiMessage, type apiMessageOptions, type targetsType } from "./apiMessageBase"
 
 export type apiMessageSimple = {
     url : string,
     key : string,
-    port? : number,
+    target? : targetsType,
 }
 
 export class ApiMessageSimpleMissingKey extends ApiMessageError {
@@ -16,7 +16,7 @@ export class ApiMessageSimpleMissingKey extends ApiMessageError {
 export async function sendApiMessageSimple(options : apiMessageSimple) : Promise<string | number | boolean>{
     let opts : apiMessageOptions = {
         url: options.url,
-        port: options.port,
+        target: options.target,
         method: "GET"
     }
     let response = await sendJsonApiMessage(opts);
@@ -32,7 +32,7 @@ export async function sendApiMessageSimple(options : apiMessageSimple) : Promise
 export async function sendApiMessageSimplePost(options : apiMessageSimple, data : any) : Promise<void>{
     let opts : apiMessageOptions= {
         url: options.url,
-        port: options.port,
+        target: options.target,
         method: "POST"
     }
 

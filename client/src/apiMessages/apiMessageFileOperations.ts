@@ -1,8 +1,8 @@
-import { checkArray, checkString, checkStringEnum, sendApiMessage, sendJsonApiMessage, sendTextApiMessage, type apiMessageOptions } from "./apiMessageBase"
+import { checkArray, checkString, checkStringEnum, sendApiMessage, sendJsonApiMessage, sendTextApiMessage, type apiMessageOptions, type targetsType } from "./apiMessageBase"
 
 export type apiMessageGetFileList = {
     url: string,
-    port?: number,
+    target?: targetsType,
     reloadFromFileSystem : boolean
 }
 
@@ -13,7 +13,7 @@ export type apiMessageGetFileListResult = {
 export async function sendApiMessageGetFileList(options : apiMessageGetFileList) : Promise<apiMessageGetFileListResult>{
     let opts : apiMessageOptions= {
         url: options.url,
-        port: options.port,
+        target: options.target,
         method: (options.reloadFromFileSystem)?"PATCH":"GET"
     }
 
@@ -64,7 +64,7 @@ export function parseApiMessageFileList(fileList : string[]) : FileListDirectory
 
 export type apiMessageGetFileContent = {
     url: string,
-    port?: number,
+    target?: targetsType,
     fileName: string
 }
 
@@ -75,7 +75,7 @@ export type apiMessageGetFileContentResult = {
 export async function sendApiMessageGetFileContent(options : apiMessageGetFileContent) : Promise<apiMessageGetFileContentResult>{
     let opts : apiMessageOptions = {
         url: options.url + "/" + options.fileName,
-        port: options.port
+        target: options.target
     }
 
     let result = await sendJsonApiMessage(opts);
@@ -92,7 +92,7 @@ export async function sendApiMessageGetFileContent(options : apiMessageGetFileCo
 
 export type apiMessageSetFileContent = {
     url: string,
-    port?: number,
+    target?: targetsType,
     fileName: string,
     content: string
 }
@@ -101,7 +101,7 @@ export type apiMessageSetFileContent = {
 export async function sendApiMessageSetFileContent(options : apiMessageSetFileContent) : Promise<void>{
     let opts : apiMessageOptions = {
         url: options.url + "/" + options.fileName,
-        port: options.port,
+        target: options.target,
         data: JSON.stringify({
             name: options.fileName,
             content: options.content
@@ -113,14 +113,14 @@ export async function sendApiMessageSetFileContent(options : apiMessageSetFileCo
 
 export type apiMessageDeleteFile = {
     url: string,
-    port?: number,
+    target?: targetsType,
     fileName: string
 }
 
 export async function sendApiMessageDeleteFile(options: apiMessageDeleteFile) : Promise<void>{
     let opts : apiMessageOptions = {
         url: options.url + "/" + options.fileName,
-        port: options.port,
+        target: options.target,
     }
 
     let result = await sendTextApiMessage(opts);

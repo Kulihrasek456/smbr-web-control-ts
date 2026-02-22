@@ -1,11 +1,14 @@
 import { isArray, isBoolean, isNull, isNumber, isString, isValidDateTime } from "../common/other/utils";
 import { smbr_apiMessageConfig } from "./apiMessageConfig";
 
+export const targets = ["reactorApi","webControlApi"] as const;
+export type targetsType = typeof targets[number];
+
 export interface apiMessageOptions{
     url : string;
 
     method ?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
-    port ?: number;
+    target ?: targetsType;
     hostname ?: string;
     data? : string;
 
@@ -15,7 +18,7 @@ export interface apiMessageOptions{
 
 export class ApiMessageError extends Error{
   constructor(options: apiMessageOptions ,message : string){
-    const fullUrl = "http://" + options.hostname + ":" + options.port?.toString() + options.url;
+    const fullUrl = "http://" + options.hostname + ":" + getTargetPort(options.target??"reactorApi").toString() + options.url;
     super(`${fullUrl} [${options.method}]: ${message}`)
     this.stack=""
     this.name = "ApiMessageError";
@@ -57,6 +60,14 @@ export class ApiUnparsableBody extends ApiMessageError{
   }
 }
 
+export function getTargetPort(target : targetsType) : number{
+    const targetToPort = {
+        "reactorApi" : 8089,
+        "webControlApi" : 8000
+    }
+    return targetToPort[target];
+}
+
 export type apiMessageJsonResult = {
   response: Response,
   jsonValue: any
@@ -64,7 +75,7 @@ export type apiMessageJsonResult = {
 
 export async function sendApiMessage(options:apiMessageOptions){
     const url = options.url
-    const port = options.port ?? 8089
+    const port = getTargetPort(options.target ?? "reactorApi")
     const hostname = options.hostname ?? smbr_apiMessageConfig.defaultHostname
     const method = options.method ?? "GET"
     const returnCodes = options.validStatusCodes ?? [200]
