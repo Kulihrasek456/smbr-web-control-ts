@@ -29,6 +29,8 @@ interface FileListElementProps {
 
   // callback called when a file is selected
   onSelect: (fileName : string)=>void;
+
+  onFileCreate?: (dirName : string)=>void;
 }
 
 function FileListElement(props: FileListElementProps) {
@@ -62,10 +64,14 @@ function FileListElement(props: FileListElementProps) {
               <Icon name="keyboard_arrow_down"></Icon>
             </div>
           </button>
-
-          <button class={fileListStyles["create-file-specific-button"]}>
-            <Icon name="add"></Icon>
-          </button>
+          
+          <Show when={props.onFileCreate}>
+            <button class={fileListStyles["create-file-specific-button"]}
+              onclick={()=>props.onFileCreate?.(prefixPath)}
+            >
+              <Icon name="add"></Icon>
+            </button>
+          </Show>
 
         </div>
       </Show>
@@ -79,6 +85,7 @@ function FileListElement(props: FileListElementProps) {
               onSelect={props.onSelect}
               prefixPath={prefixPath}
               activeFileName={props.activeFileName}
+              onFileCreate={props.onFileCreate}
             ></FileListElement>
           )}
         </For>
@@ -104,6 +111,8 @@ interface FileListProps {
     onClick: (fileName: string) => Promise<boolean>
   },
   files: FileListDirectory
+  maxDepth?: number
+  onlyDirectories? : boolean
 
   onSelect: (fileName : string) => void;
   activeFileName: ()=>string | undefined;
@@ -112,6 +121,9 @@ interface FileListProps {
 function FileList(props: FileListProps) {
   let newFileInput : HTMLInputElement | undefined;
   let newFileContainer : HTMLDivElement | undefined;
+
+
+
   return (
     <div class={fileListStyles.container} style={{ flex: "0 0 auto" }}>
       <div class={fileListStyles.search}>
@@ -165,6 +177,17 @@ function FileList(props: FileListProps) {
           data={props.files}
           onSelect={props.onSelect}
           activeFileName={props.activeFileName}
+          maxDepth={props.maxDepth}
+          onFileCreate={
+            (props.createFileButton)?(
+              (fileName : string)=>{
+                if(newFileInput && newFileContainer){
+                  newFileInput.value = fileName;
+                  newFileContainer.classList.remove(fileListStyles.collapsed);
+                }
+              }
+            ):undefined
+          }
         ></FileListElement>
       </div>
     </div>
@@ -412,6 +435,7 @@ export function TextEditor(props : TextEditorProps) {
   const [fileName,setFileName] = createSignal<string | undefined>();
   const [fileContent,setFileContent] = createSignal<string | undefined>();
   const [fileList, setFileList] = createSignal<FileListDirectory | undefined>();
+  const [directoryList, setDirectoryList] = createSignal<FileListDirectory | undefined>(); //#TODO connect this to the twoColLayout fileList
   const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
 
   const [runtimeInfoHidden, setRuntimeInfoHidden] = createSignal<boolean>(true);
@@ -572,6 +596,7 @@ export function TextEditor(props : TextEditorProps) {
           files={fileList() ?? {name:"root",files:[],subDirectories:{}}}
           onSelect={(value:string)=>{}}
           activeFileName={()=>""}
+          maxDepth={1}
         ></FileList>
       </Show>
 
