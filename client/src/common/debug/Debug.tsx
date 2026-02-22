@@ -4,6 +4,7 @@ import { moduleInstances, moduleTypes, useModuleListValue, type Module, type mod
 import { createServerCookie } from "@solid-primitives/cookies";
 import { isArray, isObject } from "../other/utils";
 import { smbr_apiMessageConfig } from "../../apiMessages/apiMessageConfig";
+import type { targetsType } from "../../apiMessages/apiMessageBase";
 
 interface DebugModuleEditorProps{
     class?: string;
@@ -117,39 +118,74 @@ interface DebugApiMessageHostnameEditor{
 }
 export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEditor){
     const [cookie, setCookie] = createServerCookie("SMBR-defaultHostname");
-    const [currHost, setCurrHost] = createSignal("---");
-    let inputEl !: HTMLInputElement
+    const [currHostWeb, setCurrHostWeb] = createSignal("---");
+    const [currHostReactor, setCurrHostReactor] = createSignal("---");
+    let inputElWeb !: HTMLInputElement
+    let inputElReactor !: HTMLInputElement
 
-    function setHostname(value : string){
+    function setWebHostname(value : string){
         if(value!=""){
-            console.log("changing hostname to: ",value);
-            smbr_apiMessageConfig.defaultHostname = value
+            console.log("changing web hostname to: ",value);
+            smbr_apiMessageConfig.defaultHostnames.webControlApi = value
         }else{
-            console.log("changing hostname back to default");
-            smbr_apiMessageConfig.defaultHostname = window.location.hostname
+            console.log("changing web hostname back to default");
+            smbr_apiMessageConfig.defaultHostnames.webControlApi = window.location.hostname
         }
-        setCurrHost(smbr_apiMessageConfig.defaultHostname);
+        setCurrHostWeb(smbr_apiMessageConfig.defaultHostnames.webControlApi);
+    }
+
+    function setReactorHostname(value : string){
+        if(value!=""){
+            console.log("changing reactor hostname to: ",value);
+            smbr_apiMessageConfig.defaultHostnames.reactorApi = value
+        }else{
+            console.log("changing reactor hostname back to default");
+            smbr_apiMessageConfig.defaultHostnames.reactorApi = window.location.hostname
+        }
+        setCurrHostReactor(smbr_apiMessageConfig.defaultHostnames.reactorApi);
+    }
+
+    function updateCookie(){
+        setCookie(JSON.stringify({
+            web: currHostWeb(),
+            reactor: currHostReactor()
+        }))
     }
 
     onMount(()=>{
-        let cookieData = cookie()
-        if(cookieData){
-            console.log(cookieData)
-            setHostname(cookieData)
+        try {
+            let cookieData = JSON.parse(cookie() ?? "{}")
+            if(cookieData.web && cookieData.reactor){
+                console.log("parsed debug hosntame cookie: ",cookieData)
+                setCurrHostWeb(cookieData.web)
+                setCurrHostReactor(cookieData.reactor)
+            }
+        } catch (error) {
         }
     })
 
     return (
         <div class={styles.container + " " + props.class}>
-            <p>Api message target:</p>
-            <p>Current: {currHost()}</p>
+            <p>Api message targets:</p>
+            <p>Current web: {currHostWeb()}</p>
             <div class={styles.horflex}>
-                <input class={styles.grow}  ref={inputEl}></input>
+                <input class={styles.grow}  ref={inputElWeb}></input>
                 <button onclick={()=>{
-                    if(inputEl){
-                        setHostname(inputEl.value);
-                        setCookie(inputEl.value);
-                        inputEl.value = ""
+                    if(inputElWeb){
+                        setWebHostname(inputElWeb.value);
+                        updateCookie();
+                        inputElWeb.value = ""
+                    }
+                }}>set</button>
+            </div>
+            <p>Current reactor: {currHostReactor()}</p>
+            <div class={styles.horflex}>
+                <input class={styles.grow}  ref={inputElReactor}></input>
+                <button onclick={()=>{
+                    if(inputElReactor){
+                        setReactorHostname(inputElReactor.value);
+                        updateCookie();
+                        inputElReactor.value = ""
                     }
                 }}>set</button>
             </div>
