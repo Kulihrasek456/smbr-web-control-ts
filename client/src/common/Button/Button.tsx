@@ -3,9 +3,10 @@ import { children, createSignal, type JSXElement} from 'solid-js'
 import styles from './Button.module.css'
 
 export interface ButtonProps {
-    callback? : () => Promise<boolean>;
+    callback? : () => Promise<boolean | void>;
     children?: JSXElement;
     class? : string;
+    disabled ?:boolean
 };
 
 
@@ -26,7 +27,7 @@ export function Button(props: ButtonProps) {
     return (
         <button 
         class={`${styles.fetcher} button ${props.class?props.class:""}`} 
-        disabled={disabled()}
+        disabled={disabled() || (props.disabled ?? false)}
         onClick={onclick}>
             {props.children}
         </button>
