@@ -36,7 +36,6 @@ export type FileListDirectory = {
 }
 
 export function parseApiMessageFileList(fileList : string[]) : FileListDirectory{
-    console.log("parsing file list: ",fileList);
     let root : FileListDirectory = {
         name: "root",
         subDirectories: {},
