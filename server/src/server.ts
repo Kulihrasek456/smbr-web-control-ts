@@ -58,6 +58,7 @@ const distPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
 
 let debugMode = false;
 let verboseMode = false;
+let noFrontEnd = false;
 process.argv.forEach(function (val, index, array) {
     if(val == "-d"){
         console.warn("Running in DEBUG MODE");
@@ -66,6 +67,10 @@ process.argv.forEach(function (val, index, array) {
     if(val == "-v"){
         console.warn("Running in VERBOSE MODE");
         verboseMode = true;
+    }
+    if(val == "--no-frontend"){
+        console.warn("Running in NO FRONTEND MODE");
+        noFrontEnd = true;
     }
 });
 
@@ -78,13 +83,15 @@ process.argv.forEach(function (val, index, array) {
 
 const app = express();
 app.use(cors()); 
-
+app.use(express.json());
 app.use(express.static(distPath));
 app.use('/config-files', configFilesRouter);
 
-app.use((req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'));
-});
+if(!noFrontEnd){
+    app.use((req, res) => {
+        res.sendFile(path.join(distPath, 'index.html'));
+    });
+}
 
 const PORT = 8000;
 app.listen(PORT, () => {
