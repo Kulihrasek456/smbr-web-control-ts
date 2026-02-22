@@ -56,7 +56,7 @@ function QuickLaunchBody(props: QuickLaunchProps){
     
     const [searchText, setSearchText] = createSignal<string>("");
 
-    const  [scheduledScript, setScheduledScript] = createSignal<string>("macros|---");
+    const  [scheduledScript, setScheduledScript] = createSignal<string>("---");
     const  [scriptState, setScriptState] = createSignal<string>("---");
 
     const refreshCntxt = useRefreshValue;
@@ -122,9 +122,6 @@ function QuickLaunchBody(props: QuickLaunchProps){
                             <Icon name="play_arrow"></Icon>
                         </Button>
                         <Button callback={stop}>
-                            <Icon name="stop"></Icon>
-                        </Button>
-                        <Button>
                             <Icon name="pause"></Icon>
                         </Button>
                     </>
@@ -133,7 +130,7 @@ function QuickLaunchBody(props: QuickLaunchProps){
             >
             <div class={styles.selected_script}>
                 <b>Selected script</b>
-                <p>{parseMacroName(scheduledScript())}</p>
+                <p>{scheduledScript()}</p>
             </div>
             <div class={styles.current_state}>
                 <b>Current state</b>
