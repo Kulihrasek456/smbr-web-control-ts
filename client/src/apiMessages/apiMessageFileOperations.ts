@@ -36,6 +36,7 @@ export type FileListDirectory = {
 }
 
 export function parseApiMessageFileList(fileList : string[]) : FileListDirectory{
+    console.log("parsing file list: ",fileList);
     let root : FileListDirectory = {
         name: "root",
         subDirectories: {},
@@ -45,7 +46,7 @@ export function parseApiMessageFileList(fileList : string[]) : FileListDirectory
     for(let file of fileList){
         let path : string[] = file.split("|");
         let target : FileListDirectory = root;
-        for(let i : number = 0; i<path.length-2; i++){
+        for(let i : number = 0; i<path.length-1; i++){
             let pathSegment = path[i];
             if(target.subDirectories[pathSegment] == undefined){
                 target.subDirectories[pathSegment] = {
@@ -85,7 +86,7 @@ export async function sendApiMessageGetFileContent(options : apiMessageGetFileCo
     checkString(data,"content",opts);
 
     return {
-        content: data.name
+        content: data.content
     }
 }
 
@@ -102,6 +103,7 @@ export async function sendApiMessageSetFileContent(options : apiMessageSetFileCo
     let opts : apiMessageOptions = {
         url: options.url + "/" + options.fileName,
         target: options.target,
+        method: "PUT",
         data: JSON.stringify({
             name: options.fileName,
             content: options.content
@@ -120,6 +122,7 @@ export type apiMessageDeleteFile = {
 export async function sendApiMessageDeleteFile(options: apiMessageDeleteFile) : Promise<void>{
     let opts : apiMessageOptions = {
         url: options.url + "/" + options.fileName,
+        method: "DELETE",
         target: options.target,
     }
 
