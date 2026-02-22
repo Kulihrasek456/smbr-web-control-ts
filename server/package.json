@@ -7,7 +7,7 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "dev": "tsx watch server.ts",
+    "dev": "npm run build && node dist/src/server.js --no-frontend",
     "build": "rimraf dist && tsc",
     "start": "npm run build && node dist/src/server.js",
     "start:debug": "npm run build && node dist/src/server.js -d"
