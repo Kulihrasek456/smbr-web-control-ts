@@ -157,8 +157,8 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
             let cookieData = JSON.parse(cookie() ?? "{}")
             if(cookieData.web && cookieData.reactor){
                 console.log("parsed debug hosntame cookie: ",cookieData)
-                setCurrHostWeb(cookieData.web)
-                setCurrHostReactor(cookieData.reactor)
+                setWebHostname(cookieData.web)
+                setReactorHostname(cookieData.reactor)
             }
         } catch (error) {
         }
