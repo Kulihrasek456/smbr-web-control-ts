@@ -11,6 +11,7 @@ import { TableStatic } from "../../../common/Table/Table";
 import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../../common/other/RefreshProvider";
 import { targets, type targetsType } from "../../../apiMessages/apiMessageBase";
 import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
+import { Scheduler } from "../../../apiMessages/scheduler/_";
 
 
 
@@ -188,7 +189,7 @@ function OutputContainer(props: { children?: JSXElement, title: string, info?: s
   )
 }
 
-function TwoColTable(props: { data: { left: string, right: string }[], leftSize: string }) {
+function TwoColTable(props: { data: twoColTableRow[], leftSize: string }) {
   return (
     <div class={runtimeInfoStyles["two-col-table"]}>
       <For each={props.data}>
@@ -207,59 +208,101 @@ function statusImg(state : string){
   return "clock_loader_10";
 }
 
+type twoColTableRow = {
+  left: string,
+  right: string
+}
+
 function RuntimeInfo(props: RuntimeInfoProps) {
-  const [selected, setSelected] = createSignal("placeholder text");
-  const [status, setStatus] = createSignal("paused");
-  const [callStack, setCallStack] = createSignal([
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" }
-  ]);
-  const [consoleOut, setConsoleOut] = createSignal([
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111da wd wad wad awd wadwad", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" },
-    { left: "1", right: "test" },
-    { left: "2", right: "test1" },
-    { left: "111", right: "test4" },
-    { left: "3", right: "test2" },
-    { left: "45", right: "test3" }
-  ]);
+  const refreshCntxt = useRefreshValue;
+  const [selected, setSelected] = createSignal<string | undefined>(undefined);
+  const [status, setStatus] = createSignal<"Running" | "Paused" | "Stopped" | "NeverStarted">("Paused");
+  const [callStack, setCallStack] = createSignal<twoColTableRow[]>([]);
+  const [consoleOut, setConsoleOut] = createSignal<twoColTableRow[]>([]);
+  const [processID, setProcessID] = createSignal<number>(0);
   const [scriptContent, setScriptContent] = createSignal("string");
+  const [startedAt, setStartedAt] = createSignal<Date | undefined>(undefined);
+
+  let lastUpdate = 0;
+  createEffect(async ()=>{
+    if(refreshValueUpdate(refreshCntxt(),{length: 10000,lastUpdate:lastUpdate})){
+      lastUpdate = Date.now();
+      let result = await Scheduler.sendGetScheduled();
+      
+      setScriptContent(result.content);
+    }
+
+    if(refreshValueUpdate(refreshCntxt())){
+      let result = await Scheduler.sendRuntimeInfo();
+
+
+      let newCallStack : twoColTableRow[]= [];
+      for(let line of result.stack){
+        newCallStack.push({
+          left: line.toString(),
+          right: scriptContent().split("\n")[line-1]
+        })
+      }
+
+      let newConsoleOut : twoColTableRow[] = [];
+      for(let outLine of result.output){
+        newConsoleOut.push({
+          left: outLine.timeStamp,
+          right: outLine.output
+        })
+      }
+
+      setCallStack(newCallStack);
+      setConsoleOut(newConsoleOut);
+      setSelected(result.name);
+      setStatus(result.state);
+      setProcessID(result.processId);
+      setStartedAt(result.startedAt);
+    }
+  })
+
+  async function stop(){
+      await Scheduler.sendStopScheduled();
+      return true;
+  }
+
+
+  async function start(){
+      await Scheduler.sendStartScheduled();
+      return true;
+  }
+
+
+  function getStatusColor(status : "Running" | "Paused" | "Stopped" | "NeverStarted") : string{
+    switch (status) {
+      case "Running":
+        return "var(--acc-color-4)"
+      case "Paused":
+        return "var(--warn-color-3)"
+      case "Stopped":
+        return "var(--err-color-3)"
+      case "NeverStarted":
+        return "var(--warn-color-3)"
+    
+      default:
+        return "white";
+    }
+  }
+
+  function getRunningFor(startedTime : Date | undefined):string{
+    if(startedTime){
+      return ((Date.now()-startedTime.getTime())/1000)+" seconds (work in progress)"
+    }
+    return "---";
+  }
+
+  function getStartedAt(startedTime : Date | undefined):string{
+    if(startedTime){
+      return startedAt()?.toDateString() + " "+ startedAt()?.toLocaleTimeString()
+    }
+    return "---";
+  }
+
 
   return (
     <div class={runtimeInfoStyles.container}>
@@ -267,27 +310,37 @@ function RuntimeInfo(props: RuntimeInfoProps) {
         <h1>
           Runtime Info
         </h1>
-        <Button class={runtimeInfoStyles["start-button"]}>
+        <Button class={runtimeInfoStyles["start-button"]}
+          callback={start}
+          disabled={selected()===undefined}
+        >
           <Icon name="play_arrow"></Icon>
         </Button>
-        <Button class={runtimeInfoStyles["stop-button"]}>
-          <Icon name="stop"></Icon>
-        </Button>
-        <Button class={runtimeInfoStyles["pause-button"]}>
+        <Button class={runtimeInfoStyles["stop-button"]}
+          callback={stop}
+          disabled={selected()===undefined}
+        >
           <Icon name="pause"></Icon>
         </Button>
       </div>
       <div class={runtimeInfoStyles.body}>
-        <div class={runtimeInfoStyles.header2}>
+        <div class={runtimeInfoStyles.header1}>
           <div class={runtimeInfoStyles["selected-script"]}>
             <p>Selected script:</p>
-            <h2 class={runtimeInfoStyles["selected-script-name"]}>{selected()}</h2>
+            <h2 class={runtimeInfoStyles["selected-script-name"]}>{selected() ?? "---"}</h2>
           </div>
           <div class={runtimeInfoStyles["selected-id"]}>
             <p>Process id:</p>
-            <h2 class={runtimeInfoStyles["selected-id-name"]}>{15235}</h2>
+            <h2 class={runtimeInfoStyles["selected-id-name"]}>{processID()}</h2>
           </div>
         </div>
+        <div class={runtimeInfoStyles.header2}>
+          <div class={runtimeInfoStyles["running-stats"]}>
+            <p>Started at: </p>
+            <h2 class={runtimeInfoStyles["started-at"]}>{getStartedAt(startedAt())}</h2>
+          </div>
+        </div>
+        
         <div class={runtimeInfoStyles.body2}>
           <div class={runtimeInfoStyles["info-panel"]}>
             <OutputContainer title="CALL STACK" class={runtimeInfoStyles["call-stack"]}>
@@ -295,28 +348,32 @@ function RuntimeInfo(props: RuntimeInfoProps) {
 
               </TwoColTable>
             </OutputContainer>
-            <div class={runtimeInfoStyles["info-panel-stats"]}>
-              <h2>Started: </h2>
-              <p>25:66 15.8.2009</p>
-              <h2>Time Elapsed: </h2>
-              <p>---</p>
-            </div>
             <div class={runtimeInfoStyles["status"]}>
               <h2>Status: {status()}</h2>
-              <div class={runtimeInfoStyles["status-img"]}>
-
+              <div 
+                classList={{
+                  [runtimeInfoStyles["status-img"]]:true,
+                  [runtimeInfoStyles["spinning"]]: status()=="Running"
+                }}
+                style={{
+                  color: getStatusColor(status())
+                }}
+              >
                 <Icon name={statusImg(status())}></Icon>
               </div>
             </div>
           </div>
-          <OutputContainer title="OUTPUT" class={runtimeInfoStyles["log-ouptut"]} info="9999 logs">
+          <OutputContainer title="OUTPUT" class={runtimeInfoStyles["log-ouptut"]} info={consoleOut().length.toString() + " logs"}>
             <TwoColTable data={consoleOut()} leftSize={"50px"}>
-
             </TwoColTable>
           </OutputContainer>
           <OutputContainer class={runtimeInfoStyles["script-preview"]} title="SELECTED SCRIPT PREVIEW" info="read-only view">
-            <CodeMirrorWrapper initialValueGetter={scriptContent} readOnly={true}>
-            </CodeMirrorWrapper>
+
+            <CodeMirrorWrapper 
+              initialValueGetter={scriptContent} 
+              readOnly={true}
+            ></CodeMirrorWrapper>
+
           </OutputContainer>
         </div>
       </div>
@@ -348,7 +405,8 @@ export function TextEditor(props : TextEditorProps) {
   const [fileContent,setFileContent] = createSignal<string | undefined>();
   const [fileList, setFileList] = createSignal<FileListDirectory | undefined>();
   const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
-  const [runtimeInfoPeriod, setRuntimeInfoPeriod] = createSignal<number | undefined>();
+
+  const [runtimeInfoHidden, setRuntimeInfoHidden] = createSignal<boolean>(true);
 
   // this is the currently edited, original version of a files content.
   const [downloadedScriptContent, setDownloadedScriptContent] = createSignal<string>("");
@@ -477,6 +535,17 @@ export function TextEditor(props : TextEditorProps) {
     return true;
   }
 
+  async function scheduleFile() : Promise<boolean>{
+    let currFile = fileName();
+    if(currFile && !dirtyFlag()){
+      await Scheduler.sendSetScheduled({
+        fileName: currFile
+      })
+      return true;
+    }
+    return false;
+  }
+
   createEffect(async ()=>{
     if(refreshValueUpdate(refreshCntxt())){
       await reloadFileList(refreshCntxt()?.()?.forced ?? false);
@@ -545,6 +614,7 @@ export function TextEditor(props : TextEditorProps) {
 
           <Button
             disabled={dirtyFlag() || fileName() === undefined}
+            callback={scheduleFile}
           >
             <Icon name="share_windows"></Icon>
           </Button>
@@ -565,13 +635,23 @@ export function TextEditor(props : TextEditorProps) {
 
 
       <Show when={props.runtimeInfo}>
-        <button class={textEditorStyles["runtime-info-handle"] + " button"} onclick={e => { if (runtimeInfo) { runtimeInfo.classList.toggle(textEditorStyles.collapsed) } }}>
+        <button 
+          class={textEditorStyles["runtime-info-handle"] + " button"} 
+          onclick={e => { 
+            if (runtimeInfo) {
+              setRuntimeInfoHidden(!runtimeInfoHidden())
+            } 
+          }}
+        >
           <div><Icon name="arrow_back_ios_new"></Icon></div>
           <p>Runtime info</p>
           <div><Icon name="arrow_back_ios_new"></Icon></div>
         </button>
-        <div class={textEditorStyles["runtime-info"]} ref={runtimeInfo}>
-          <RefreshProvider autoRefreshPeriod={runtimeInfoPeriod()}>
+        <div classList={{
+          [textEditorStyles["runtime-info"]]:true,
+          [textEditorStyles.collapsed]:runtimeInfoHidden()
+        }} ref={runtimeInfo}>
+          <RefreshProvider autoRefreshPeriod={runtimeInfoHidden()?(undefined):(250)}>
             <RuntimeInfo></RuntimeInfo>
           </RefreshProvider>
         </div>

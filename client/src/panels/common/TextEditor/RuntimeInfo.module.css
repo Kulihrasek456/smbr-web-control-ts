@@ -5,6 +5,8 @@
     justify-content: space-between;
     align-items: stretch;
     min-height: 0;
+
+    overflow: hidden;
 }
 .header{
     display: flex;
@@ -58,7 +60,7 @@
     
 }
 
-.header2{
+.header2,.header1{
     padding: 5px 10px;
 }
 .body2{
@@ -76,13 +78,16 @@
 
 }
 
-.header2{
+.header2,.header1{
     flex: 0 0 auto;
     display: flex;
 
+}
+.header2{
+    
     border-bottom: 1px solid var(--bg-color-5);
 }
-.selected-script, .selected-id{
+.selected-script, .selected-id, .running-stats{
     flex: 1 1 auto;
     display: flex;
     justify-content: start;
@@ -95,9 +100,13 @@
         color: var(--bg-color-5);
     }
 }
-.selected-script-name,.selected-id-name{
+.selected-script-name,.selected-id-name, .started-at{
     color: var(--text-color-light) !important;
     font-weight: bold;
+}
+
+.running-stats {
+    justify-content: space-between;
 }
 
 .selected-id{
@@ -118,31 +127,14 @@
     gap: 10px;
 
     height: 150px;
-}
 
-.call-stack{
-    flex: 1 1 auto;
-}
-
-.info-panel-stats{
-    flex: 1 1 auto;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: stretch;
-
-    h2{
-        text-align: left;
-    }
-    p{
-        text-align: right;
+    >*{
+        flex: 0 0 auto;
+        width: 50%;
     }
 }
 
 .status{
-    flex: 0 0 auto;
-
     border-left: 2px solid var(--bg-color-4);
     padding-left: 10px;
 
@@ -161,6 +153,19 @@
     align-items: center;
 
     font-size: 100px;
+}
+
+@keyframes spin360 {
+    from {
+        rotate:0deg
+    }
+
+    to {
+        rotate:360deg
+    }
+}
+.status-img.spinning{
+    animation: spin360 3s infinite linear;
 }
 
 .log-ouptut,.script-preview{
