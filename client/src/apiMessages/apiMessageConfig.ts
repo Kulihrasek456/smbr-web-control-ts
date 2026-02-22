@@ -1,4 +1,7 @@
 
 export const smbr_apiMessageConfig = {
-    defaultHostname : window.location.hostname
+    defaultHostnames : {
+        reactorApi: window.location.hostname,
+        webControlApi: window.location.hostname
+    }
 }
