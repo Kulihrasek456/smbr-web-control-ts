@@ -13,6 +13,7 @@
     "start:debug": "npm run build && node dist/src/server.js -d"
   },
   "dependencies": {
+    "axios": "^1.13.5",
     "chalk": "^5.6.2",
     "cors": "^2.8.6",
     "express": "^5.2.1"
