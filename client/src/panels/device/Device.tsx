@@ -5,7 +5,7 @@ import { Control } from "../dashboard/Control.tsx";
 import { Temperature } from "../dashboard/Temperature.tsx";
 import { DeviceInformation } from "./DeviceInformation.tsx";
 import { ModuleListDisplay } from "./ModuleList.tsx";
-import { ServiceStatus } from "./ServiceStatus.tsx";
+import { ServicesStatus } from "./ServiceStatus.tsx";
 
 export function Device() {
   const moduleListCntxt = useModuleListValue();
@@ -15,7 +15,7 @@ export function Device() {
     <div style={{ padding: "8px" }}>
       <GridstackGrid>
           <ModuleListDisplay id="moduleList"></ModuleListDisplay>
-          <ServiceStatus id="serviceStatus"></ServiceStatus>
+          <ServicesStatus id="serviceStatus"></ServicesStatus>
           <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive")}>
             <DeviceInformation id="deviceInformation"></DeviceInformation>
           </Show>
