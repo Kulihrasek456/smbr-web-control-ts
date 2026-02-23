@@ -4,6 +4,7 @@ import express from 'express';
 import chalk from 'chalk';
 import cors from 'cors';
 import { configFilesRouter } from './config-endpoints.js';
+import { serviceStatusRouter } from './service-status.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -86,6 +87,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(distPath));
 app.use('/config-files', configFilesRouter);
+app.use('/services-status', serviceStatusRouter);
 
 if(!noFrontEnd){
     app.use((req, res) => {
