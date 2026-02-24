@@ -27,6 +27,17 @@ type row = {
     lastSubRow? : boolean
 }
 
+const endpointToName : {[key: string]: string} = {
+    "/sensor/bottle/temperature" : "Bottle",
+    "/sensor/bottle/top/measured_temperature" : "Bottle.Top",
+    "/sensor/bottle/bottom/measured_temperature" : "Bottle.Bottom",
+    "/sensor/fluorometer/detector/temperature" : "Fluorometer.Detector",
+    "/sensor/fluorometer/emitor/temperature" : "Fluorometer.Emitor",
+    "/sensor/spectrophotometer/emitor/temperature" : "Spectrophotometer",
+    "/control/led_panel/temperature" : "LED panel",
+    "/control/heater/plate_temperature" : "Heater plate"
+}as const;
+
 function createRow(data: row, index:number) : JSXElement[] {
     return [
         <Icon 
@@ -98,10 +109,10 @@ export function TemperatureBody(props : TemperatureBodyProps) {
     const [scope, setScope] = createSignal<"M"|"D"|"H">("M");
     const [labels, setLabels] = createSignal<string[]>([])
     const [datasets, setDatasets] = createSignal<TemperatureLogs.Logs>({})
-    const [historyLen , setHistoryLen] = createSignal<number>(10);
     const moduleListCntxt = useModuleListValue();
     const scopeGroupName = createUniqueId()
     const refreshCntxt = useRefreshValue;
+    let historyLen = 80;
     let lastRefresh = 0;
     let lastScope = ""
 
@@ -223,8 +234,8 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         for(let endpoint in datasets){
             if(datasets[endpoint]){
                 result.push({
-                    label: endpoint,
-                    data: datasets[endpoint]
+                    label: endpointToName[endpoint] ?? endpoint,
+                    data: datasets[endpoint],
                 })
             }
         }
@@ -243,9 +254,8 @@ export function TemperatureBody(props : TemperatureBodyProps) {
 
         for(let endpoint in logs){
             if(logs[endpoint]){
-                let history = historyLen();
                 let newData = logs[endpoint];
-                let oldData : (number|undefined)[] = getEmptyArray(history);
+                let oldData : (number|undefined)[] = getEmptyArray(historyLen);
     
                 if(oldDatasets[endpoint]){
                     oldData = oldDatasets[endpoint]
@@ -267,7 +277,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         }
         if(lastScope != scope()){
             lastRefresh = 0;
-            setLabels(generateTimeLabels(Date.now(),historyLen(),scope()));
+            setLabels(generateTimeLabels(Date.now(),historyLen,scope()));
             lastScope = scope();
             setDatasets({});
         }
@@ -276,11 +286,10 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             scope: scope()
         })
         if(result.logCount > 0){
+            historyLen = result.historyLen;
             lastRefresh = Date.now();
             addLogsToChart(result.logs);
         }
-        
-        console.log(result.logs);
     })
 
     return (
