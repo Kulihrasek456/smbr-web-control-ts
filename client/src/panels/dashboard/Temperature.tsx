@@ -287,20 +287,6 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             <Widget
                 name="Temperature"
                 customRefreshProvider={true}
-                hotbarTargets={() => {
-                    return (
-                        <>
-                            <WidgetHotbarValue
-                                name="API value:"
-                                apiFetcherProps={{
-                                    target: {url: "",key:""},
-                                    interval: 3000,
-                                    unit: " ms",
-                                }}></WidgetHotbarValue>
-                            <Button callback={async () => { return true }} ><p>test</p></Button>
-                        </>
-                    )
-                }}
             >
                 <TableStatic 
                     renderRow={createRow} 
