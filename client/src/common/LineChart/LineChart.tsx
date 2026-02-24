@@ -49,7 +49,7 @@ export interface LineChartProps{
     labels : Array<string | number>,
     datasets : Array<{
         label: string,
-        data : Array<number>,
+        data : Array<number | undefined>,
         hidden? : boolean
     }>,
     ref?: (methods: { getCanvas: () => HTMLCanvasElement | undefined }) => void;
@@ -60,11 +60,8 @@ function getPlugins(options?: CustomChartOptions) {
     let result : any = {
         tooltip: {
             callbacks: {
-                title: function(context: TooltipItem<any>[]){
-                    if(context.length>0){
-                        return context[0].label + ' µs';
-                    }
-                }
+                title: options?.plugins?.tooltip?.titleCallback,
+                label: options?.plugins?.tooltip?.labelCallback
             },
         },
     };
