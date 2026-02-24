@@ -5,6 +5,7 @@ import chalk from 'chalk';
 import cors from 'cors';
 import { configFilesRouter } from './config-endpoints.js';
 import { serviceStatusRouter } from './service-status.js';
+import { TempLogger } from './temperature-history.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,7 +37,7 @@ const distPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
 
     const originalLog = console.log;
     console.log = (...args) => {
-        originalError(consoleTimestamp(),...args);
+        originalLog(consoleTimestamp(),...args);
     };
 
     const originalError = console.error;
@@ -80,7 +81,7 @@ process.argv.forEach(function (val, index, array) {
 
 
 
-
+const tempLogger : TempLogger = new TempLogger(80);
 
 const app = express();
 app.use(cors()); 
@@ -88,6 +89,7 @@ app.use(express.json());
 app.use(express.static(distPath));
 app.use('/config-files', configFilesRouter);
 app.use('/services-status', serviceStatusRouter);
+app.use('/temperature-logs', tempLogger.router);
 
 if(!noFrontEnd){
     app.use((req, res) => {
