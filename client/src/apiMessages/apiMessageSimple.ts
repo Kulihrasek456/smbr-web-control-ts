@@ -23,7 +23,7 @@ export async function sendApiMessageSimple(options : apiMessageSimple) : Promise
 
     let result = response.jsonValue[options.key]
     if(result != undefined){
-        return (result).toString()
+        return result
     }else{
         throw new ApiMessageSimpleMissingKey(opts,options.key);
     }
