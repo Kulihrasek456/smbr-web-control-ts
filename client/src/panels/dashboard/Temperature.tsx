@@ -8,10 +8,12 @@ import { Icon } from "../../common/Icon/Icon"
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
 import { getColor } from "../../common/other/colorGenerator"
 import { LineChart } from "../../common/LineChart/LineChart"
-import { getCountdownArray } from "../../common/other/utils"
+import { formatTime, getCountdownArray } from "../../common/other/utils"
 import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
 import { RadialSelect } from "../../common/RadialSelect/RadialSelect"
 import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
+import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider"
+import { TemperatureLogs } from "../../apiMessages/temperature-logs/_"
 
 // create subrows by setting icon as undefined
 // row indexes are then given automatically after generating the array
@@ -58,17 +60,50 @@ function createRow(data: row, index:number) : JSXElement[] {
     ]
 }
 
+function generateTimeLabels(currentTime : number, count : number, scope : "M"|"D"|"H") {
+    const labels = [];
+    const step : number = {
+        "M":    1000,
+        "H":   60000,
+        "D": 3600000,
+    }[scope];
+
+    for (let i = 0; i < count; i++) {
+        const timePoint = new Date(currentTime - (count - 1 - i) * step);
+        
+        const timeString = formatTime({
+            "M":"HH:MM:SS",
+            "H":"HH:MM",
+            "D":"dd.mo HHh"
+        }[scope],timePoint)
+        
+        labels.push(timeString);
+    }
+
+    return labels;
+}
+
 
 interface TemperatureProps{
     id: string;
 }
 
-export function Temperature(props:TemperatureProps) {
+interface TemperatureBodyProps extends TemperatureProps{
+    rowNumberSetter : (value : number) => void;
+}
+
+export function TemperatureBody(props : TemperatureBodyProps) {
     let i=0;
     const [rows, setRows] = createSignal<row[]>([]);
-    const [scope, setScope] = createSignal<string>("minute");
+    const [scope, setScope] = createSignal<"M"|"D"|"H">("M");
+    const [labels, setLabels] = createSignal<string[]>([])
+    const [datasets, setDatasets] = createSignal<TemperatureLogs.Logs>({})
+    const [historyLen , setHistoryLen] = createSignal<number>(10);
     const moduleListCntxt = useModuleListValue();
     const scopeGroupName = createUniqueId()
+    const refreshCntxt = useRefreshValue;
+    let lastRefresh = 0;
+    let lastScope = ""
 
     function assignIndexes(rows : row[]){
         let rowI=-1;
@@ -183,11 +218,75 @@ export function Temperature(props:TemperatureProps) {
         refreshRows(moduleListCntxt.state())
     }
 
+    function parseDatasets(datasets : TemperatureLogs.Logs) : {data: (number|undefined)[], label: string}[]{
+        let result : {data: (number|undefined)[], label: string}[] = [];
+        for(let endpoint in datasets){
+            if(datasets[endpoint]){
+                result.push({
+                    label: endpoint,
+                    data: datasets[endpoint]
+                })
+            }
+        }
+        return result;
+    }
+
+    function getEmptyArray(size : number) : undefined[]{
+        let arr : undefined[]= []
+        arr.length = size;
+        return arr;
+    }
+
+    function addLogsToChart(logs: TemperatureLogs.Logs){
+        let newDatasets : TemperatureLogs.Logs = {}
+        let oldDatasets = datasets();
+
+        for(let endpoint in logs){
+            if(logs[endpoint]){
+                let history = historyLen();
+                let newData = logs[endpoint];
+                let oldData : (number|undefined)[] = getEmptyArray(history);
+    
+                if(oldDatasets[endpoint]){
+                    oldData = oldDatasets[endpoint]
+                }
+    
+                newDatasets[endpoint]=[...oldData.slice(newData.length),...newData];
+            }
+        }
+
+        setDatasets(newDatasets)
+    }
+
+    createEffect(()=>{
+        props.rowNumberSetter(rows().length)
+    })
+    createEffect(async ()=>{
+        if(!refreshValueUpdate(refreshCntxt()) && lastScope == scope()){
+            return;
+        }
+        if(lastScope != scope()){
+            lastRefresh = 0;
+            setLabels(generateTimeLabels(Date.now(),historyLen(),scope()));
+            lastScope = scope();
+            setDatasets({});
+        }
+        let result = await TemperatureLogs.sendGetLogs({
+            timeBack: Date.now()-lastRefresh,
+            scope: scope()
+        })
+        if(result.logCount > 0){
+            lastRefresh = Date.now();
+            addLogsToChart(result.logs);
+        }
+        
+        console.log(result.logs);
+    })
 
     return (
-        <GridElement id={props.id} w={1} h={5 + Math.round(rows().length/3)}>
             <Widget
                 name="Temperature"
+                customRefreshProvider={true}
                 hotbarTargets={() => {
                     return (
                         <>
@@ -212,21 +311,44 @@ export function Temperature(props:TemperatureProps) {
                 <RadialSelect
                     groupName={scopeGroupName}
                     selections={[
-                        {value:"m",label:"minute"},
-                        {value:"s",label:"hour"},
-                        {value:"d",label:"day"}
+                        {value:"M",label:"minute"},
+                        {value:"H",label:"hour"},
+                        {value:"D",label:"day"}
                     ]}
                     getter={scope}
                     setter={setScope}
                 ></RadialSelect>
                 <div style={{flex:"1 1 auto", "min-height": 0}}>
                     <LineChart 
-                        labels={getCountdownArray(15)} 
-                        datasets={[{data:getCountdownArray(15),label:"test"}]}
+                        labels={labels()} 
+                        datasets={parseDatasets(datasets())}
+                        options={{raw:{
+                            scales:{
+                                x:{
+                                    type: 'category',
+                                    ticks: {
+                                        autoSkip: true,
+                                    }
+                                }
+                            }
+                        }}}
                     ></LineChart>
                 </div>
                 
             </Widget>
+    )
+}
+
+export function Temperature(props: TemperatureProps) {
+    const [rows, setRows] = createSignal(0);
+    return (
+        <GridElement id={props.id} w={1} h={5 + Math.round(rows() / 3)}>
+            <RefreshProvider>
+                <TemperatureBody 
+                    rowNumberSetter={setRows}
+                    {...props}
+                ></TemperatureBody>
+            </RefreshProvider> 
         </GridElement>
     )
 }
