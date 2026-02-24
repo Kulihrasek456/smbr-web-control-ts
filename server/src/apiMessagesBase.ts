@@ -76,7 +76,7 @@ export async function sendApiMessage(options:apiMessageOptions){
     let response : Response;
 
     try {
-        response = await axios(url_full, {
+        response = await fetch(url_full, {
             "headers": {
                 "Accept": "application/json",
                 "Accept-Language": "cs,sk;q=0.8,en-US;q=0.5,en;q=0.3",
