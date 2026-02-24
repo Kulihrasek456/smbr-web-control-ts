@@ -159,7 +159,7 @@ export function checkArray(value: any, key:string, checkElement: (element : any)
     let values : any[] = value[key]
 
     if(!isArray(values)){
-        throw new ApiUnparsableBody(options,"should contain samples array")
+        throw new ApiUnparsableBody(options,`should contain ${key} array`)
     }
 
     for(let i = 0; i<values.length; i++){
