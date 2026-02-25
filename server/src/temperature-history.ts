@@ -188,6 +188,8 @@ export class TempLogger {
 
     updateCounter : number = 0;
 
+    timeStarted : number;
+
     mLogs : LogContainer
     hLogs : LogContainer
     dLogs : LogContainer
@@ -199,6 +201,8 @@ export class TempLogger {
         this.mLogs = new LogContainer(historyLen,    1000);
         this.hLogs = new LogContainer(historyLen,   60000);
         this.dLogs = new LogContainer(historyLen, 3600000);
+
+        this.timeStarted = Date.now();
 
         this.router.post("/",(req: Request, res: Response)=>{
             this.getter(req,res);
@@ -298,6 +302,10 @@ export class TempLogger {
 
     getter(req: Request, res: Response){
         let timeBack = req.body["timeBack"];
+        let maxTimeBack = Date.now()-this.timeStarted;
+        if(timeBack > maxTimeBack){
+            timeBack = maxTimeBack;
+        }
         if(isNumber(timeBack)){
             let scope = req.body["scope"];
             if(isString(req.body["scope"])){
