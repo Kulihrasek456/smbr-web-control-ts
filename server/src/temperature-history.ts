@@ -76,7 +76,6 @@ class LogContainer{
     }
 
     push(log : Log, currTime : number){
-        console.debug("temperature logger created new log: ",JSON.stringify(log));
 
         for(let endpoint in log.data){
             let logData = log.data[endpoint];
@@ -95,7 +94,6 @@ class LogContainer{
     }
 
     getValues(timeBack : number) : Record<string,(number|undefined)[]>{
-        console.log("getting values from past:",timeBack, "ms");
         let result : Record<string,(number|undefined)[]> = {};
 
         if(this.newestLogTime == timeBack){
@@ -107,7 +105,6 @@ class LogContainer{
             resultLen = this.len;
         }
 
-        console.log("num of values: ",resultLen);
         for(let endpoint in this.logs){
             let resultPart : (number | undefined)[] = [];
             let history = this.logs[endpoint]
@@ -119,7 +116,6 @@ class LogContainer{
             }
             result[endpoint]= resultPart;
         }
-        console.log("result length: ",result);
 
         return result;
     }
@@ -216,14 +212,12 @@ export class TempLogger {
     }
 
     async reloadModules() : Promise<boolean>{
-        console.debug("temperature logger reloading modules");
         try {
             this.lastReload = Date.now();
             let result = await sendModules();
             this.forceReload = false;
             
             this.loadedModules = result.modules;
-            console.debug("reloaded modules to: ",JSON.stringify(this.loadedModules))
             return true;
         } catch (error) {
             this.loadedModules = [];
@@ -329,12 +323,10 @@ export class TempLogger {
                         res.status(400).send(JSON.stringify({message:"invalid scope selected"}))
                         return;
                 }
-                console.log("HUGACUKA",this);
                 res.status(200).send(JSON.stringify(logsToApiResponse(result,historyLen)));
                 return
             }
         }
-        console.debug("body: ",req.body);
         res.status(400).send(JSON.stringify({message:"missing values in message body"}));    
     }
 }
