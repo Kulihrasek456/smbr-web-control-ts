@@ -6,6 +6,9 @@ import cors from 'cors';
 import { configFilesRouter } from './config-endpoints.js';
 import { serviceStatusRouter } from './service-status.js';
 import { TempLogger } from './temperature-history.js';
+import fs from 'fs';
+import { isString } from './utils.js';
+import { smbr_config } from './config.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,6 +61,7 @@ const distPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
     };
 }
 
+
 let debugMode = false;
 let verboseMode = false;
 let noFrontEnd = false;
@@ -65,6 +69,21 @@ process.argv.forEach(function (val, index, array) {
     if(val == "-d"){
         console.warn("Running in DEBUG MODE");
         debugMode = true;
+        try {
+            let pathToConfig = path.join(__dirname,"..","..","..","server_config.json");
+            let configFile = fs.readFileSync(pathToConfig);
+            let configContent = JSON.parse(configFile.toString());
+            if(isString(configContent.targetHostname)){
+                smbr_config.defaultHostname = configContent.targetHostname;
+                console.warn("target hostname changed to:",configContent.targetHostname);
+            }
+            if(isString(configContent.configFilesTarget)){
+                smbr_config.configFilesTarget = configContent.configFilesTarget;
+                console.warn("config files target changed to:",configContent.configFilesTarget);
+            }
+        } catch (error) {
+            console.warn("missing or invalid config file \"server_config.json\", error: \n",error);
+        }
     }
     if(val == "-v"){
         console.warn("Running in VERBOSE MODE");

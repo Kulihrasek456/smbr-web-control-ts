@@ -2,9 +2,7 @@ import { Router, type Request, type Response } from "express";
 import fs from 'fs';
 import path from 'path';
 import { isArray, isString } from "./utils.js";
-
-const configFilesPath = "/home/user1/Plocha/";
-
+import { smbr_config } from "./config.js";
 
 let fileList : string[] = [];
 export function reloadFileListFromDisk() : boolean{
@@ -26,7 +24,7 @@ export function reloadFileListFromDisk() : boolean{
     }
 
     try {
-        readDirRecursive(configFilesPath);
+        readDirRecursive(smbr_config.configFilesTarget);
         fileList = result;
         return true;
     } catch (err) {
@@ -84,7 +82,7 @@ export function getFileContent(req: Request, res: Response){
 
     var fileData = "";
     try {
-        fileData = fs.readFileSync(path.join(configFilesPath,...fileNameSplit),'utf8');
+        fileData = fs.readFileSync(path.join(smbr_config.configFilesTarget,...fileNameSplit),'utf8');
     } catch (error) {
         res.status(404).send("file not found");
         return;
@@ -115,7 +113,7 @@ export function setFileContent(req : Request, res : Response){
     }
 
     try {
-        fs.writeFileSync(path.join(configFilesPath,...fileNameSplit),req.body.content);
+        fs.writeFileSync(path.join(smbr_config.configFilesTarget,...fileNameSplit),req.body.content);
     } catch (error) {
         res.status(500).send("unable to write to file");
         console.error("failed to write to config file: "+fileName+" errror:\n",error);
@@ -135,7 +133,7 @@ export function deleteFile(req : Request, res : Response){
 
     const fileNameSplit = fileName.split("|");
     try {
-        fs.unlinkSync(path.join(configFilesPath,...fileNameSplit));
+        fs.unlinkSync(path.join(smbr_config.configFilesTarget,...fileNameSplit));
     } catch (error) {
         res.status(500).send("failed to delete file");
         console.error("failed to delete config file: "+fileName+" errror:\n",error);

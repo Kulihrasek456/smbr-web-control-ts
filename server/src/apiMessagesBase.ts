@@ -1,5 +1,6 @@
 import axios from "axios";
 import { isArray, isBoolean, isNull, isNumber, isString, isValidDateTime } from "./utils.js";
+import { smbr_config } from "./config.js";
 
 export const targets = ["reactorApi","webControlApi"] as const;
 
@@ -67,7 +68,7 @@ export type apiMessageJsonResult = {
 export async function sendApiMessage(options:apiMessageOptions){
     const url = options.url
     const port = options.port ?? 8089
-    const hostname = options.hostname ?? "localhost"
+    const hostname = options.hostname ?? smbr_config.defaultHostname
     const method = options.method ?? "GET"
     const returnCodes = options.validStatusCodes ?? [200]
 
