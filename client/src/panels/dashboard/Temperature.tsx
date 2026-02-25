@@ -112,7 +112,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
     const moduleListCntxt = useModuleListValue();
     const scopeGroupName = createUniqueId()
     const refreshCntxt = useRefreshValue;
-    let historyLen = 80;
+    const historyLen = 80;
     let lastRefresh = 0;
     let lastScope = ""
 
@@ -286,7 +286,6 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             scope: scope()
         })
         if(result.logCount > 0){
-            historyLen = result.historyLen;
             lastRefresh = Date.now();
             addLogsToChart(result.logs);
         }
