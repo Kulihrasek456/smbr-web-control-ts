@@ -7,7 +7,7 @@ import { configFilesRouter } from './config-endpoints.js';
 import { serviceStatusRouter } from './service-status.js';
 import { TempLogger } from './temperature-history.js';
 import fs from 'fs';
-import { isString } from './utils.js';
+import { isNumber, isString } from './utils.js';
 import { smbr_config } from './config.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -81,6 +81,10 @@ process.argv.forEach(function (val, index, array) {
                 smbr_config.configFilesTarget = configContent.configFilesTarget;
                 console.warn("config files target changed to:",configContent.configFilesTarget);
             }
+            if(isNumber(configContent.port)){
+                smbr_config.port = configContent.port;
+                console.warn("port changed to:",configContent.port);
+            }
         } catch (error) {
             console.warn("missing or invalid config file \"server_config.json\", error: \n",error);
         }
@@ -116,7 +120,7 @@ if(!noFrontEnd){
     });
 }
 
-const PORT = 8000;
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+
+app.listen(smbr_config.port, () => {
+    console.log(`Server running on http://localhost:${smbr_config.port}`);
 });
