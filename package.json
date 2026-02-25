@@ -7,7 +7,7 @@
     "build": "npm --prefix client run build",
     "build:debug": "npm --prefix client run build:debug",
     "start": "npm run build && npm --prefix server run start",
-    "start:debug": "npm run build:debug && npm --prefix server run start",
+    "start:debug": "npm run build:debug && npm --prefix server run start:debug",
     "dev": "concurrently \"npm --prefix client run dev\" \"npm --prefix server run dev\"",
     "make:license" : "node generate-licenses.mjs"
   },
