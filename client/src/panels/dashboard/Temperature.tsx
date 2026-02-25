@@ -316,12 +316,24 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                     <LineChart 
                         labels={labels()} 
                         datasets={parseDatasets(datasets())}
-                        options={{raw:{
+                        options={{
+                            x:{
+                                showTicks: true
+                            },
+                            raw:{
                             scales:{
                                 x:{
                                     type: 'category',
                                     ticks: {
                                         autoSkip: true,
+                                    },
+                                    grid:{
+                                        color: "rgb(50,50,50)"
+                                    }
+                                },
+                                y:{
+                                    grid:{
+                                        color: "rgb(50,50,50)"
                                     }
                                 }
                             }
