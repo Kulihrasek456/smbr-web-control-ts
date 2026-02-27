@@ -289,6 +289,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         if(result.logCount > 0 && scopeForThisFetch == scope()){
             lastRefresh = Date.now();
             addLogsToChart(result.logs);
+            setLabels(generateTimeLabels(Date.now(),historyLen,scope()));
         }
     })
 
