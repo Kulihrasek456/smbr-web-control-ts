@@ -5,6 +5,7 @@ import { isNumber } from "../other/utils";
 export interface ValueDisplayProps{
     value: string | undefined
     unit?: string,
+    error? : boolean
     numberOnly?: {
         decimalPlaces :number,
         resultModifier? : (value: number)=>number
@@ -39,12 +40,22 @@ export function ValueDisplay(props:ValueDisplayProps){
     }
 
     return (
-        <p class={`${props.value ? "" : styles.error} ${styles.fetcher} ${props.class ?? ""}`}>
-            <Show when={props.value} fallback="err">
-                {renderValue(props.value)}
-                <Show when={props.unit}>
-                    <span class={styles.fetcher_unit}>{props.unit}</span>
+        <p 
+            class = {props.class}
+            classList={{
+                [styles.error]:props.error === true,
+                [styles.fetcher]:true
+            }}
+        >
+            <Show when={props.error} fallback={
+                <Show when={props.value} fallback={undefinedPlaceholder}>
+                    {renderValue(props.value)}
+                    <Show when={props.unit}>
+                        <span class={styles.fetcher_unit}>{props.unit}</span>
+                    </Show>
                 </Show>
+            }>
+                <span>Err</span>
             </Show>
         </p>
     );
