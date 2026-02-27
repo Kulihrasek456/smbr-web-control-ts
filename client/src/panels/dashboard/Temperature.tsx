@@ -282,8 +282,8 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             setDatasets({});
         }
         let result = await TemperatureLogs.sendGetLogs({
-            timeBack: Date.now()-lastRefresh,
             scope: scope()
+            timeBack: 1000+Date.now()-lastRefresh,
         })
         if(result.logCount > 0){
             lastRefresh = Date.now();
