@@ -281,11 +281,12 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             lastScope = scope();
             setDatasets({});
         }
+        let scopeForThisFetch = scope();
         let result = await TemperatureLogs.sendGetLogs({
-            scope: scope()
             timeBack: 1000+Date.now()-lastRefresh,
+            scope: scopeForThisFetch
         })
-        if(result.logCount > 0){
+        if(result.logCount > 0 && scopeForThisFetch == scope()){
             lastRefresh = Date.now();
             addLogsToChart(result.logs);
         }
