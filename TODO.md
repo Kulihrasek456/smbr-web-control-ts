@@ -2,9 +2,10 @@ other
  - [ ] better button visuals
  - [ ] fix vertical sliders on IOS (extremely thick)
  - [ ] add error display
- - [ ] fix runtime info collpasing in favor of editor (width: 0 needed)
+ - [x] fix runtime info collpasing in favor of editor (width: 0 needed)
  - [ ] fix gridstack grid not holding its width in device pannel
- - [ ] sort modules by UID to reduce flickering
+ - [x] sort modules by UID to reduce flickering
+ - [ ] text overflow problems
 
 api fetchers
  - [x] updater context
@@ -35,6 +36,7 @@ dashboard
  - Control widget
      - [x] visual
      - [x] functionality
+     - [ ] mixer speed based on /control/mixer/info
  - Quick launch
      - [x] visual
      - [x] functionality
@@ -49,11 +51,11 @@ text editor
  - [x] visual - file list
  - [x] visual - code part
  - [x] visual - runtime info
- - [ ] functionality
- - [ ] functionality - runtime info
- - [ ] remove ctrl+s alert placeholder
+ - [x] functionality
+ - [x] functionality - runtime info
+ - [x] remove ctrl+s alert placeholder
  - file browser 
-     - [ ] create file buttons
+     - [x] create file buttons
      - [x] recursive
      - [ ] two columns
 
