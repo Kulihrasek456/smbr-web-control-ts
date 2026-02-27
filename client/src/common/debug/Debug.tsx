@@ -187,7 +187,8 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
     return (
         <div class={styles.container + " " + props.class}>
             <p>Api message targets:</p>
-            <p>Current web: {currHostWeb()}</p>
+            <p>Current web:</p>
+            <p>{currHostWeb()}</p>
             <div class={styles.horflex}>
                 <input class={styles.grow}  ref={inputElWeb}></input>
                 <button onclick={()=>{
@@ -198,7 +199,8 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
                     }
                 }}>set</button>
             </div>
-            <p>Current reactor: {currHostReactor()}</p>
+            <p>Current reactor:</p>
+            <p>{currHostReactor()}</p>
             <div class={styles.horflex}>
                 <input class={styles.grow}  ref={inputElReactor}></input>
                 <button onclick={()=>{
