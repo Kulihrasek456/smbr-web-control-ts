@@ -7,6 +7,7 @@ import { ValueController, ValueControllerApiControl } from "../../common/ValueCo
 import { enforceMinMax } from "../../common/other/inputFilters"
 import styles from "./Control.module.css"
 import { sendApiMessage } from "../../apiMessages/apiMessageBase"
+import { Sensor_Heater } from "../../apiMessages/sensor/heater"
 
 
 interface ControlProps{
@@ -91,6 +92,7 @@ export function Control(props : ControlProps){
                         onClick={async (value : number | undefined)=>{
                             sendApiMessage({url:"/control/heater/turn_off"});
                         }}
+                        getValueFunction={async ()=>((await Sensor_Heater.sendGetTarget()).targetTemp)}
                     ></ValueControllerApiControl>
                 </div>
             </Widget>
