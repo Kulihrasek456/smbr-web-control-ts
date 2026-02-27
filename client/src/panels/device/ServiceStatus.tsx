@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from "solid-js"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
-import { TableStatic } from "../../common/Table/Table"
+import { TableStatic, widgetHeightChange } from "../../common/Table/Table"
 import { Widget } from "../common/Widget"
 
 import styles from "./ServiceStatus.module.css"
@@ -71,7 +71,7 @@ export function ServicesStatusBody(props : ServiceStatusBodyProps){
     })
 
     createEffect(()=>{
-        props.rowLenSetter(Math.round(rows().length/2.1))
+        props.rowLenSetter(rows().length)
     })
 
 
@@ -90,7 +90,7 @@ export function ServicesStatus(props : ServiceStatusProps){
     const [rowNum, setRowNum] = createSignal<number>(1);
 
     return (
-        <GridElement id={props.id} w={1} h={rowNum()}>
+        <GridElement id={props.id} w={1} h={widgetHeightChange(rowNum())}>
             <Widget name="Service status">
                 <ServicesStatusBody
                     {...props}

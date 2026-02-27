@@ -1,4 +1,4 @@
-import { TableStatic } from "../../common/Table/Table"
+import { TableStatic, widgetHeightChange } from "../../common/Table/Table"
 import { Widget, WidgetHotbarValue } from "../common/Widget"
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import type { JSX } from "solid-js/jsx-runtime"
@@ -350,7 +350,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
 export function Temperature(props: TemperatureProps) {
     const [rows, setRows] = createSignal(0);
     return (
-        <GridElement id={props.id} w={1} h={5 + Math.round(rows() / 3)}>
+        <GridElement id={props.id} w={1} h={widgetHeightChange(rows())+3}>
             <RefreshProvider>
                 <TemperatureBody 
                     rowNumberSetter={setRows}

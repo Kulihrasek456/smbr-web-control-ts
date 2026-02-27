@@ -1,7 +1,7 @@
 import { createEffect, createSignal } from "solid-js";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
 import { useModuleListValue, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
-import { TableStatic } from "../../common/Table/Table";
+import { TableStatic, widgetHeightChange } from "../../common/Table/Table";
 import { Widget } from "../common/Widget";
 import { Button } from "../../common/Button/Button";
 import { Icon } from "../../common/Icon/Icon";
@@ -97,7 +97,7 @@ export function ModuleListDisplay(props : ModuleListDisplayProps){
     const [rowNum, setRowNum] = createSignal(0);
 
     return (
-        <GridElement id={props.id} h={1 + Math.round(rowNum()/3)} w={2}>
+        <GridElement id={props.id} h={widgetHeightChange(rowNum(),{rowHeight: 30})} w={2}>
             <Widget name="Module list">
                 <ModuleListDisplayBody rowNumSetter={setRowNum} {...props}></ModuleListDisplayBody>
             </Widget>

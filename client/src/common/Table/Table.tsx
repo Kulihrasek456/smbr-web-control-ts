@@ -77,3 +77,22 @@ export function TableStatic<T>(props: TableStaticProps<T>){
     </div>
   )
 }
+
+
+export function widgetHeightChange(numOfRows : number, settings?: {rowHeight?: number, widgetRowHeight?: number, addedPixels?: number}){
+  const rowHeight = settings?.rowHeight ?? 24;
+  const widgetRowHeight = settings?.widgetRowHeight ?? 100;
+  const addedPixels = settings?.addedPixels ?? 0;
+  
+  let pixels = addedPixels;        
+
+  pixels += 15;                     // 15 for the header
+  pixels += 85;                     // 64 for the widget header
+  pixels += numOfRows*rowHeight;    // for every row
+
+  let rows = Math.trunc(pixels / widgetRowHeight);
+  if((pixels - rows*widgetRowHeight) > 0){
+    rows+=1;
+  }
+  return rows;
+}

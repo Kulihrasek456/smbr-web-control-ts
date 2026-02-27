@@ -1,6 +1,6 @@
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
 import { Widget } from "../common/Widget"
-import { TableStatic } from "../../common/Table/Table"
+import { TableStatic, widgetHeightChange } from "../../common/Table/Table"
 import { createSignal } from "solid-js"
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
 import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
@@ -72,7 +72,7 @@ export function DeviceInformation(props:DeviceInformationProps){
     ])
 
     return (
-        <GridElement id={props.id} w={1} h={Math.round(rows().length/2.5)}>
+        <GridElement id={props.id} w={1} h={widgetHeightChange(rows().length)}>
             <Widget name="Device information">
                 <TableStatic
                     data={rows()}

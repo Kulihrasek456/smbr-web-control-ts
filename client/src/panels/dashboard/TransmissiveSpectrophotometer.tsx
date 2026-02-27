@@ -1,5 +1,5 @@
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import { TableStatic } from "../../common/Table/Table";
+import { TableStatic, widgetHeightChange } from "../../common/Table/Table";
 import { Widget } from "../common/Widget";
 import { Icon } from "../../common/Icon/Icon";
 import { createEffect, createSignal } from "solid-js";
@@ -148,7 +148,7 @@ export function TransSpectrophotometer(props: TransSpectrophotometerProps) {
     const [rowNum, setRowNum] = createSignal(1);
 
     return (
-        <GridElement id={props.id} w={1} h={Math.round(rowNum() / 3) + 1}>
+        <GridElement id={props.id} w={1} h={widgetHeightChange(rowNum(),{addedPixels:35})}>
             <Widget name="Transmissive spectrophotometer">
                 <TransSpectrophotometerBody
                     widgetProps={props}
