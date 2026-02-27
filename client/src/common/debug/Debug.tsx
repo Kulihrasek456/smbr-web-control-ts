@@ -2,7 +2,7 @@ import { createSignal, For, onMount } from "solid-js";
 import styles from "./Debug.module.css"
 import { moduleInstances, moduleTypes, useModuleListValue, type Module, type moduleInstancesType, type moduleTypesType } from "../other/ModuleListProvider";
 import { createServerCookie } from "@solid-primitives/cookies";
-import { isArray, isObject } from "../other/utils";
+import { isArray, isNull, isNumber, isObject } from "../other/utils";
 import { smbr_apiMessageConfig } from "../../apiMessages/apiMessageConfig";
 import type { targetsType } from "../../apiMessages/apiMessageBase";
 
@@ -126,23 +126,43 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
     function setWebHostname(value : string){
         if(value!=""){
             console.log("changing web hostname to: ",value);
-            smbr_apiMessageConfig.defaultHostnames.webControlApi = value
+            let split = value.split(":");
+            let hostname = split[0];
+            let port = Number(split[1]);
+            smbr_apiMessageConfig.defaultHostnames.webControlApi = hostname
+            if(isNumber(port)){
+                smbr_apiMessageConfig.defaultPorts.webControlApi = port
+            }
         }else{
             console.log("changing web hostname back to default");
             smbr_apiMessageConfig.defaultHostnames.webControlApi = window.location.hostname
         }
-        setCurrHostWeb(smbr_apiMessageConfig.defaultHostnames.webControlApi);
+        setCurrHostWeb(
+            smbr_apiMessageConfig.defaultHostnames.webControlApi+
+            ":"+
+            smbr_apiMessageConfig.defaultPorts.webControlApi
+        );
     }
 
     function setReactorHostname(value : string){
         if(value!=""){
             console.log("changing reactor hostname to: ",value);
-            smbr_apiMessageConfig.defaultHostnames.reactorApi = value
+            let split = value.split(":");
+            let hostname = split[0];
+            let port = Number(split[1]);
+            smbr_apiMessageConfig.defaultHostnames.reactorApi = hostname
+            if(isNumber(port)){
+                smbr_apiMessageConfig.defaultPorts.reactorApi = port
+            }
         }else{
             console.log("changing reactor hostname back to default");
             smbr_apiMessageConfig.defaultHostnames.reactorApi = window.location.hostname
         }
-        setCurrHostReactor(smbr_apiMessageConfig.defaultHostnames.reactorApi);
+        setCurrHostReactor(
+            smbr_apiMessageConfig.defaultHostnames.reactorApi+
+            ":"+
+            smbr_apiMessageConfig.defaultPorts.reactorApi
+        );
     }
 
     function updateCookie(){
