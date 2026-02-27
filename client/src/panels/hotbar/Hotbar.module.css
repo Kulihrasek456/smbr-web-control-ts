@@ -15,14 +15,25 @@
 }
 
 .state_display{
-    border: 3px solid var(--err-color-3);
+    border: 3px solid var(--acc-color-3);
     border-style: none none solid solid;
-    background: var(--err-color-2);
+    background: var(--acc-color-2);
     width: 110px;
     align-items: stretch;
     padding: 0 5px;
     border-bottom-left-radius: 15px;
 }
+
+.state_display.warnings{
+    border-color: var(--warn-color-3);
+    background: var(--warn-color-2);
+}
+
+.state_display.errors{
+    border-color: var(--err-color-3);
+    background: var(--err-color-2);
+}
+
 
 .flex_row{
     display: flex;

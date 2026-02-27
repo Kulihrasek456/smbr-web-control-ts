@@ -80,7 +80,13 @@ export function Hotbar() {
 
     return (
         <>
-            <div class={styles.state_display + " " +styles.twoRowContainer}>
+            <div classList={{
+                [styles.state_display]:true,
+                [styles.twoRowContainer]:true,
+                [styles.errors]:    (countsErrs().count  ?? 0) > 0,
+                [styles.warnings]:  (countsWarns().count ?? 0) > 0
+            }}
+            >
                 <div class={styles.flex_row + " " + styles.bold}>
                     <p>Errors: </p>
                     <ValueDisplay 
