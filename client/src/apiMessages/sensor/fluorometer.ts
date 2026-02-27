@@ -1,4 +1,4 @@
-import { checkArray, checkBoolean, checkNumber, checkString, checkStringEnum, checkTimestamp, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
+import { ApiMessageError, checkArray, checkBoolean, checkNumber, checkString, checkStringEnum, checkTimestamp, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
 
 export namespace Sensor_Fluorometer{
     const detectorGainsValues = ["x1", "x10", "x50", "Auto"] as const
@@ -67,6 +67,11 @@ export namespace Sensor_Fluorometer{
         let opts : apiMessageOptions = {
             url: "/sensor/fluorometer/ojip/capture",
             method: "POST",
+            timeout: 5*options.lengthMs
+        }
+
+        if(!(await sendCompleted()).capture_complete){
+            throw new ApiMessageError(opts,"fluorometer ojip is still capturing");
         }
     
         opts.data = JSON.stringify({
@@ -120,6 +125,10 @@ export namespace Sensor_Fluorometer{
         let opts: apiMessageOptions = {
             url: "/sensor/fluorometer/ojip/read_last"
         }
+
+        if(!(await sendCompleted()).capture_complete){
+            throw new ApiMessageError(opts,"fluorometer ojip is still capturing");
+        }
     
         let response = await sendJsonApiMessage(opts);
         let data = response.jsonValue
@@ -137,9 +146,11 @@ export namespace Sensor_Fluorometer{
             method: "POST",
             data: "{}"
         }
-    
-        let response = await sendJsonApiMessage(opts);
 
-        return
+        if(!(await sendCompleted()).capture_complete){
+            throw new ApiMessageError(opts,"fluorometer ojip is still capturing");
+        }
+    
+        await sendJsonApiMessage(opts);
     }
 }
