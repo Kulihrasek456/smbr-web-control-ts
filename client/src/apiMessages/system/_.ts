@@ -1,5 +1,5 @@
 import { moduleInstances, moduleTypes, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
-import { checkArray, checkString, checkStringEnum, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
+import { checkArray, checkNumber, checkString, checkStringEnum, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
 
 export namespace System{
 
@@ -42,5 +42,43 @@ export namespace System{
         return {
             modules: result
         }
+    }
+
+    export type  problemResult = {
+        message: string,
+        problems: {
+            type : string,
+            id: number,
+            message: string,
+            detail: string
+        }[]
+    }
+
+    async function sendProblems(url : string) : Promise<problemResult>{
+        let opts : apiMessageOptions = {
+            url: url
+        }
+
+        let response = await sendJsonApiMessage(opts);
+        let data = response.jsonValue;
+
+        checkString(data,"message",opts);
+        checkArray(data,"problems",(el)=>{
+            checkString(el,"type",opts);
+            checkNumber(el,"id",opts);
+            checkString(el,"message",opts);
+            checkString(el,"detail",opts);
+            return true;
+        },opts);
+
+        return data;
+    }
+
+    export async function sendErrors() : Promise<problemResult>{
+        return await sendProblems("/system/errors");
+    }
+
+    export async function sendWarnings() : Promise<problemResult>{
+       return await sendProblems("/system/warnings");
     }
 }
