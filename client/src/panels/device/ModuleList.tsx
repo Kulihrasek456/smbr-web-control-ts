@@ -21,10 +21,29 @@ function renderRow(value : System.module, index: number){
         <p>{value.module_type}</p>,
         <p>{value.uid}</p>,
         <p>{value.instance}</p>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/ping" ,key: "time_ms"}} unit="ms"></ApiFetcher>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/core_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/board_temp" ,key: "temperature"}} unit="°C"></ApiFetcher>,
-        <ApiFetcher numberOnly={{decimalPlaces: 2}} target={{url: "/"+value.module_type+"/load" ,key: "load"}} unit="%"></ApiFetcher>,
+        <ApiFetcher 
+            numberOnly={{decimalPlaces: 2}} 
+            target={{url: "/"+value.module_type+"/ping" ,key: "time_ms"}} 
+            unit="ms"
+        ></ApiFetcher>,
+        <ApiFetcher 
+            numberOnly={{decimalPlaces: 2}} 
+            target={{url: "/"+value.module_type+"/core_temp" ,key: "temperature"}} 
+            unit="°C"
+        ></ApiFetcher>,
+        <ApiFetcher 
+            numberOnly={{decimalPlaces: 2}} 
+            target={{url: "/"+value.module_type+"/board_temp" ,key: "temperature"}} 
+            unit="°C"
+        ></ApiFetcher>,
+        <ApiFetcher 
+            numberOnly={{
+                decimalPlaces: 2,
+                resultModifier: (value:number)=>(value*100)
+            }} 
+            target={{url: "/"+value.module_type+"/load" ,key: "load"}} 
+            unit="%"
+        ></ApiFetcher>,
         <Button callback={()=>restartModule(value.module_type,value.uid)}>
             <Icon name="refresh"></Icon>
         </Button>
