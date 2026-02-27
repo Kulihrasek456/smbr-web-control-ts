@@ -78,11 +78,13 @@ function TransSpectrophotometerBody(
     }
 
     let inProgress = false;
+    let lastUpdate = 0;
 
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshValue()) || inProgress){
+        if(!refreshValueUpdate(refreshValue(),{length:12000,lastUpdate:lastUpdate}) || inProgress){
             return
         }
+        lastUpdate = Date.now();
         inProgress = true;
         try {
             let response = await Sensor_Spectrophotometer.sendMeasureAll();
