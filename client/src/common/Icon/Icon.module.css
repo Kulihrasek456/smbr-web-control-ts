@@ -4,7 +4,7 @@
   src: url('/fonts/GoogleMaterialIcons.woff2') format('woff2');
 }
 
-.normal,
+.icon,
 .filled {
   font-family: 'Material Icons';
   user-select: none;

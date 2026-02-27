@@ -1,16 +1,22 @@
 import styles from './Icon.module.css'
 
 type IconProps = {
-  name: string;
-  filled?: boolean;
-  color?: string;
+    name: string;
+    filled?: boolean;
+    color?: string;
 };
 
-export function Icon({ name, filled = true,color}: IconProps) {
+export function Icon(props: IconProps) {
 
-  return (
-    <span class={`${styles.normal} ${(filled)?(styles.filled):''}`} style={(color)?`color: ${color}`:''}>
-        {name}
-    </span>
-  );
+    return (
+        <span
+            classList={{
+                [styles.icon]: true,
+                [styles.filled]: props.filled ?? true
+            }}
+            style={(props.color) ? `color: ${props.color}` : ''}
+        >
+            {props.name}
+        </span>
+    );
 }
