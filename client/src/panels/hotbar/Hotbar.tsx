@@ -1,10 +1,13 @@
-import { createSignal, onCleanup, onMount, Show } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { ApiFetcher } from '../../common/ApiFetcher/ApiFetcher'
 import { formatTime } from '../../common/other/utils';
 
 import styles from './Hotbar.module.css'
 import { countInstancesOfType, useModuleListValue } from '../../common/other/ModuleListProvider';
 import type { apiMessageSimple } from '../../apiMessages/apiMessageSimple';
+import { refreshValueUpdate, useRefreshValue } from '../../common/other/RefreshProvider';
+import { ValueDisplay } from '../../common/ApiFetcher/ValueDisplay';
+import { System } from '../../apiMessages/system/_';
 
 
 type SimpleDisplayProps = {
@@ -24,6 +27,10 @@ function SimpleDisplay({ name, target }: SimpleDisplayProps) {
 export function Hotbar() {
     const [time, setTime] = createSignal(new Date());
     const moduleListCntxt = useModuleListValue();
+    const refreshCntxt = useRefreshValue;
+    const [countsErrs, setCountsErrs] = createSignal<{err: boolean, count: number | undefined}>({err:false,count:undefined});
+    const [countsWarns, setCountsWarns] = createSignal<{err: boolean, count: number | undefined}>({err:false,count:undefined});
+    const [error, setError] = createSignal<boolean>(false);
 
     onMount(()=>{
         let id = setInterval(()=>{
@@ -35,11 +42,59 @@ export function Hotbar() {
         })
     })
 
+    async function refreshCountsErrs(){
+        try {
+            setCountsErrs({
+                err: false,
+                count: (await System.sendErrors()).problems.length
+            });
+        } catch (error) {
+            setCountsErrs({
+                err: true,
+                count: undefined
+            });
+        }
+        
+    }
+    async function refreshCountsWarns(){
+        try {
+            setCountsWarns({
+                err: false,
+                count: (await System.sendWarnings()).problems.length
+            });
+        } catch (error) {
+            setCountsWarns({
+                err: true,
+                count: undefined
+            });
+        }
+    }
+
+    createEffect(async ()=>{
+        if(!refreshValueUpdate(refreshCntxt())){
+            return;
+        }
+        refreshCountsErrs();
+        refreshCountsWarns();
+    })
+
     return (
         <>
             <div class={styles.state_display + " " +styles.twoRowContainer}>
-                <div class={styles.flex_row + " " + styles.bold}><p>Errors: </p><p>1</p></div>
-                <div class={styles.flex_row + " " + styles.bold}><p>Warnings: </p><p>1</p></div>
+                <div class={styles.flex_row + " " + styles.bold}>
+                    <p>Errors: </p>
+                    <ValueDisplay 
+                        value={countsErrs().count?.toString()}
+                        error={countsErrs().err}
+                    ></ValueDisplay>
+                </div>
+                <div class={styles.flex_row + " " + styles.bold}>
+                    <p>Warnings: </p>
+                    <ValueDisplay 
+                        value={countsWarns().count?.toString()}
+                        error={countsWarns().err}
+                    ></ValueDisplay>
+                </div>
             </div>
             <div class={styles.twoRowContainer}>
                 <p>{formatTime("hh:MM",time())}</p>
