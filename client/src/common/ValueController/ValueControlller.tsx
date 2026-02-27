@@ -13,6 +13,7 @@ interface ValueControllerProps{
     valueName : string,
     buttonText : string,
     unit? : string,
+    error? : boolean,
     
     getter : () => number | undefined,
     setter : (value : number | undefined) => void,
@@ -50,7 +51,13 @@ export function ValueController(props : ValueControllerProps){
                 </p>
                 <p class={styles.valueLabel}>
                     {(props.valueName || "current value") + ": "}
-                    <ValueDisplay class={styles.value} value={props.getter?.()?.toString() ?? "---"} numberOnly={{decimalPlaces: 2}} unit={props.unit}></ValueDisplay>
+                    <ValueDisplay 
+                        class={styles.value} 
+                        value={props.getter()?.toString()} 
+                        numberOnly={{decimalPlaces: 2}} 
+                        unit={props.unit}
+                        error={props.error}
+                    ></ValueDisplay>
                 </p>
             </div>
             <div class={styles.bottom}>
@@ -104,6 +111,8 @@ interface ValueControllerApiControl{
     getter: apiMessageSimple,
     setter?: apiMessageSimple,
 
+    getValueFunction? : ()=>Promise<number | undefined>
+
     onClick: (value: number | undefined) => Promise<void>
 
     min?: number;
@@ -112,18 +121,27 @@ interface ValueControllerApiControl{
 
 export function ValueControllerApiControl(props : ValueControllerApiControl){
     const [value, setValue] = createSignal<number | undefined>(undefined);
+    const [error, setError] = createSignal<boolean>(false);
     const refreshCntx = useRefreshValue;
 
     async function refreshValue(){
         try {
-            let response = await sendApiMessageSimple(props.getter);
-            if(isNumber(response)){
-                setValue(response);
+            if(props.getValueFunction){
+                setValue(await props.getValueFunction());
+                setError(false);
             }else{
-                throw Error("invalid return value");
+                let response = await sendApiMessageSimple(props.getter);
+                if(isNumber(response)){
+                    setValue(response);
+                    setError(false);
+                }else{
+                    throw Error("invalid return value");
+                }
             }
         } catch (error) {
+            setError(true);
             setValue(undefined);
+            throw error;
         }
     }
 
@@ -159,6 +177,8 @@ export function ValueControllerApiControl(props : ValueControllerApiControl){
             onClick={onClick}
 
             onSubmit={onSubmit}
+
+            error={error()}
         
         ></ValueController>
     )
