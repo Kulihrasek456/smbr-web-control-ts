@@ -4,6 +4,7 @@
   "license": "GPL-3.0-only",
   "scripts": {
     "install:all": "npm install --prefix client && npm install --prefix server",
+    "ci:all": "npm ci --prefix client && npm ci --prefix server",
     "build": "npm --prefix client run build",
     "build:debug": "npm --prefix client run build:debug",
     "start": "npm run build && npm --prefix server run start",
