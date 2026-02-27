@@ -2,15 +2,11 @@ import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 
 import { refreshValueUpdate, useRefreshValue } from '../other/RefreshProvider';
 import { sendApiMessageSimple, type apiMessageSimple } from '../../apiMessages/apiMessageSimple';
-import { ValueDisplay } from './ValueDisplay';
+import { ValueDisplay, type ValueDisplayProps } from './ValueDisplay';
 
-export interface ApiFetcherProps{
+export interface ApiFetcherProps extends Omit<ValueDisplayProps,"value">{
     target: apiMessageSimple;
-    unit?: string,
     interval?: number,
-    numberOnly?: {
-        decimalPlaces :number
-    }
 };
 
 
@@ -39,8 +35,7 @@ export function ApiFetcher(props: ApiFetcherProps) {
     return (
          <ValueDisplay
             value={value()}
-            unit={props.unit}
-            numberOnly={props.numberOnly}
+            {...props}
          ></ValueDisplay>
     );
 }

@@ -2,7 +2,7 @@ import { Show } from "solid-js";
 import styles from "./ValueDisplay.module.css"
 import { isNumber } from "../other/utils";
 
-interface ValueDisplayProps{
+export interface ValueDisplayProps{
     value: string | undefined
     unit?: string,
     numberOnly?: {
