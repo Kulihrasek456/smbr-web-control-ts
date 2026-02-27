@@ -62,8 +62,8 @@ export class ApiUnparsableBody extends ApiMessageError{
 
 export function getTargetPort(target : targetsType) : number{
     const targetToPort = {
-        "reactorApi" : 8089,
-        "webControlApi" : 8000
+        "reactorApi" : smbr_apiMessageConfig.defaultPorts.reactorApi,
+        "webControlApi" : smbr_apiMessageConfig.defaultPorts.webControlApi
     }
     return targetToPort[target];
 }
