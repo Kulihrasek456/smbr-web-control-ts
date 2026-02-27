@@ -37,14 +37,14 @@
     justify-content: start;
     flex-shrink: 1;
 
-    >*{
-        border-radius: 0;
+    >*:not(:last-child){
+        border-radius: 0 !important;
     }
     >*:not(:hover):not(:active){
         border-top-color: transparent;
     }
     >*:last-child{
-        border-radius: 0 0 5px 5px;
+        border-radius: 0 0 5px 5px !important;
     }
 }
 

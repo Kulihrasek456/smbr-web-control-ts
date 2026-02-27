@@ -117,7 +117,7 @@ interface FileListProps {
   createFileButton?: {
     onClick: (fileName: string) => Promise<boolean>
   },
-  files: FileListDirectory
+  files: FileListDirectory | undefined
   maxDepth?: number
   onlyDirectories? : boolean
 
@@ -140,9 +140,7 @@ function FileList(props: FileListProps) {
         <Show when={props.buttons}>
           <For each={props.buttons}>
             {(button, index) => (
-              <div class={fileListStyles["panel-button"] + " button"}>
-                {button(index())}
-              </div>
+              button(index())
             )}
           </For>
         </Show>
@@ -181,7 +179,7 @@ function FileList(props: FileListProps) {
       </div>
       <div class={fileListStyles.list}>
         <FileListElement 
-          data={props.files}
+          data={props.files ?? {name:"root",files:[],subDirectories:{}}}
           onSelect={props.onSelect}
           activeFileName={props.activeFileName}
           maxDepth={props.maxDepth}
@@ -609,16 +607,6 @@ export function TextEditor(props : TextEditorProps) {
       "min-width": 0,
       flex: "1 1 auto"
     }}>
-      <Show when={props.twoColFileList}>
-        <FileList 
-          files={fileList() ?? {name:"root",files:[],subDirectories:{}}}
-          onSelect={(value:string)=>{}}
-          activeFileName={()=>""}
-          maxDepth={1}
-          onlyDirectories={true}
-        ></FileList>
-      </Show>
-
       <FileList 
         buttons={[() => (
           <Button
@@ -626,11 +614,15 @@ export function TextEditor(props : TextEditorProps) {
           >reload from fileSystem</Button>
         )]} 
         files={
-          fileList() ?? {name:"root",files:[],subDirectories:{}}
+          fileList()
         } 
-        createFileButton={{
-          onClick: async val => (await createFile(val.replaceAll("/","|")))
-        }}
+        createFileButton={(props.allowFileCreation)?(
+          {
+            onClick: async val => (await createFile(val.replaceAll("/","|")))
+          }
+        ):(
+          undefined
+        )}
         onSelect={(value:string)=>{
           loadFile(value);
         }}
