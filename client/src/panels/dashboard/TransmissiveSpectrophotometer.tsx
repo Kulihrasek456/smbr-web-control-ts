@@ -19,7 +19,7 @@ type row = {
     frequency: number,
     name: string,
     absolue_value: string,
-    relative_value: string
+    relative_value: string,
 }
 
 
@@ -38,6 +38,7 @@ function TransSpectrophotometerBody(
         {color:"#800000",frequency:870,name:"IR"},
     ];
     const [rows, setRows] = createSignal<row[]>([])
+    const [error, setError] = createSignal<boolean>(false);
     const refreshValue = useRefreshValue
     
     if(isDebug){
@@ -53,6 +54,7 @@ function TransSpectrophotometerBody(
             })
         }
         setRows(newRows)
+        setError(false);
     }
 
     
@@ -66,6 +68,7 @@ function TransSpectrophotometerBody(
                 numberOnly={{
                     decimalPlaces: 0
                 }}
+                error={error()}
             ></ValueDisplay>,
             <ValueDisplay
                 value={value.relative_value}
@@ -73,6 +76,7 @@ function TransSpectrophotometerBody(
                 numberOnly={{
                     decimalPlaces: 1
                 }}
+                error={error()}
             ></ValueDisplay>
         ])
     }
@@ -100,7 +104,9 @@ function TransSpectrophotometerBody(
                 })
             }
             setRows(newRows);
+            setError(false);
         } catch (error) {
+            setError(true);
             console.error(error);
         }
         inProgress = false;
