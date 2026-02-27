@@ -18,6 +18,7 @@ import { Scheduler } from "../../../apiMessages/scheduler/_";
 interface FileListElementProps {
   data: FileListDirectory,
   maxDepth?: number,
+  dirsOnly?: boolean,
 
   isRoot?: boolean,
 
@@ -51,7 +52,10 @@ function FileListElement(props: FileListElementProps) {
       ref={self}
     >
       <Show when={!isRoot}>
-        <div class={fileListStyles["directory-header"]}>
+        <div classList={{
+          [fileListStyles["directory-header"]]:true,
+          [fileListStyles["last-directory"]]:props.maxDepth === 0
+        }}>
 
           <button
             class={fileListStyles["collapse-button"]}
@@ -86,20 +90,23 @@ function FileListElement(props: FileListElementProps) {
               prefixPath={prefixPath}
               activeFileName={props.activeFileName}
               onFileCreate={props.onFileCreate}
+              dirsOnly={props.dirsOnly}
             ></FileListElement>
           )}
         </For>
-        <For each={props.data.files}>
-          {(fileName, index) => (
-            <li 
-              classList={{
-                [fileListStyles["file"]]:true,
-                [fileListStyles["active"]]: (props.activeFileName() === prefixPath+fileName)
-              }}
-              onclick={()=>{props.onSelect(prefixPath+fileName)}}
-            >{fileName}</li>
-          )}
-        </For>
+        <Show when={!props.dirsOnly}>
+          <For each={props.data.files}>
+            {(fileName, index) => (
+              <li 
+                classList={{
+                  [fileListStyles["file"]]:true,
+                  [fileListStyles["active"]]: (props.activeFileName() === prefixPath+fileName)
+                }}
+                onclick={()=>{props.onSelect(prefixPath+fileName)}}
+              >{fileName}</li>
+            )}
+          </For>
+        </Show>
       </Show>
     </ul>
   )
@@ -188,6 +195,7 @@ function FileList(props: FileListProps) {
               }
             ):undefined
           }
+          dirsOnly={props.onlyDirectories}
         ></FileListElement>
       </div>
     </div>
@@ -607,6 +615,7 @@ export function TextEditor(props : TextEditorProps) {
           onSelect={(value:string)=>{}}
           activeFileName={()=>""}
           maxDepth={1}
+          onlyDirectories={true}
         ></FileList>
       </Show>
 

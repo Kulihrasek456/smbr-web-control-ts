@@ -163,6 +163,12 @@
     align-items: center;
 }
 
+.directory-header.last-directory{
+    .collapse-arrow{
+        rotate: 270deg !important;
+    }
+}
+
 .create-file-specific-button,.collapse-button{
     border: none;
     border-radius: 0;
