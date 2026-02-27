@@ -12,6 +12,8 @@ export interface apiMessageOptions{
     hostname ?: string;
     data? : string;
 
+    timeout? : number;
+
     validStatusCodes?: number[]
 }
 
@@ -104,7 +106,7 @@ export async function sendApiMessage(options:apiMessageOptions){
             "body": options.data,
             "method": method,
             "mode": "cors",
-            signal: AbortSignal.timeout( 10000 )  
+            signal: AbortSignal.timeout( options.timeout ?? 10000 )  
         });
     } catch(error){
         throw new ApiConnectionError(options);
