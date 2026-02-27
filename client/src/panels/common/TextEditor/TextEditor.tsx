@@ -227,8 +227,18 @@ function TwoColTable(props: { data: twoColTableRow[], leftSize: string }) {
   )
 }
 
-function statusImg(state : string){
-  return "clock_loader_10";
+function statusImg(state : "Running" | "Paused" | "Stopped" | "NeverStarted"){
+  switch(state){
+    case "Running":
+      return "clock_loader_10";
+    case "Paused":
+      return "pause_circle";
+    case "Stopped":
+      return "stop_circle";
+    case "NeverStarted":
+      return "stop_circle";
+  }
+  
 }
 
 type twoColTableRow = {
@@ -390,7 +400,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
                   color: getStatusColor(status())
                 }}
               >
-                <Icon name={statusImg(status())}></Icon>
+                <Icon filled={false} name={statusImg(status())}></Icon>
               </div>
             </div>
           </div>
