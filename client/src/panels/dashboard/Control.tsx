@@ -60,6 +60,7 @@ export function Control(props : ControlProps){
 
                     <ValueControllerApiControl
                         title="Mixer target rpm"
+                        buttonTooltip="turn off the mixer"
                         valueName="current target"
                         buttonText="turn off"
                         min={0}
@@ -84,6 +85,7 @@ export function Control(props : ControlProps){
                     <ValueControllerApiControl
                         title="Heater target temperature"
                         valueName="current target"
+                        buttonTooltip="turn off the heater"
                         buttonText="turn off"
                         min={0}
                         max={90}

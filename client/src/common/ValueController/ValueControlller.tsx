@@ -5,6 +5,7 @@ import { isNumber } from "chart.js/helpers";
 import { enforceMax, enforceMin } from "../other/inputFilters";
 import { ValueDisplay } from "../ApiFetcher/ValueDisplay";
 import { refreshValueUpdate, useRefreshValue } from "../other/RefreshProvider";
+import { Button } from "../Button/Button";
 
 //#TODO this implementation is not pretty. It should be refractored in the near future.
 
@@ -18,10 +19,11 @@ interface ValueControllerProps{
     getter : () => number | undefined,
     setter : (value : number | undefined) => void,
 
-    onSubmit? : (value : number | undefined)=>void,
+    onSubmit? : (value : number | undefined)=>Promise<void>,
     onChange? : (value : number | undefined)=>void,
     onInput? : (value : number | undefined)=>void,
-    onClick? : () => void
+    onClick? : () => Promise<boolean>
+    buttonTooltip : string
 
     min?: number;
     max?: number;
@@ -41,6 +43,7 @@ function getInputPlaceholder(min?:number,max?:number,unit?:string){
 }
 
 export function ValueController(props : ValueControllerProps){
+    const [input, setInput] = createSignal("");
     let inputField : HTMLInputElement | undefined;
 
     return (
@@ -61,7 +64,10 @@ export function ValueController(props : ValueControllerProps){
                 </p>
             </div>
             <div class={styles.bottom}>
-                <button class="button" onClick={props.onClick}>{props.buttonText}</button>
+                <Button 
+                    callback={props.onClick}
+                    tooltip={props.buttonTooltip}
+                >{props.buttonText}</Button>
                 <div class={styles["input-container"]}>
                     <input 
                         class={"button " + styles.input}
@@ -74,6 +80,7 @@ export function ValueController(props : ValueControllerProps){
                             if(isNumber(props.max)){
                                 e.currentTarget.value = enforceMax(e.currentTarget.value,props.max);
                             }
+                            setInput(e.currentTarget.value);
                             props.onInput?.(props.getter());
                         }}
                         onChange={e => {
@@ -84,18 +91,22 @@ export function ValueController(props : ValueControllerProps){
                         }}
                     ></input>
 
-                    <button 
+                    <Button 
+                        disabled={input()===""}
                         class={"button " + styles["set-button"]}
-                        onClick={e => {
+                        tooltip="send the value to api"
+                        disabledTooltip="no value set"
+                        callback={async () => {
                             if(inputField){
                                 if(inputField.value!=""){
                                     let val = +inputField.value;
                                     props.setter(val);
-                                    props.onSubmit?.(val);
+                                    await props.onSubmit?.(val);
                                 }
                             }
+                            return true;
                         }}
-                    >set</button>
+                    >set</Button>
                 </div>
             </div>
         </div>
@@ -107,6 +118,7 @@ interface ValueControllerApiControl{
     valueName : string,
     buttonText : string,
     unit? : string,
+    buttonTooltip : string
 
     getter: apiMessageSimple,
     setter?: apiMessageSimple,
@@ -159,6 +171,7 @@ export function ValueControllerApiControl(props : ValueControllerApiControl){
     async function onClick(){
         await props.onClick(value());
         await refreshValue();
+        return true;
     }
 
     return (
@@ -166,6 +179,7 @@ export function ValueControllerApiControl(props : ValueControllerApiControl){
             title={props.title}
             valueName={props.valueName}
             buttonText={props.buttonText}
+            buttonTooltip={props.buttonTooltip}
 
             unit={props.unit}
             min={props.min}
