@@ -289,7 +289,7 @@ export class TempLogger {
         if(updateDLog){
             console.debug("temperature logger day log updated");
             this.dLogs.push(
-                this.dLogs.avg(currTime - lastDUpdate),currTime
+                this.hLogs.avg(currTime - lastDUpdate),currTime
             );
         }
     }
