@@ -336,7 +336,9 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                                 y:{
                                     grid:{
                                         color: "rgb(50,50,50)"
-                                    }
+                                    },
+                                    suggestedMax: 40,
+                                    suggestedMin: 10
                                 }
                             }
                         }}}

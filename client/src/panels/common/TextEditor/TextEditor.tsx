@@ -360,12 +360,16 @@ function RuntimeInfo(props: RuntimeInfoProps) {
         <Button class={runtimeInfoStyles["start-button"]}
           callback={start}
           disabled={selected()===undefined}
+          tooltip="Start script"
+          disabledTooltip="no script loaded"
         >
           <Icon name="play_arrow"></Icon>
         </Button>
         <Button class={runtimeInfoStyles["stop-button"]}
           callback={stop}
           disabled={selected()===undefined}
+          tooltip="Pause script"
+          disabledTooltip="no script loaded"
         >
           <Icon name="pause"></Icon>
         </Button>
@@ -438,6 +442,7 @@ interface TextEditorProps {
   twoColFileList? : boolean;
   runtimeInfo? : RuntimeInfoProps;
   allowFileCreation? : boolean;
+  allowFileDeletion? : boolean;
 
   targetEndpoint: string;
   target?: targetsType
@@ -611,6 +616,7 @@ export function TextEditor(props : TextEditorProps) {
         buttons={[() => (
           <Button
             callback={async ()=>(await reloadFileList(true))}
+            tooltip="Reload files from the device file system"
           >reload from fileSystem</Button>
         )]} 
         files={
@@ -637,13 +643,16 @@ export function TextEditor(props : TextEditorProps) {
         style={{ "flex": "1 1 auto", "min-width": 0, "min-height": 0 }}
       >
         <div class={codeStyles.header}>
-
-          <Button
-            disabled={dirtyFlag() || fileName() === undefined}
-            callback={deleteFile}
-          >
-            <Icon name="delete"></Icon>
-          </Button>
+          <Show when={props.allowFileDeletion ?? true}>
+            <Button
+              disabled={dirtyFlag() || fileName() === undefined}
+              callback={deleteFile}
+              tooltip="Delete the current file"
+              disabledTooltip={(fileName() !== undefined)?("unsaved changes"):("no file loaded")}
+            >
+              <Icon name="delete"></Icon>
+            </Button>
+          </Show>
 
           <h1 class={codeStyles["file-name"]}>
             {(fileName() ?? "No file loaded").replaceAll("|","/")}
@@ -652,16 +661,22 @@ export function TextEditor(props : TextEditorProps) {
           <Button
             disabled={(!dirtyFlag()) || fileName() === undefined}
             callback={uploadToServer}
+            tooltip="Save the file"
+            disabledTooltip={(fileName() !== undefined)?"all changes saved":"no file loaded"}
           >
             <Icon name="upload"></Icon>
           </Button>
 
-          <Button
-            disabled={dirtyFlag() || fileName() === undefined}
-            callback={scheduleFile}
-          >
-            <Icon name="share_windows"></Icon>
-          </Button>
+          <Show when={props.runtimeInfo !== undefined}>
+            <Button
+              disabled={dirtyFlag() || fileName() === undefined}
+              callback={scheduleFile}
+              tooltip="Send current file to scheduler"
+              disabledTooltip={(fileName() !== undefined)?"unsaved changes":"no file loaded"}
+            >
+              <Icon name="share_windows"></Icon>
+            </Button>
+          </Show>
           
         </div>
         <div class={codeStyles["code-editor"]}>

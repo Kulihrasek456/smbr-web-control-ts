@@ -26,7 +26,10 @@ export function WidgetHotbarValue(props: WidgetHotbarValueProps){
 function WidgetRefreshButton() {
     const triggerRefresh = useRefreshTrigger();
     return (
-        <Button callback={async (): Promise<boolean> => {triggerRefresh?.({forced:true,_ts:Date.now()}); return true;}}>
+        <Button 
+            callback={async (): Promise<boolean> => {triggerRefresh?.({forced:true,_ts:Date.now()}); return true;}}
+            tooltip="Refresh values"
+        >
             <Icon name="autorenew"></Icon>
         </Button>
     )

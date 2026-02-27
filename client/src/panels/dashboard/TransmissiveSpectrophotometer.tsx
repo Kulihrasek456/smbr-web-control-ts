@@ -2,7 +2,7 @@ import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
 import { TableStatic, widgetHeightChange } from "../../common/Table/Table";
 import { Widget } from "../common/Widget";
 import { Icon } from "../../common/Icon/Icon";
-import { createEffect, createSignal } from "solid-js";
+import { createEffect, createSignal, onMount } from "solid-js";
 import { Button } from "../../common/Button/Button";
 import { refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
@@ -38,10 +38,11 @@ function TransSpectrophotometerBody(
         {color:"#800000",frequency:870,name:"IR"},
     ];
     const [rows, setRows] = createSignal<row[]>([])
+    
     const [error, setError] = createSignal<boolean>(false);
     const refreshValue = useRefreshValue
     
-    if(isDebug){
+    function setRowsToUndefined(){
         let newRows = []
         for(let index in channelDictionary){
             let channelDictRes = channelDictionary[index]
@@ -57,7 +58,10 @@ function TransSpectrophotometerBody(
         setError(false);
     }
 
-    
+    onMount(()=>{
+        setRowsToUndefined();
+    })
+
     function renderRow(value : row, index: number){
         return ([
             <Icon name="circle" color={value.color}></Icon>,
@@ -134,10 +138,13 @@ function TransSpectrophotometerBody(
                 "flex-direction": "column",
                 "padding-top": 0
             }}>
-                <Button callback={async ()=>{
-                    await sendApiMessage({url:"/sensor/spectrophotometer/calibrate",method:"POST",data:"{}"});
-                    return true;
-                }}>set reference</Button>
+                <Button 
+                    callback={async ()=>{
+                        await sendApiMessage({url:"/sensor/spectrophotometer/calibrate",method:"POST",data:"{}"});
+                        return true;
+                    }}
+                    tooltip="Sets the current absolute values as reference for relative"
+                >set reference</Button>
             </div>
         </>
     )

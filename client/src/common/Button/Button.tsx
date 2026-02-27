@@ -6,29 +6,45 @@ export interface ButtonProps {
     callback? : () => Promise<boolean | void>;
     children?: JSXElement;
     class? : string;
-    disabled ?:boolean
+    disabled ?:boolean;
+    tooltip : string;
+    disabledTooltip ?:string;
 };
 
+function getTooltip(tooltip : string, disabledTooltip : string | undefined, disabled : boolean){
+    let result = tooltip;
+    if(disabled && disabledTooltip){
+        result += " (currently disabled, "+disabledTooltip+")";
+    }
+    return result;
+}
+
+function isDisabled(loading : boolean, disabled : boolean | undefined){
+    return loading || (disabled ?? false)
+}
 
 export function Button(props: ButtonProps) {
-    const [disabled, setDisabled] = createSignal<boolean>(false);
+    const [loading, setLoading] = createSignal<boolean>(false);
 
     const onclick = async () => {
-        setDisabled(true)
+        setLoading(true)
         try {
             await props.callback?.();
         } catch (error) {
             console.error(error);
         }
 
-        setDisabled(false);
+        setLoading(false);
     }
+
 
     return (
         <button 
-        class={`${styles.fetcher} button ${props.class?props.class:""}`} 
-        disabled={disabled() || (props.disabled ?? false)}
-        onClick={onclick}>
+            class={`${styles.fetcher} button ${props.class?props.class:""}`} 
+            disabled={isDisabled(loading(),props.disabled)}
+            onClick={onclick}
+            title={getTooltip(props.tooltip,props.disabledTooltip,isDisabled(loading(),props.disabled))}
+        >
             {props.children}
         </button>
     );

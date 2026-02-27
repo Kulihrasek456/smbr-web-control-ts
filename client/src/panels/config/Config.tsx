@@ -6,6 +6,8 @@ export function Config(){
             twoColFileList={true}
             targetEndpoint="/config-files"
             target="webControlApi"
+            allowFileCreation={false}
+            allowFileDeletion={false}
         ></TextEditor>
     )
 }

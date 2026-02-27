@@ -308,32 +308,45 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                 customRefreshProvider={true}
                 hotbarTargets={() => (
                         <>
-                            <Button callback={async () => {
-                                await Sensor_Fluorometer.sendCalibrate();
-                                return true;
-                            }} >
+                            <Button 
+                                callback={async () => {
+                                    await Sensor_Fluorometer.sendCalibrate();
+                                    return true;
+                                }} 
+                                tooltip="Calibrate the Kinetic fluorometer"
+                            >
                                 <p>calibrate</p>
                             </Button>
-                            <Button callback={async () => {
-                                let filename= await getFileName() + ".png";
-                                if(chartMethods){
-                                    let canvas = chartMethods.getCanvas();
-                                    if(canvas){
-                                        downloadCanvas(canvas,filename);
+                            <Button 
+                                disabled={currentMeasurement() === undefined}
+                                callback={async () => {
+                                    let filename= await getFileName() + ".png";
+                                    if(chartMethods){
+                                        let canvas = chartMethods.getCanvas();
+                                        if(canvas){
+                                            downloadCanvas(canvas,filename);
+                                        }
                                     }
-                                }
-                                return true
-                            }}>
+                                    return true
+                                }}
+                                tooltip="download current capture chart as an image"
+                                disabledTooltip="no data loaded"
+                            >
                                 <Icon name="image_arrow_up"></Icon>
                             </Button>
-                            <Button callback={async () => {
-                                let measurement = currentMeasurement();
-                                if(measurement) {
-                                    let filename= await getFileName() + ".json";
-                                    downloadStringAsFile(JSON.stringify(measurement, null, 2),filename);
-                                }
-                                return true;
-                            }}>
+                            <Button 
+                                disabled={currentMeasurement() === undefined}
+                                callback={async () => {
+                                    let measurement = currentMeasurement();
+                                    if(measurement) {
+                                        let filename= await getFileName() + ".json";
+                                        downloadStringAsFile(JSON.stringify(measurement, null, 2),filename);
+                                    }
+                                    return true;
+                                }}
+                                tooltip="download current capture data as json"
+                                disabledTooltip="no data loaded"
+                            >
                                 <Icon name="upload_file"></Icon>
                             </Button>
                         </>
@@ -421,7 +434,11 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                                     </div>
                                 </div>
                             </div>
-                            <Button class={styles.begin_button} callback={doCapture}>
+                            <Button 
+                                class={styles.begin_button} 
+                                callback={doCapture}
+                                tooltip="starts a capture, this action can take some time"
+                            >
                                 begin capture
                             </Button>
                         </div>

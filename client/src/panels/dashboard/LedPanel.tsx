@@ -24,14 +24,17 @@ export function LEDPanel(props: LEDPanelProps){
                 name="LED panel"
                 hotbarTargets={()=>(
                     <>
-                        <Button callback={async ()=>{
-                            await sendJsonApiMessage({
-                                url: "/control/led_panel/intensity",
-                                method: "POST",
-                                data: "{\"intensity\": [0,0,0,0]}"
-                            })
-                            return true;
-                        }}>disable</Button>
+                        <Button 
+                            callback={async ()=>{
+                                await sendJsonApiMessage({
+                                    url: "/control/led_panel/intensity",
+                                    method: "POST",
+                                    data: "{\"intensity\": [0,0,0,0]}"
+                                })
+                                return true;
+                            }}
+                            tooltip="Set all LED channels to 0%"
+                        >disable</Button>
                     </>
                 )}
             >

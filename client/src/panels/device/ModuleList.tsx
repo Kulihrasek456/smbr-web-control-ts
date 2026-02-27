@@ -44,7 +44,10 @@ function renderRow(value : System.module, index: number){
             target={{url: "/"+value.module_type+"/load" ,key: "load"}} 
             unit="%"
         ></ApiFetcher>,
-        <Button callback={()=>restartModule(value.module_type,value.uid)}>
+        <Button 
+            tooltip="Restart this module"
+            callback={()=>restartModule(value.module_type,value.uid)}
+        >
             <Icon name="refresh"></Icon>
         </Button>
     ])

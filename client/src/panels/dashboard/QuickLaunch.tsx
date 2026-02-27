@@ -118,10 +118,16 @@ function QuickLaunchBody(props: QuickLaunchProps){
                 name="Quick launch"
                 hotbarTargets={()=>(
                     <>
-                        <Button callback={start}>
+                        <Button 
+                            callback={start}
+                            tooltip="Start the currently selected script"
+                        >
                             <Icon name="play_arrow"></Icon>
                         </Button>
-                        <Button callback={stop}>
+                        <Button 
+                            callback={stop}
+                            tooltip="Pause the currently selected script"
+                        >
                             <Icon name="pause"></Icon>
                         </Button>
                     </>
