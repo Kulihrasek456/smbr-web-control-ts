@@ -26,8 +26,21 @@ export namespace System{
             return true;
         },opts);
 
+        let result : module[] = response.jsonValue;
+        result.sort((a:module,b:module)=>(
+            (a.uid===b.uid)?(
+                0
+            ):(
+                (a.uid>b.uid)?(
+                    -1
+                ):(
+                    1
+                )
+            )
+        ))
+
         return {
-            modules: response.jsonValue
+            modules: result
         }
     }
 }
