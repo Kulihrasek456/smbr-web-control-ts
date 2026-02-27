@@ -6,9 +6,11 @@ export interface ValueDisplayProps{
     value: string | undefined
     unit?: string,
     numberOnly?: {
-        decimalPlaces :number
+        decimalPlaces :number,
+        resultModifier? : (value: number)=>number
     }
-    class?: string
+    class?: string,
+    resultModifier? : (value:string )=>string
 }
 
 export function ValueDisplay(props:ValueDisplayProps){
@@ -23,6 +25,9 @@ export function ValueDisplay(props:ValueDisplayProps){
             if(!isNumber(result)){
                 console.warn("value: ",val," is not a number!");
                 return undefinedPlaceholder
+            }
+            if(props.numberOnly.resultModifier){
+                result = props.numberOnly.resultModifier(result);
             }
             if(props.numberOnly.decimalPlaces == 0){
                 return Math.round(result).toString()
