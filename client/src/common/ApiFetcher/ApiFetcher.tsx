@@ -14,6 +14,7 @@ export function ApiFetcher(props: ApiFetcherProps) {
     const undefinedPlaceholder = "---"
 
     const [value, setValue] = createSignal<string | undefined>(undefinedPlaceholder);
+    const [error, setError] = createSignal<boolean>(false);
     const refreshValue = useRefreshValue
     
     let inProgress : boolean = false;
@@ -24,9 +25,11 @@ export function ApiFetcher(props: ApiFetcherProps) {
         }
         inProgress = true;
         try {
-            setValue(((await sendApiMessageSimple(props.target)).toString()));
+            setValue(((await sendApiMessageSimple(props.target)).toString()));3
+            setError(false);
         } catch (e) {
             setValue(undefined);
+            setError(true);
             console.error(e);
         }
         inProgress = false;
@@ -35,6 +38,7 @@ export function ApiFetcher(props: ApiFetcherProps) {
     return (
          <ValueDisplay
             value={value()}
+            error={error()}
             {...props}
          ></ValueDisplay>
     );
