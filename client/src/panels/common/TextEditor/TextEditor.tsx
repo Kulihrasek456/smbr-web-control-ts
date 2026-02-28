@@ -472,10 +472,22 @@ export function TextEditor(props : TextEditorProps) {
 
   // this is the currently edited, original version of a files content.
   const [downloadedScriptContent, setDownloadedScriptContent] = createSignal<string>("");
+
+
+  function unsavedChangesCheck() : boolean{
+    if(dirtyFlag()){
+      if(!window.confirm("you have unsaved changes, do you want to continue?")){
+        return false;
+      }else{
+        setDirtyFlag(false);
+      }
+    }
+    return true;
+  }
   
   async function loadFile(fileName : string) : Promise<boolean>{
     try {
-      if(!dirtyFlag()){
+      if(unsavedChangesCheck()){
         let result = await sendApiMessageGetFileContent({
           fileName: fileName,
           url: props.targetEndpoint,
@@ -517,7 +529,7 @@ export function TextEditor(props : TextEditorProps) {
   async function deleteFile() : Promise<boolean>{
     let currFileName = fileName();
     if(currFileName !== undefined){
-      if(!dirtyFlag()){
+      if(unsavedChangesCheck()){
         await sendApiMessageDeleteFile({
           fileName: currFileName,
           url: props.targetEndpoint,
@@ -647,7 +659,7 @@ export function TextEditor(props : TextEditorProps) {
       <div
         classList={{
           [codeStyles.container]: true,
-          [codeStyles.unsaved]: dirtyFlag() ?? false
+          [codeStyles.unsaved]: dirtyFlag()
         }}
         style={{ "flex": "1 1 auto", "min-width": 0, "min-height": 0 }}
       >
