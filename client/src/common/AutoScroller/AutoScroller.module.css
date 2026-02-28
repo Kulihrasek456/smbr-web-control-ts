@@ -1,0 +1,27 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.auto_scroller{
+    display: inline-block;
+    position: absolute;
+
+    transition: transform 1s linear;
+}
+
+.overflowing{
+    .text{
+        opacity: 0;
+    }
+}
+
+.empty_space{
+    display: inline-block;
+}
+
+
+
