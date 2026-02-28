@@ -6,9 +6,9 @@ import { syntaxHighlighting, indentUnit } from "@codemirror/language";
 
 import { customTheme, customSyntaxHighligting } from "./CodeMirrorWrapperTheme";
 
-import { keymap } from "@codemirror/view";
+import { keymap, type EditorViewConfig } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
-import { Compartment, EditorState } from "@codemirror/state";
+import { Compartment, EditorState, type EditorStateConfig } from "@codemirror/state";
 
 const hideCursorTheme = EditorView.theme({
   ".cm-content": { caretColor: "transparent !important" },
@@ -40,8 +40,12 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
     }
   ]);
 
-  const loadCustomCode = (newCode : string) => {
+  function loadCustomCode(newCode : string){
     console.log("Code editor is loading new content");
+    view?.setState(
+      EditorState.create(getConfig(false,newCode))
+    )
+    /*
     if (view) {
       view.dispatch({
         changes: {
@@ -51,12 +55,12 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
         }
       });
     }
+    */
   };
 
-  onMount(() => {
-    if (editorRef) {
-      view = new EditorView({
-        doc: props.initialValueGetter(),
+  function getConfig(initialization : boolean, value: string) : EditorStateConfig{
+    let result : EditorViewConfig = {
+        doc: value,
         extensions: [
           basicSetup,
           indentUnit.of("    "),
@@ -82,8 +86,19 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
             }
           }),
         ],
-        parent: editorRef,
-      });
+      }
+      if(initialization){
+        result = {
+          ...result,
+          parent: editorRef
+        }
+      }
+      return result
+  }
+
+  onMount(() => {
+    if (editorRef) {
+      view = new EditorView(getConfig(true,props.initialValueGetter()));
     }
   });
 
