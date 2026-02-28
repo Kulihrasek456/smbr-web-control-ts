@@ -1,6 +1,6 @@
-import { For, type JSXElement } from "solid-js";
+import { createEffect, createSignal, For, type JSXElement } from "solid-js";
 import type { JSX } from "solid-js/jsx-runtime";
-
+import isEqual from "fast-deep-equal";
 import styles from './Table.module.css'
 
 interface TableProps {
@@ -43,6 +43,7 @@ interface TableStaticProps<T> {
 }
 
 export function TableStatic<T>(props: TableStaticProps<T>){
+  const [data, setData] = createSignal<T[]>([]);
   props.headers = props.headers ? props.headers  : [];
 
   function renderRow(cell : string | JSX.Element, index : ()=>number){
@@ -57,6 +58,24 @@ export function TableStatic<T>(props: TableStaticProps<T>){
       >{cell}</div>
     )
   }
+
+  function updateItemsSafely(newData: T[], oldData: T[]){    
+    const reconciledData = newData.map((newItem, index) => {
+      const oldItem = oldData[index];
+      if (oldItem && isEqual(oldItem, newItem)) {
+        return oldItem;
+      }
+      return newItem;
+    });
+
+    return reconciledData;
+  };
+
+  let oldData : T[] = [];
+  createEffect(()=>{
+    oldData = updateItemsSafely(props.data,oldData);
+    setData(oldData);
+  })
   
   return (
     <div class={styles["table-static"] + " " + ((props.fillHeight ?? false)?styles.fill_height:"")}>
@@ -65,7 +84,7 @@ export function TableStatic<T>(props: TableStaticProps<T>){
           {(cell, index) => renderRow(cell,index)}
         </For>
       </div>
-      <For each={props.data}>
+      <For each={data()}>
         {(rowData, index) => (
           <div class={styles.row}>
             <For each={props.renderRow(rowData, index())}>
