@@ -199,9 +199,10 @@
     padding-top: 2px;
     padding-bottom: 2px;
     width: 0;
-    text-align: left;
+    justify-content: left !important;
     min-width: 0;
     flex: 1 1 auto;
+    overflow: hidden;
 }
 
 .collapse-arrow{
@@ -230,6 +231,10 @@
 
     transition: background 0.2s ease-in-out;
     cursor: pointer;
+
+    >*{
+        width: 100%;
+    }
 }
 
 .file:hover{

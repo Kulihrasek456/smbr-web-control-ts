@@ -12,6 +12,7 @@ import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../../c
 import { targets, type targetsType } from "../../../apiMessages/apiMessageBase";
 import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
 import { Scheduler } from "../../../apiMessages/scheduler/_";
+import { AutoScrollerP } from "../../../common/AutoScroller/AutoScroller";
 
 
 
@@ -63,7 +64,10 @@ function FileListElement(props: FileListElementProps) {
               self?.classList.toggle(fileListStyles["collapsed"]) 
             }}
           >
-            <p class={fileListStyles["directory-name"]}>{props.data.name}</p>
+            <AutoScrollerP 
+              class={fileListStyles["directory-name"]} 
+              value={props.data.name}
+            ></AutoScrollerP>
             <div class={fileListStyles["collapse-arrow"]}>
               <Icon name="keyboard_arrow_down"></Icon>
             </div>
@@ -103,7 +107,12 @@ function FileListElement(props: FileListElementProps) {
                   [fileListStyles["active"]]: (props.activeFileName() === prefixPath+fileName)
                 }}
                 onclick={()=>{props.onSelect(prefixPath+fileName)}}
-              >{fileName}</li>
+              >
+                <AutoScrollerP 
+                  class={fileListStyles["directory-name"]} 
+                  value={fileName}
+                ></AutoScrollerP>
+              </li>
             )}
           </For>
         </Show>
