@@ -37,11 +37,17 @@
         border: 1px solid var(--bg-color-5);
 
         font-size: 100%;
-        >*{
-            scale: 2;
-        }
     }
 }
+
+.icon{
+    scale: 2;
+    display: inline-block;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .body{
     flex: 1 1 auto;
     display: flex;

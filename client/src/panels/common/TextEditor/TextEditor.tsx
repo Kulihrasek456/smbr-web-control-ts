@@ -372,7 +372,10 @@ function RuntimeInfo(props: RuntimeInfoProps) {
           tooltip="Start script"
           disabledTooltip="no script loaded"
         >
-          <Icon name="play_arrow"></Icon>
+          <Icon 
+            name="play_arrow"
+            class={runtimeInfoStyles.icon}
+          ></Icon>
         </Button>
         <Button class={runtimeInfoStyles["stop-button"]}
           callback={stop}
@@ -380,7 +383,10 @@ function RuntimeInfo(props: RuntimeInfoProps) {
           tooltip="Pause script"
           disabledTooltip="no script loaded"
         >
-          <Icon name="pause"></Icon>
+          <Icon 
+            name="pause"
+            class={runtimeInfoStyles.icon}
+          ></Icon>
         </Button>
       </div>
       <div class={runtimeInfoStyles.body}>
@@ -671,7 +677,7 @@ export function TextEditor(props : TextEditorProps) {
               tooltip="Delete the current file"
               disabledTooltip={(fileName() !== undefined)?("unsaved changes"):("no file loaded")}
             >
-              <Icon name="delete"></Icon>
+              <Icon name="delete" class={codeStyles.icon}></Icon>
             </Button>
           </Show>
 
@@ -685,7 +691,7 @@ export function TextEditor(props : TextEditorProps) {
             tooltip="Save the file"
             disabledTooltip={(fileName() !== undefined)?"all changes saved":"no file loaded"}
           >
-            <Icon name="upload"></Icon>
+            <Icon name="upload" class={codeStyles.icon}></Icon>
           </Button>
 
           <Show when={props.runtimeInfo !== undefined}>
@@ -695,7 +701,7 @@ export function TextEditor(props : TextEditorProps) {
               tooltip="Send current file to scheduler"
               disabledTooltip={(fileName() !== undefined)?"unsaved changes":"no file loaded"}
             >
-              <Icon name="share_windows"></Icon>
+              <Icon name="share_windows" class={codeStyles.icon}></Icon>
             </Button>
           </Show>
           
@@ -723,9 +729,13 @@ export function TextEditor(props : TextEditorProps) {
             } 
           }}
         >
-          <div><Icon name="arrow_back_ios_new"></Icon></div>
+          <div>
+            <Icon name="arrow_back_ios_new"></Icon>
+          </div>
           <p>Runtime info</p>
-          <div><Icon name="arrow_back_ios_new"></Icon></div>
+          <div>
+            <Icon name="arrow_back_ios_new"></Icon>
+          </div>
         </button>
         <div classList={{
           [textEditorStyles["runtime-info"]]:true,
