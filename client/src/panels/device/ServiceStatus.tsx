@@ -6,6 +6,7 @@ import { Widget } from "../common/Widget"
 import styles from "./ServiceStatus.module.css"
 import { ServicesStatus  as ServicesStatusNamespace} from "../../apiMessages/services-status/_"
 import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider"
+import { AutoScrollerP } from "../../common/AutoScroller/AutoScroller"
 
 interface ServiceStatusProps{
     id:string
@@ -39,10 +40,11 @@ function renderRow(value : row, index : number){
             [state]:true,
             [styles.service_status]:true
         }}>{value.state}</p>,
-        <p>{value.name}</p>,
-        <p>{value.stateDuration}</p>
+        <AutoScrollerP value={value.name}></AutoScrollerP>,
+        <AutoScrollerP value={value.stateDuration}></AutoScrollerP>
     ])
 }
+
 
 export function ServicesStatusBody(props : ServiceStatusBodyProps){
     const [rows, setRows] = createSignal<row[]>([])
