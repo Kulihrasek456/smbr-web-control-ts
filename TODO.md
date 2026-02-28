@@ -5,7 +5,7 @@ other
  - [x] fix runtime info collpasing in favor of editor (width: 0 needed)
  - [ ] fix gridstack grid not holding its width in device pannel
  - [x] sort modules by UID to reduce flickering
- - [ ] text overflow problems
+ - [x] text overflow problems
 
 api fetchers
  - [x] updater context
@@ -58,6 +58,9 @@ text editor
      - [x] create file buttons
      - [x] recursive
      - [ ] two columns
+     - [ ] ctrl+z brings back the previous files value
+     - [ ] unsaved changes alert
+     - [ ] syntax problems alert
 
 hotbar
  - [ ] better clock
