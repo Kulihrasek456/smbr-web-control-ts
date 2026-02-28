@@ -15,6 +15,7 @@ import { RefreshProvider } from './common/other/RefreshProvider'
 import { isDebug } from './common/debug/debugFlag'
 import { DebugApiMessageHostnameEditor, DebugModuleEditor, DebugRefreshProviderInterval } from './common/debug/Debug'
 import { ModuleListProvider, ModuleListRefresher } from './common/other/ModuleListProvider'
+import { AutoScrollerP } from './common/AutoScroller/AutoScroller'
 
 type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
 
@@ -58,7 +59,10 @@ function App() {
             <RefreshProvider disabled={updateDisabled()} autoRefreshPeriod={updateInterval()}>
                <header class={styles.hotbar}>
                   <button class={styles.logo}><img src={Public.images.minilogo} /></button>
-                  <h1>Smart Modular Photo Bioreaktor</h1>
+                  <AutoScrollerP
+                     class={styles.title}
+                     value='Smart Modular Photo Bioreaktor'
+                  ></AutoScrollerP>
                   <div class={styles.hotbar_right}>
                      <Hotbar></Hotbar>
                   </div>

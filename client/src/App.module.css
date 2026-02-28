@@ -8,6 +8,22 @@
     justify-content: space-between;
 }
 
+.hotbar_right{
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 10px;
+    flex: 0 0 auto;
+}
+
+.title{
+    flex: 1 1 auto;
+    justify-content: start !important;
+    p {
+        font-size: 30px;
+        font-weight: bold;
+    }
+}
+
 .main{
     display: flex;
     max-height: calc(100vh - 50px);
@@ -90,12 +106,6 @@
     border-right-color: var(--acc-color-2);
 }
 
-.hotbar_right{
-    display: flex;
-    flex-direction: row-reverse;
-    gap: 10px;
-    width: 100%;
-}
 
 ul{
     display: flex;
