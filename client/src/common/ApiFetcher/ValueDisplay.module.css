@@ -10,6 +10,6 @@
 }
 
 .error{
-    color: red;
+    color: red !important;
     font-weight: bold;
 }
