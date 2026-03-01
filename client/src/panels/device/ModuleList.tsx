@@ -9,10 +9,12 @@ import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher";
 import { sendApiMessageSimplePost } from "../../apiMessages/apiMessageSimple";
 import { refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
 import { System } from "../../apiMessages/system/_";
+import { sleep } from "../../common/other/utils";
 
 
 async function restartModule(moduleType: moduleTypesType, uid: string){
     await sendApiMessageSimplePost({url:"/"+moduleType+"/restart",key:"uid"},uid);
+    await sleep(3000);
     return true
 }
 
