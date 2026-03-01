@@ -26,7 +26,7 @@ export function RefreshProvider(props: RefreshProviderProps) {
 
   createEffect(() => {
     const pVal = parentValue?.();
-    if (pVal && pVal._ts > 0) {
+    if (pVal && pVal._ts > 0 && !props.disabled) {
       setLastRefresh(pVal);
     }
   });

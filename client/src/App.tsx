@@ -1,4 +1,4 @@
-import { createSignal, Show, type Accessor } from 'solid-js'
+import { createSignal, For, Show, type Accessor, type JSXElement } from 'solid-js'
 import './common/css/colors.css'
 import './common/css/global.css'
 import styles from './App.module.css'
@@ -35,6 +35,49 @@ function Item({ text, iconName,onClick,active}: ItemProps) {
 }
 
 
+interface PanelProps{
+    children : JSXElement,
+    active : boolean
+}
+
+function Panel(props: PanelProps) {
+   return (
+      <div classList={{
+         [styles.hidden]: !props.active,
+         [styles.container]: true
+      }}>
+         <RefreshProvider disabled={!props.active}>
+            {props.children}
+         </RefreshProvider>
+      </div>
+   )
+}
+
+interface PanelsProps{
+   items : {
+      text: string, 
+      iconName: string, 
+      component: ()=>JSXElement
+   }[],
+   activeItem : string
+}
+
+function Panels(props: PanelsProps){
+   return (
+      <div class={styles.content}>
+         <For each={props.items}>
+            {(item)=>(
+               <Panel active={item.text===props.activeItem}>
+                  {item.component()}
+               </Panel>
+            )}
+         </For>
+                  
+      </div>
+   )
+}
+
+
 function App() {
    const [activeItem, setActiveItem] = createSignal("Dashboard");
    
@@ -47,7 +90,7 @@ function App() {
 
    console.debug("update")
 
-  const items = [
+  const items : {text: string, iconName: string, component: ()=>JSXElement}[] = [
       { text: "Dashboard", iconName: "home", component: Dashboard },
       { text: "Scripts", iconName: "science", component: Scripts },
       { text: "Config", iconName: "build", component: Config },
@@ -107,17 +150,10 @@ function App() {
                         </div>
                      </Show>
                   </ul>
-                  <div class={styles.content}>
-                     {items.map(item => {
-                        const ContentComponent = item.component;
-                        return (
-                           
-                           <div class={((activeItem() !== item.text)?styles.hidden:"") + " " + styles.container}>
-                              <ContentComponent />
-                           </div>
-                        );
-                     })}
-                  </div>
+                  <Panels 
+                     items={items}
+                     activeItem={activeItem()}
+                  ></Panels>
                </div>
             </RefreshProvider>
             <RefreshProvider autoRefreshPeriod={moduleListUpdateInterval()}>
