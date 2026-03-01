@@ -6,6 +6,8 @@ other
  - [ ] fix gridstack grid not holding its width in device pannel
  - [x] sort modules by UID to reduce flickering
  - [x] text overflow problems
+ - [ ] open runtime info on scheduler select
+ - [x] restart timeout
 
 api fetchers
  - [x] updater context
@@ -44,7 +46,7 @@ dashboard
 device
  - [x] device info
  - [x] loaded modules
- - [ ] CAN statistics
+ - [x] CAN statistics
 
 text editor
  - [x] codemirror setup
@@ -58,10 +60,10 @@ text editor
      - [x] create file buttons
      - [x] recursive
      - [ ] two columns
-     - [ ] ctrl+z brings back the previous files value
-     - [ ] unsaved changes alert
+     - [x] ctrl+z brings back the previous files value
+     - [x] unsaved changes alert
      - [ ] syntax problems alert
 
 hotbar
  - [ ] better clock
- - [ ] title overflow on small screens
+ - [x] title overflow on small screens
