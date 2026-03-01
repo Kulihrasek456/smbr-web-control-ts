@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, Show, type JSXElement } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, onMount, Show, type JSXElement } from "solid-js";
 import { CodeMirrorWrapper, type CodeMirrorWrapperProps } from "./CodeMirrorWrapper";
 
 import codeStyles from "./CodePart.module.css";
@@ -625,6 +625,20 @@ export function TextEditor(props : TextEditorProps) {
     }
     return false;
   }
+
+  function blockUnload(this: Window, ev: BeforeUnloadEvent) {
+    if (dirtyFlag()) {
+      ev.preventDefault();
+    }
+  }
+
+  onMount(()=>{
+    window.addEventListener('beforeunload',blockUnload);
+  })
+
+  onCleanup(()=>{
+    window.removeEventListener('beforeunload',blockUnload);
+  })
 
   createEffect(async ()=>{
     if(refreshValueUpdate(refreshCntxt())){
