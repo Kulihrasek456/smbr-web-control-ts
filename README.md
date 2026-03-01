@@ -10,7 +10,10 @@ Since the server hosts a web dashboard, you only need to connect to it using you
 
 ___
 
-# how to install
+# how to host
+
+## preparation
+
 clone this repository into you desired directory
 ```bash
 git clone #TODO when repo is created
@@ -28,12 +31,43 @@ npm install -g n
 n latest
 ```
 
-
 then install all of the needed node modules:
+
 ```bash
-npm install
 npm run install:all
 ```
+
+or
+
+```bash
+npm run ci:all
+```
+
+## building
+
+If you want to just build the project for production, use:
+
+```bash
+npm run build
+```
+
+or, if you want to run it later on you local machine, use the following command, which will install the needed node modules into the created dist folder.
+
+```bash
+npm run build:installed
+```
+
+## running
+
+> requires the project to be built, see previous chapter as a guide.
+
+For starting the server, use:
+
+```bash
+npm run start
+```
+
+
 ___
 
 # how to host
@@ -56,5 +90,6 @@ This will allow you to simulate a connected reactor using the debug menu.
 
 ___
 
+Used libraries, and their licenses can be viewed in dist/ folder after building the project, and should be bundled with it in production.
 
 Some icons are from https://github.com/google/material-design-icons/ in the original, unchanged state.

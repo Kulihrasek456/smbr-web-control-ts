@@ -34,3 +34,6 @@ server/*.local
 *.sw?
 
 server_config.json
+server/server_config.json
+
+LICENSES.md

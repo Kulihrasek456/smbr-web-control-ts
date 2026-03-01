@@ -7,10 +7,10 @@
   "type": "module",
   "main": "src/server.js",
   "scripts": {
-    "dev": "npm run build && node dist/src/server.js --no-frontend -d -v" ,
-    "build": "rimraf dist && tsc",
-    "start": "npm run build && node dist/src/server.js",
-    "start:debug": "npm run build && node dist/src/server.js -d"
+    "dev": "npm run build && node ./dist/server.js --no-frontend -d -v",
+    "build": "rimraf ./dist && tsc",
+    "start": "node ./dist/server.js",
+    "start:debug": "node ./dist/server.js -d"
   },
   "dependencies": {
     "axios": "^1.13.5",

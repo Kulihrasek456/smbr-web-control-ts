@@ -13,7 +13,7 @@ import { smbr_config } from './config.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const distPath = path.join(__dirname, '..', '..', '..', 'client', 'dist');
+let clientDistPath = path.join(__dirname,'..', 'client');
 
 
 
@@ -70,7 +70,7 @@ process.argv.forEach(function (val, index, array) {
         console.warn("Running in DEBUG MODE");
         debugMode = true;
         try {
-            let pathToConfig = path.join(__dirname,"..","..","..","server_config.json");
+            let pathToConfig = path.join(__dirname,"..","server_config.json");
             let configFile = fs.readFileSync(pathToConfig);
             let configContent = JSON.parse(configFile.toString());
             if(isString(configContent.targetHostname)){
@@ -109,15 +109,19 @@ const tempLogger : TempLogger = new TempLogger(80);
 const app = express();
 app.use(cors()); 
 app.use(express.json());
-app.use(express.static(distPath));
 app.use('/config-files', configFilesRouter);
 app.use('/services-status', serviceStatusRouter);
 app.use('/temperature-logs', tempLogger.router);
 
 if(!noFrontEnd){
-    app.use((req, res) => {
-        res.sendFile(path.join(distPath, 'index.html'));
-    });
+    if(fs.existsSync(clientDistPath)){
+        app.use(express.static(clientDistPath));
+        app.use((req, res) => {
+            res.sendFile(path.join(clientDistPath, 'index.html'));
+        });
+    }else{
+        console.error("Client files not found!! Expected path:",clientDistPath);
+    }
 }
 
 
