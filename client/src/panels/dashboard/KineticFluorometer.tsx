@@ -332,7 +332,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                                 tooltip="download current capture chart as an image"
                                 disabledTooltip="no data loaded"
                             >
-                                <Icon name="image_arrow_up"></Icon>
+                                <Icon scale={1.4} name="image_arrow_up"></Icon>
                             </Button>
                             <Button 
                                 disabled={currentMeasurement() === undefined}
@@ -347,7 +347,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                                 tooltip="download current capture data as json"
                                 disabledTooltip="no data loaded"
                             >
-                                <Icon name="upload_file"></Icon>
+                                <Icon scale={1.4} name="upload_file"></Icon>
                             </Button>
                         </>
                     )

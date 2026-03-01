@@ -48,7 +48,7 @@ function renderRow(value : System.module, index: number){
             tooltip="Restart this module"
             callback={()=>restartModule(value.module_type,value.uid)}
         >
-            <Icon name="refresh"></Icon>
+            <Icon scale={1.4} name="refresh"></Icon>
         </Button>
     ])
 }

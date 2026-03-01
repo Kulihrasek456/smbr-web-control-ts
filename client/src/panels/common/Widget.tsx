@@ -30,7 +30,7 @@ function WidgetRefreshButton() {
             callback={async (): Promise<boolean> => {triggerRefresh?.({forced:true,_ts:Date.now()}); return true;}}
             tooltip="Refresh values"
         >
-            <Icon name="autorenew"></Icon>
+            <Icon scale={1.2} name="autorenew"></Icon>
         </Button>
     )
 }

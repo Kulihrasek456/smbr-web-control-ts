@@ -122,13 +122,13 @@ function QuickLaunchBody(props: QuickLaunchProps){
                             callback={start}
                             tooltip="Start the currently selected script"
                         >
-                            <Icon name="play_arrow"></Icon>
+                            <Icon scale={1.6} name="play_arrow"></Icon>
                         </Button>
                         <Button 
                             callback={stop}
                             tooltip="Pause the currently selected script"
                         >
-                            <Icon name="pause"></Icon>
+                            <Icon scale={1.6} name="pause"></Icon>
                         </Button>
                     </>
                 )}
