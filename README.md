@@ -70,26 +70,6 @@ npm run start
 
 ___
 
-# how to host
-
-> __the server does not support the HTTPS protocol__
-
-NPM will automatically compile the client and server typescript files, and host them as a NodeJS server.
-
-to build and run the server, use: 
-```bash
-npm run start
-```
-
-If you just want to try it out and don't have a SMBR reactor, run the server in debug mode:
-```bash
-npm run start:debug
-```
-
-This will allow you to simulate a connected reactor using the debug menu.
-
-___
-
 Used libraries, and their licenses can be viewed in dist/ folder after building the project, and should be bundled with it in production.
 
 Some icons are from https://github.com/google/material-design-icons/ in the original, unchanged state.
