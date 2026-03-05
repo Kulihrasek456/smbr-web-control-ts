@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For, onCleanup, onMount, Show, type JSXElement } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show, type JSXElement } from "solid-js";
 import { CodeMirrorWrapper, type CodeMirrorWrapperProps } from "./CodeMirrorWrapper";
 
 import codeStyles from "./CodePart.module.css";
@@ -36,23 +36,29 @@ interface FileListElementProps {
 }
 
 function FileListElement(props: FileListElementProps) {
-  let isRoot=(props.isRoot ?? true);
   let self : HTMLUListElement | undefined;
+  const isRoot = createMemo(() =>
+    props.isRoot ?? true
+  );
+  const prefixPath = createMemo(() =>
+    (props.prefixPath ?? "") +
+    (isRoot() ? (
+      ""
+    ) : (
+      props.data.name + "|"
+    ))
+  );
   
-  let prefixPath ="";
-  if(props.prefixPath !== undefined && !isRoot){
-    prefixPath = props.prefixPath + props.data.name + "|"
-  }
   return (
     <ul 
       classList={{
-        [fileListStyles["directory"]]:!isRoot,
-        [fileListStyles["root"]]:isRoot,
+        [fileListStyles["directory"]]:!isRoot(),
+        [fileListStyles["root"]]:isRoot(),
         [fileListStyles["collapsed"]]:true
       }}
       ref={self}
     >
-      <Show when={!isRoot}>
+      <Show when={!isRoot()}>
         <div classList={{
           [fileListStyles["directory-header"]]:true,
           [fileListStyles["last-directory"]]:props.maxDepth === 0
@@ -75,7 +81,7 @@ function FileListElement(props: FileListElementProps) {
           
           <Show when={props.onFileCreate}>
             <button class={fileListStyles["create-file-specific-button"]}
-              onclick={()=>props.onFileCreate?.(prefixPath)}
+              onclick={()=>props.onFileCreate?.(prefixPath())}
             >
               <Icon name="add"></Icon>
             </button>
@@ -91,7 +97,7 @@ function FileListElement(props: FileListElementProps) {
               data={directory[1]}
               isRoot={false}
               onSelect={props.onSelect}
-              prefixPath={prefixPath}
+              prefixPath={prefixPath()}
               activeFileName={props.activeFileName}
               onFileCreate={props.onFileCreate}
               dirsOnly={props.dirsOnly}
@@ -104,9 +110,9 @@ function FileListElement(props: FileListElementProps) {
               <li 
                 classList={{
                   [fileListStyles["file"]]:true,
-                  [fileListStyles["active"]]: (props.activeFileName() === prefixPath+fileName)
+                  [fileListStyles["active"]]: (props.activeFileName() === prefixPath()+fileName)
                 }}
-                onclick={()=>{props.onSelect(prefixPath+fileName)}}
+                onclick={()=>{props.onSelect(prefixPath()+fileName)}}
               >
                 <AutoScrollerP 
                   class={fileListStyles["directory-name"]} 
@@ -132,6 +138,8 @@ interface FileListProps {
 
   onSelect: (fileName : string) => void;
   activeFileName: ()=>string | undefined;
+
+  pathPrefix?: string
 }
 
 function FileList(props: FileListProps) {
@@ -192,6 +200,7 @@ function FileList(props: FileListProps) {
           onSelect={props.onSelect}
           activeFileName={props.activeFileName}
           maxDepth={props.maxDepth}
+          prefixPath={props.pathPrefix}
           onFileCreate={
             (props.createFileButton)?(
               (fileName : string)=>{
@@ -208,6 +217,77 @@ function FileList(props: FileListProps) {
     </div>
   )
 }
+
+function TwoColFileList(props: FileListProps){
+  const [activeDirectory, setActiveDirectory] = createSignal<string | undefined>();
+
+  function getEmpty() : FileListDirectory{
+    return  {
+      name: "root",
+      subDirectories: {},
+      files: []
+    };
+  }
+
+  function getActiveDirContent(directories : FileListDirectory | undefined, active: string | undefined) : FileListDirectory{
+    if(directories && active){
+      return directories.subDirectories[active] ?? getEmpty();
+    }
+    return getEmpty();
+  } 
+
+  function getPathPrefix(prop : string | undefined, active : string | undefined) : string | undefined{
+    if(prop){
+      return prop + (active ?? "")
+    }
+    if(active){
+      return (prop ?? "") + active + "|"
+    }
+    return undefined
+  }
+  
+  createEffect(()=>{
+    console.log("new dir selected: ",activeDirectory());
+  })
+
+  return (
+    <>
+      <div class={fileListStyles.container}>
+        <div class={fileListStyles.list}>
+          <For each={Object.entries(props.files?.subDirectories ?? {})}>
+            {(directory, index)=>(
+              <button 
+                classList={{
+                  [fileListStyles.two_col_directory]: true,
+                  [fileListStyles.active]: activeDirectory()===directory[1].name
+                }}
+                onclick={()=>setActiveDirectory(directory[0])}
+              >
+                <div>
+                  <AutoScrollerP value={directory[1].name}></AutoScrollerP>
+                  <Icon 
+                    name="keyboard_arrow_right"
+                    class={fileListStyles.icon}
+                  ></Icon>
+                </div>
+              </button>
+            )}
+          </For>
+        </div>
+      </div>
+      
+      <FileList
+        files={getActiveDirContent(props.files,activeDirectory())}
+        onSelect={props.onSelect}
+        activeFileName={props.activeFileName}
+        createFileButton={props.createFileButton}
+        buttons={props.buttons}
+        pathPrefix={getPathPrefix(props.pathPrefix,activeDirectory())}
+      ></FileList>
+    </>
+  )
+}
+
 
 interface RuntimeInfoProps {
   
@@ -653,28 +733,56 @@ export function TextEditor(props : TextEditorProps) {
       "min-width": 0,
       flex: "1 1 auto"
     }}>
-      <FileList 
-        buttons={[() => (
-          <Button
-            callback={async ()=>(await reloadFileList(true))}
-            tooltip="Reload files from the device file system"
-          >reload from fileSystem</Button>
-        )]} 
-        files={
-          fileList()
-        } 
-        createFileButton={(props.allowFileCreation)?(
-          {
-            onClick: async val => (await createFile(val.replaceAll("/","|")))
-          }
-        ):(
-          undefined
-        )}
-        onSelect={(value:string)=>{
-          loadFile(value);
-        }}
-        activeFileName={fileName}
-      ></FileList>
+      <Show when={props.twoColFileList}
+        fallback={
+          <FileList 
+            buttons={[() => (
+              <Button
+                callback={async ()=>(await reloadFileList(true))}
+                tooltip="Reload files from the device file system"
+              >reload from fileSystem</Button>
+            )]} 
+            files={
+              fileList()
+            } 
+            createFileButton={(props.allowFileCreation)?(
+              {
+                onClick: async val => (await createFile(val.replaceAll("/","|")))
+              }
+            ):(
+              undefined
+            )}
+            onSelect={(value:string)=>{
+              loadFile(value);
+            }}
+            activeFileName={fileName}
+          ></FileList>
+        }
+      >
+        <TwoColFileList
+          buttons={[() => (
+            <Button
+              callback={async ()=>(await reloadFileList(true))}
+              tooltip="Reload files from the device file system"
+            >reload from fileSystem</Button>
+          )]} 
+          files={
+            fileList()
+          } 
+          createFileButton={(props.allowFileCreation)?(
+            {
+              onClick: async val => (await createFile(val.replaceAll("/","|")))
+            }
+          ):(
+            undefined
+          )}
+          onSelect={(value:string)=>{
+            loadFile(value);
+          }}
+          activeFileName={fileName}
+        ></TwoColFileList>
+      </Show>
+      
 
       <div
         classList={{

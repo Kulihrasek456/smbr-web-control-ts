@@ -257,3 +257,44 @@
     overflow-x: hidden;
     overflow-y: scroll;
 }
+
+
+.two_col_directory{
+   background: none;
+   border: none;
+
+    border-left: 2px solid var(--acc-color-2);
+    border-right:2px solid transparent;
+
+    padding: 5px 4px;
+
+    margin: 5px 0;
+
+    font-weight: bold;
+
+    >*{
+         display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        padding: 3px;
+    }
+
+    *.icon{
+        scale: 2;
+    }
+}
+
+.two_col_directory:hover{
+    cursor: pointer;
+    >*{
+        background-color: var(--acc-color-2);
+    }
+}
+
+.two_col_directory.active{
+    border-left: 3px solid var(--acc-color-3);
+    border-right: 3px solid var(--acc-color-3);
+    background-color: var(--bg-color-3);
+    padding: 5px 2px;
+}
