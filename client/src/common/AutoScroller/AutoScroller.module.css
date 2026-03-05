@@ -13,9 +13,10 @@
     transition: transform 1s linear;
 }
 
-.overflowing{
+.container.overflowing{
     border-left: 1px solid rgba(var(--bg-color-5-rgb),0.2);
     border-right: 1px solid rgba(var(--bg-color-5-rgb),0.2);
+    justify-content: left;
 
     .text{
         opacity: 0;
