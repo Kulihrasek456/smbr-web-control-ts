@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show, type JSXElement } from "solid-js";
+import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show, type JSX, type JSXElement } from "solid-js";
 import { CodeMirrorWrapper, type CodeMirrorWrapperProps } from "./CodeMirrorWrapper";
 
 import codeStyles from "./CodePart.module.css";
@@ -528,6 +528,72 @@ function RuntimeInfo(props: RuntimeInfoProps) {
 }
 
 
+function VisibilityHandle(props:{
+  direction: "Left" | "Right",
+  text: string,
+  getter: ()=>boolean,
+  setter: (value: boolean)=>void
+}){
+  function toggle(){
+    props.setter(!props.getter());
+  }
+
+  return (
+    <button 
+      classList={{
+        [textEditorStyles.visibility_handle]:true,
+        [textEditorStyles.left]:props.direction=="Left",
+        [textEditorStyles.right]:props.direction=="Right",
+        [textEditorStyles.visible]:!props.getter()
+      }}
+      onclick={toggle}
+    >
+      <div class={textEditorStyles.visible_content}>
+        
+      </div>
+      <div class={textEditorStyles.hidden_content}>
+        <Icon name="arrow_back_ios_new"></Icon>
+        <p>{props.text}</p>
+        <Icon name="arrow_back_ios_new"></Icon>
+      </div>
+      <div class={textEditorStyles.visible_content}>
+        
+      </div>
+    </button>
+  )
+}
+
+function SlideDrawer(props:{
+  children: JSXElement,
+  direction: "Left" | "Right",
+  hidden: boolean,
+  maxWidth?: string,
+  minWidth?: string
+}){
+  function getStyle(hidden: boolean,maxWidth?: string,minWidth?:string): JSX.CSSProperties {
+    if(maxWidth!==undefined){
+      return {
+        "max-width": hidden?(0):(maxWidth),
+        "min-width": hidden?(undefined):(minWidth)
+      }
+    }else{
+      return {
+        "width": hidden?(0):(undefined)
+      }
+    }
+  }
+  return (
+    <div 
+      classList={{
+        [textEditorStyles.visibility_drawer]:true
+      }}
+      style={getStyle(props.hidden,props.maxWidth,props.minWidth)}
+    >
+      {props.children}
+    </div>
+  )
+}
+
 type File = {
   name: string,
   content: string
@@ -555,6 +621,7 @@ export function TextEditor(props : TextEditorProps) {
   const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
 
   const [runtimeInfoHidden, setRuntimeInfoHidden] = createSignal<boolean>(true);
+  const [fileListHidden, setfileListHidden] = createSignal<boolean>(false);
 
   // this is the currently edited, original version of a files content.
   const [downloadedScriptContent, setDownloadedScriptContent] = createSignal<string>("");
@@ -733,9 +800,38 @@ export function TextEditor(props : TextEditorProps) {
       "min-width": 0,
       flex: "1 1 auto"
     }}>
-      <Show when={props.twoColFileList}
-        fallback={
-          <FileList 
+
+      <SlideDrawer
+        direction="Left"
+        hidden={fileListHidden()}
+      >
+        <Show when={props.twoColFileList}
+          fallback={
+            <FileList 
+              buttons={[() => (
+                <Button
+                  callback={async ()=>(await reloadFileList(true))}
+                  tooltip="Reload files from the device file system"
+                >reload from fileSystem</Button>
+              )]} 
+              files={
+                fileList()
+              } 
+              createFileButton={(props.allowFileCreation)?(
+                {
+                  onClick: async val => (await createFile(val.replaceAll("/","|")))
+                }
+              ):(
+                undefined
+              )}
+              onSelect={(value:string)=>{
+                loadFile(value);
+              }}
+              activeFileName={fileName}
+            ></FileList>
+          }
+        >
+          <TwoColFileList
             buttons={[() => (
               <Button
                 callback={async ()=>(await reloadFileList(true))}
@@ -756,32 +852,16 @@ export function TextEditor(props : TextEditorProps) {
               loadFile(value);
             }}
             activeFileName={fileName}
-          ></FileList>
-        }
-      >
-        <TwoColFileList
-          buttons={[() => (
-            <Button
-              callback={async ()=>(await reloadFileList(true))}
-              tooltip="Reload files from the device file system"
-            >reload from fileSystem</Button>
-          )]} 
-          files={
-            fileList()
-          } 
-          createFileButton={(props.allowFileCreation)?(
-            {
-              onClick: async val => (await createFile(val.replaceAll("/","|")))
-            }
-          ):(
-            undefined
-          )}
-          onSelect={(value:string)=>{
-            loadFile(value);
-          }}
-          activeFileName={fileName}
-        ></TwoColFileList>
-      </Show>
+          ></TwoColFileList>
+        </Show>
+      </SlideDrawer>
+
+      <VisibilityHandle
+        text="file list"
+        direction="Left"
+        getter={fileListHidden}
+        setter={setfileListHidden}
+      ></VisibilityHandle>
       
 
       <div
@@ -843,30 +923,22 @@ export function TextEditor(props : TextEditorProps) {
 
 
       <Show when={props.runtimeInfo}>
-        <button 
-          class={textEditorStyles["runtime-info-handle"] + " button"} 
-          onclick={e => { 
-            if (runtimeInfo) {
-              setRuntimeInfoHidden(!runtimeInfoHidden())
-            } 
-          }}
+        <VisibilityHandle
+          text="runtime info"
+          direction={"Right"}
+          getter={runtimeInfoHidden}
+          setter={setRuntimeInfoHidden}
+        ></VisibilityHandle>
+        <SlideDrawer
+          direction={"Right"}
+          hidden={runtimeInfoHidden()}
+          maxWidth="800px"
+          minWidth="700px"
         >
-          <div>
-            <Icon name="arrow_back_ios_new"></Icon>
-          </div>
-          <p>Runtime info</p>
-          <div>
-            <Icon name="arrow_back_ios_new"></Icon>
-          </div>
-        </button>
-        <div classList={{
-          [textEditorStyles["runtime-info"]]:true,
-          [textEditorStyles.collapsed]:runtimeInfoHidden()
-        }} ref={runtimeInfo}>
           <RefreshProvider autoRefreshPeriod={runtimeInfoHidden()?(undefined):(250)}>
             <RuntimeInfo></RuntimeInfo>
           </RefreshProvider>
-        </div>
+        </SlideDrawer>
       </Show>
     </div>
   )
