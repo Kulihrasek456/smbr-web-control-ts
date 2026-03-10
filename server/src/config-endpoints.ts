@@ -52,12 +52,16 @@ function fileSpecifierCheck(specifier : string | string[] | undefined, res : Res
 }
 
 
-
+function prepareMessage(message: string){
+    return JSON.stringify({
+        message: message
+    })
+}
 
 export function getFileList(req : Request, res : Response) {
     if(fileList.length === 0){
         if(!reloadFileListFromDisk()){
-            res.status(500).send("unable to read file list");
+            res.status(500).send(prepareMessage("unable to read file list"));
             return;
         }
     }
@@ -66,7 +70,7 @@ export function getFileList(req : Request, res : Response) {
 
 export function getFileListReload(req : Request, res : Response) {
     if(!reloadFileListFromDisk()){
-        res.status(500).send("unable to read file list");
+        res.status(500).send(prepareMessage("unable to read file list"));
         return;
     }
     res.status(200).json(fileList);
@@ -84,7 +88,7 @@ export function getFileContent(req: Request, res: Response){
     try {
         fileData = fs.readFileSync(path.join(smbr_config.configFilesTarget,...fileNameSplit),'utf8');
     } catch (error) {
-        res.status(404).send("file not found");
+        res.status(404).send(prepareMessage("file not found"));
         return;
     }
     res.status(200).send({
@@ -102,25 +106,20 @@ export function setFileContent(req : Request, res : Response){
 
     const fileNameSplit = fileName.split("|");
 
-    if(!isString(req.body.name) || !isString(req.body.content)){
-        res.status(400).send("invalid request body, missing required fields");
-        return;
-    }
-
-    if(req.body.name!=fileName){
-        res.status(400).send("invalid request body, name missmatch");
+    if(!isString(req.body.content)){
+        res.status(400).send(prepareMessage("invalid request body, missing required fields"));
         return;
     }
 
     try {
         fs.writeFileSync(path.join(smbr_config.configFilesTarget,...fileNameSplit),req.body.content);
     } catch (error) {
-        res.status(500).send("unable to write to file");
+        res.status(500).send(prepareMessage("unable to write to file"));
         console.error("failed to write to config file: "+fileName+" errror:\n",error);
         return;
     }
 
-    res.status(200).send("file updated successfully");
+    res.status(200).send(prepareMessage("file updated successfully"));
 
     reloadFileListFromDisk();
 }
@@ -135,11 +134,11 @@ export function deleteFile(req : Request, res : Response){
     try {
         fs.unlinkSync(path.join(smbr_config.configFilesTarget,...fileNameSplit));
     } catch (error) {
-        res.status(500).send("failed to delete file");
+        res.status(500).send(prepareMessage("failed to delete file"));
         console.error("failed to delete config file: "+fileName+" errror:\n",error);
         return;
     }
-    res.status(200).send("file deleted successfully");
+    res.status(200).send(prepareMessage("file deleted successfully"));
 
     reloadFileListFromDisk();
 }
