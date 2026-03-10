@@ -29,9 +29,8 @@ export namespace Scheduler {
 
     export async function sendSetScheduled(options : setSchedule) : Promise<void> {
         let opts : apiMessageOptions = {
-            url: "/scheduler/recipe",
-            method: "POST",
-            data: `"${options.fileName}"`
+            url: "/scheduler/recipe/"+encodeURI(options.fileName),
+            method: "POST"
         }
 
         await sendTextApiMessage(opts);
