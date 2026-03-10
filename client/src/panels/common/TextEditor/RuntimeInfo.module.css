@@ -163,11 +163,11 @@
 
 @keyframes spin360 {
     from {
-        rotate:0deg
+        transform: rotateZ(0deg);
     }
 
     to {
-        rotate:360deg
+        transform: rotateZ(360deg);
     }
 }
 .status-img.spinning{
