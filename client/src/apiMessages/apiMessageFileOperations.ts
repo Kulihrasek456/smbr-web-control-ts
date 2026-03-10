@@ -74,7 +74,7 @@ export type apiMessageGetFileContentResult = {
 
 export async function sendApiMessageGetFileContent(options : apiMessageGetFileContent) : Promise<apiMessageGetFileContentResult>{
     let opts : apiMessageOptions = {
-        url: options.url + "/" + options.fileName,
+        url: options.url + "/"  +encodeURI(options.fileName),
         target: options.target
     }
 
@@ -100,11 +100,10 @@ export type apiMessageSetFileContent = {
 
 export async function sendApiMessageSetFileContent(options : apiMessageSetFileContent) : Promise<void>{
     let opts : apiMessageOptions = {
-        url: options.url + "/" + options.fileName,
+        url: options.url + "/" + encodeURI(options.fileName),
         target: options.target,
         method: "PUT",
         data: JSON.stringify({
-            name: options.fileName,
             content: options.content
         })
     }
@@ -120,7 +119,7 @@ export type apiMessageDeleteFile = {
 
 export async function sendApiMessageDeleteFile(options: apiMessageDeleteFile) : Promise<void>{
     let opts : apiMessageOptions = {
-        url: options.url + "/" + options.fileName,
+        url: options.url + "/" + encodeURI(options.fileName),
         method: "DELETE",
         target: options.target,
     }
