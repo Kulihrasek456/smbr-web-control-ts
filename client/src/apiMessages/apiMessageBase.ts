@@ -25,6 +25,7 @@ export class ApiMessageError extends Error{
     this.stack=""
     this.name = "ApiMessageError";
   }
+  
 }
 
 export class ApiConnectionError extends ApiMessageError {
@@ -35,9 +36,12 @@ export class ApiConnectionError extends ApiMessageError {
 }
 
 export class ApiInvalidStatusCodeError extends ApiMessageError {
-  constructor(options: apiMessageOptions, status : number) {
-    super(options,`invalid status code: ${status}`);
+  responseMessage : string | undefined;
+  constructor(options: apiMessageOptions, status : number, responseMessage ?: string) {
+    const apiResponseText = (responseMessage!==undefined)?`api responded with a message: "${responseMessage}"`:"no details";
+    super(options,`invalid status code: ${status}, ${apiResponseText}`);
     this.name = "ApiInvalidStatusCodeError";
+    this.responseMessage = responseMessage;
   }
 }
 
@@ -99,7 +103,7 @@ export async function sendApiMessage(options:apiMessageOptions){
         response = await fetch(url_full, {
             "credentials": "omit",
             "headers": {
-                "Accept": "application/json",
+                "Accept": "*/*",
                 "Accept-Language": "cs,sk;q=0.8,en-US;q=0.5,en;q=0.3",
                 "Content-Type": "application/json"
             },
@@ -115,7 +119,16 @@ export async function sendApiMessage(options:apiMessageOptions){
     if(returnCodes.includes(response.status)){
         return response;
     }else{
-        throw new ApiInvalidStatusCodeError(options,response.status);
+        let responseMessage : string | undefined = undefined;
+        try {
+            const potentialMessage = (await response.json())["message"];
+            if(isString(potentialMessage)){
+                responseMessage = potentialMessage;
+            }
+        } catch (error) {
+            
+        }
+        throw new ApiInvalidStatusCodeError(options,response.status,responseMessage);
     }
 }
 
