@@ -9,7 +9,7 @@ import { Button } from "../../../common/Button/Button";
 import { Icon } from "../../../common/Icon/Icon";
 import { TableStatic } from "../../../common/Table/Table";
 import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../../common/other/RefreshProvider";
-import { targets, type targetsType } from "../../../apiMessages/apiMessageBase";
+import { ApiInvalidStatusCodeError, targets, type targetsType } from "../../../apiMessages/apiMessageBase";
 import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
 import { Scheduler } from "../../../apiMessages/scheduler/_";
 import { AutoScrollerP } from "../../../common/AutoScroller/AutoScroller";
@@ -598,6 +598,10 @@ type File = {
   name: string,
   content: string
 }
+type ErrorNotice = {
+  error: string,
+  message: string,
+}
 
 interface TextEditorProps {
   twoColFileList? : boolean;
@@ -619,6 +623,7 @@ export function TextEditor(props : TextEditorProps) {
   const [fileList, setFileList] = createSignal<FileListDirectory | undefined>();
   const [directoryList, setDirectoryList] = createSignal<FileListDirectory | undefined>(); //#TODO connect this to the twoColLayout fileList
   const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
+  const [errorMessages, setErrorMessages] = createSignal<ErrorNotice[]>([]);
 
   const [runtimeInfoHidden, setRuntimeInfoHidden] = createSignal<boolean>(true);
   const [fileListHidden, setfileListHidden] = createSignal<boolean>(false);
@@ -626,6 +631,12 @@ export function TextEditor(props : TextEditorProps) {
   // this is the currently edited, original version of a files content.
   const [downloadedScriptContent, setDownloadedScriptContent] = createSignal<string>("");
 
+  function addErrorMessage(error : string,message : string){
+    setErrorMessages([...errorMessages(),{
+      error: error,
+      message: message
+    }]);
+  }
 
   function unsavedChangesCheck() : boolean{
     if(dirtyFlag()){
@@ -655,6 +666,9 @@ export function TextEditor(props : TextEditorProps) {
     } catch (error) {
       setFileName(undefined)
       setFileContent(undefined)
+      if(error instanceof ApiInvalidStatusCodeError){
+        addErrorMessage("unable to read file contents",error.responseMessage ?? "unknown error");
+      }
       throw error;
     }
     return false;
@@ -665,12 +679,19 @@ export function TextEditor(props : TextEditorProps) {
     let currFileContent = fileContent();
     if(currFileName !== undefined && currFileContent !== undefined){    
       if(dirtyFlag()){
-        await sendApiMessageSetFileContent({
-          fileName: currFileName,
-          content: currFileContent,
-          url: props.targetEndpoint,
-          target: props.target
-        });
+        try {
+          await sendApiMessageSetFileContent({
+            fileName: currFileName,
+            content: currFileContent,
+            url: props.targetEndpoint,
+            target: props.target
+          });
+        } catch (error) {
+          if(error instanceof ApiInvalidStatusCodeError){
+            addErrorMessage("unable to upload file contents",error.responseMessage ?? "unknown error");
+          }
+          throw error;
+        }
   
         setDirtyFlag(false);
         return true;
@@ -683,11 +704,18 @@ export function TextEditor(props : TextEditorProps) {
     let currFileName = fileName();
     if(currFileName !== undefined){
       if(unsavedChangesCheck()){
-        await sendApiMessageDeleteFile({
-          fileName: currFileName,
-          url: props.targetEndpoint,
-          target: props.target
-        })
+        try {
+          await sendApiMessageDeleteFile({
+            fileName: currFileName,
+            url: props.targetEndpoint,
+            target: props.target
+          })
+        } catch (error) {
+          if(error instanceof ApiInvalidStatusCodeError){
+            addErrorMessage("unable to delete the file",error.responseMessage ?? "unknown error");
+          }
+          throw error;
+        }
 
         setDownloadedScriptContent(" ");
         setFileName(undefined);
@@ -750,13 +778,19 @@ export function TextEditor(props : TextEditorProps) {
     if(fileExists){
       return false;
     }
-
-    await sendApiMessageSetFileContent({
-      fileName: fileName,
-      content: "",
-      url: props.targetEndpoint,
-      target: props.target
-    })
+    try {
+      await sendApiMessageSetFileContent({
+        fileName: fileName,
+        content: "",
+        url: props.targetEndpoint,
+        target: props.target
+      })
+    } catch (error) {
+      if(error instanceof ApiInvalidStatusCodeError){
+        addErrorMessage("unable to create the file",error.responseMessage ?? "unknown error");
+      }
+      throw error;
+    }
 
     reloadFileList(true);
     return true;
@@ -765,9 +799,16 @@ export function TextEditor(props : TextEditorProps) {
   async function scheduleFile() : Promise<boolean>{
     let currFile = fileName();
     if(currFile && !dirtyFlag()){
-      await Scheduler.sendSetScheduled({
-        fileName: currFile
-      })
+      try {
+        await Scheduler.sendSetScheduled({
+          fileName: currFile
+        })
+      } catch (error) {
+        if(error instanceof ApiInvalidStatusCodeError){
+          addErrorMessage("unable to schedule the file",error.responseMessage ?? "unknown error");
+        }
+        throw error;
+      }
       return true;
     }
     return false;
@@ -793,6 +834,14 @@ export function TextEditor(props : TextEditorProps) {
     }
   })
 
+
+  function removePopup(index : number){
+    let newArr = errorMessages();
+    console.error(newArr);
+    newArr = newArr.filter((_,i)=>(i!==index)); 
+    console.error(newArr);
+    setErrorMessages(newArr);
+  }
 
   return (
     <div style={{
@@ -869,7 +918,8 @@ export function TextEditor(props : TextEditorProps) {
       <div
         classList={{
           [codeStyles.container]: true,
-          [codeStyles.unsaved]: dirtyFlag()
+          [codeStyles.unsaved]: dirtyFlag(),
+          [codeStyles.error] : errorMessages().length > 0
         }}
         style={{ "flex": "1 1 auto", "min-width": 0, "min-height": 0 }}
       >
@@ -911,6 +961,20 @@ export function TextEditor(props : TextEditorProps) {
           
         </div>
         <div class={codeStyles["code-editor"]}>
+          <div class={codeStyles.popupPanel}>
+            <p class={codeStyles.closeText}>errors occured, click on a popup to close it</p>
+            <For each={errorMessages()}>
+              {(el,index)=>(
+                <button 
+                  class={codeStyles.popup}
+                  onclick={e=>removePopup(index())}
+                >
+                  <p class={codeStyles.errorText}>{el.error}</p>
+                  <p class={codeStyles.messageText}>{el.message}</p>
+                </button>
+              )}
+            </For>
+          </div>
           <CodeMirrorWrapper
             initialValueGetter={downloadedScriptContent}
             onChange={(value: string)=>{
