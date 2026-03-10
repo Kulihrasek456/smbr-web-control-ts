@@ -15,6 +15,8 @@
 
     cursor: pointer;
 
+    transition: background 0.5s ease-in-out, width 0.5s ease-in-out;
+
     p{
         writing-mode: vertical-rl;
         text-orientation: mixed;
@@ -62,6 +64,9 @@
 
 .visibility_handle:hover{
     border: 1px solid var(--acc-color-4) !important;
+    .visible_content{
+        border-color: var(--acc-color-2);
+    }
 }
 
 
