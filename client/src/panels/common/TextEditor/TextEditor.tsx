@@ -149,7 +149,7 @@ function FileList(props: FileListProps) {
 
 
   return (
-    <div class={fileListStyles.container} style={{ flex: "0 0 auto" }}>
+    <div class={fileListStyles.container}>
       <div class={fileListStyles.search}>
         <input class={fileListStyles["search-field"]} placeholder="type in to search..."></input>
       </div>
@@ -804,6 +804,8 @@ export function TextEditor(props : TextEditorProps) {
       <SlideDrawer
         direction="Left"
         hidden={fileListHidden()}
+        maxWidth={(props.twoColFileList===undefined)?("200px"):("400px")}
+        minWidth={(props.twoColFileList===undefined)?("200px"):("400px")}
       >
         <Show when={props.twoColFileList}
           fallback={
