@@ -13,6 +13,7 @@ import { ApiInvalidStatusCodeError, targets, type targetsType } from "../../../a
 import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
 import { Scheduler } from "../../../apiMessages/scheduler/_";
 import { AutoScrollerP } from "../../../common/AutoScroller/AutoScroller";
+import { PopupPanel, type Popup } from "../Widget";
 
 
 
@@ -552,9 +553,9 @@ function VisibilityHandle(props:{
         
       </div>
       <div class={textEditorStyles.hidden_content}>
-        <Icon name="arrow_back_ios_new"></Icon>
+        <Icon name={(props.direction==="Right")?("arrow_back_ios_new"):("arrow_forward_ios")}></Icon>
         <p>{props.text}</p>
-        <Icon name="arrow_back_ios_new"></Icon>
+        <Icon name={(props.direction==="Right")?("arrow_back_ios_new"):("arrow_forward_ios")}></Icon>
       </div>
       <div class={textEditorStyles.visible_content}>
         
@@ -594,15 +595,6 @@ function SlideDrawer(props:{
   )
 }
 
-type File = {
-  name: string,
-  content: string
-}
-type ErrorNotice = {
-  error: string,
-  message: string,
-}
-
 interface TextEditorProps {
   twoColFileList? : boolean;
   runtimeInfo? : RuntimeInfoProps;
@@ -623,7 +615,7 @@ export function TextEditor(props : TextEditorProps) {
   const [fileList, setFileList] = createSignal<FileListDirectory | undefined>();
   const [directoryList, setDirectoryList] = createSignal<FileListDirectory | undefined>(); //#TODO connect this to the twoColLayout fileList
   const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
-  const [errorMessages, setErrorMessages] = createSignal<ErrorNotice[]>([]);
+  const [errorMessages, setErrorMessages] = createSignal<Popup[]>([]);
 
   const [runtimeInfoHidden, setRuntimeInfoHidden] = createSignal<boolean>(true);
   const [fileListHidden, setfileListHidden] = createSignal<boolean>(false);
@@ -631,10 +623,11 @@ export function TextEditor(props : TextEditorProps) {
   // this is the currently edited, original version of a files content.
   const [downloadedScriptContent, setDownloadedScriptContent] = createSignal<string>("");
 
-  function addErrorMessage(error : string,message : string){
+  function addErrorMessage(message : string,details : string){
     setErrorMessages([...errorMessages(),{
-      error: error,
-      message: message
+      message: message,
+      details: details,
+      severity: "error"
     }]);
   }
 
@@ -834,15 +827,6 @@ export function TextEditor(props : TextEditorProps) {
     }
   })
 
-
-  function removePopup(index : number){
-    let newArr = errorMessages();
-    console.error(newArr);
-    newArr = newArr.filter((_,i)=>(i!==index)); 
-    console.error(newArr);
-    setErrorMessages(newArr);
-  }
-
   return (
     <div style={{
       display: "flex",
@@ -961,20 +945,10 @@ export function TextEditor(props : TextEditorProps) {
           
         </div>
         <div class={codeStyles["code-editor"]}>
-          <div class={codeStyles.popupPanel}>
-            <p class={codeStyles.closeText}>errors occured, click on a popup to close it</p>
-            <For each={errorMessages()}>
-              {(el,index)=>(
-                <button 
-                  class={codeStyles.popup}
-                  onclick={e=>removePopup(index())}
-                >
-                  <p class={codeStyles.errorText}>{el.error}</p>
-                  <p class={codeStyles.messageText}>{el.message}</p>
-                </button>
-              )}
-            </For>
-          </div>
+          <PopupPanel
+            getter={errorMessages}
+            setter={setErrorMessages}
+          ></PopupPanel>
           <CodeMirrorWrapper
             initialValueGetter={downloadedScriptContent}
             onChange={(value: string)=>{
