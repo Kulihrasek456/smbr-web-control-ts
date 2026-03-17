@@ -48,7 +48,10 @@ export interface CustomChartOptions {
 export type datasetType = {
     label: string,
     data : Array<number | undefined>,
-    hidden? : boolean
+    hidden ?: boolean,
+    borderColor ?: string,
+    backgroundColor ?: string,
+    borderWidth ?: number,
 }
 
 export interface LineChartProps{
