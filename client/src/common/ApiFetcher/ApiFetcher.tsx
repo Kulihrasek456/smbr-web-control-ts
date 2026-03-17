@@ -6,7 +6,7 @@ import { ValueDisplay, type ValueDisplayProps } from './ValueDisplay';
 
 export interface ApiFetcherProps extends Omit<ValueDisplayProps,"value">{
     target: apiMessageSimple;
-    interval?: number,
+    minInterval?: number,
 };
 
 
@@ -18,11 +18,17 @@ export function ApiFetcher(props: ApiFetcherProps) {
     const refreshValue = useRefreshValue
     
     let inProgress : boolean = false;
+    let lastUpdate : number = 0;
 
     createEffect(async () => {
-        if(!refreshValueUpdate(refreshValue()) || inProgress){
+        let minInterval = (props.minInterval)? {
+            length: props.minInterval, 
+            lastUpdate: lastUpdate
+        }:undefined;
+        if(!refreshValueUpdate(refreshValue(), minInterval) || inProgress){
             return
         }
+        lastUpdate = Date.now();
         inProgress = true;
         try {
             setValue(((await sendApiMessageSimple(props.target)).toString()));3
