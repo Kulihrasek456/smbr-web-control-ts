@@ -45,13 +45,15 @@ export interface CustomChartOptions {
     raw?: ChartOptions<'line'> //used for applying any chartJS options
 }
 
+export type datasetType = {
+    label: string,
+    data : Array<number | undefined>,
+    hidden? : boolean
+}
+
 export interface LineChartProps{
     labels : Array<string | number>,
-    datasets : Array<{
-        label: string,
-        data : Array<number | undefined>,
-        hidden? : boolean
-    }>,
+    datasets : Array<datasetType>,
     ref?: (methods: { getCanvas: () => HTMLCanvasElement | undefined }) => void;
     options? : CustomChartOptions
 }
