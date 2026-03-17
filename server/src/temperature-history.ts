@@ -154,7 +154,16 @@ class LogContainer{
 }
 
 type ParsedLog = {endpoint: string, values:(number|undefined)[]}
-function logsToApiResponse(logs : Record<string,(number|undefined)[]>,historyLen:number) : {logs:ParsedLog[],logCount:number, historyLen:number}{
+function logsToApiResponse(
+    logs : Record<string,(number|undefined)[]>,
+    historyLen:number, 
+    toTime : number
+) : {
+    logs:ParsedLog[],
+    logCount: number, 
+    historyLen: number,
+    toTime: number
+}{
     let result  : ParsedLog[] = [];
     let logCount = 0;
     for(let endpoint in logs){
@@ -171,7 +180,8 @@ function logsToApiResponse(logs : Record<string,(number|undefined)[]>,historyLen
     return {
         logs: result,
         logCount: logCount,
-        historyLen: historyLen
+        historyLen: historyLen,
+        toTime: toTime
     };
 }
 
@@ -295,11 +305,12 @@ export class TempLogger {
     }
 
     getter(req: Request, res: Response){
-        let timeBack = req.body["timeBack"];
-        let maxTimeBack = Date.now()-this.timeStarted;
-        if(timeBack > maxTimeBack){
-            timeBack = maxTimeBack;
+        let fromTime = req.body["fromTime"];
+        if(fromTime < this.timeStarted){
+            fromTime = this.timeStarted;
         }
+        let toTime = Date.now();
+        let timeBack = toTime - fromTime;
         if(isNumber(timeBack)){
             let scope = req.body["scope"];
             if(isString(req.body["scope"])){
@@ -323,7 +334,7 @@ export class TempLogger {
                         res.status(400).send(JSON.stringify({message:"invalid scope selected"}))
                         return;
                 }
-                res.status(200).send(JSON.stringify(logsToApiResponse(result,historyLen)));
+                res.status(200).send(JSON.stringify(logsToApiResponse(result,historyLen,toTime)));
                 return
             }
         }
