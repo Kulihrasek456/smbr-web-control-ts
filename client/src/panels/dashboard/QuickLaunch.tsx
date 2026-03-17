@@ -2,13 +2,14 @@ import { createEffect, createSignal, For } from "solid-js";
 import { Button } from "../../common/Button/Button";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
 import { Icon } from "../../common/Icon/Icon";
-import { Widget } from "../common/Widget";
+import { type Popup, Widget } from "../common/Widget";
 
 import styles from "./QuickLaunch.module.css"
 import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
 import { Recipes } from "../../apiMessages/recipes/_";
 import { Scheduler } from "../../apiMessages/scheduler/_";
 import { sleep } from "../../common/other/utils";
+import { ApiInvalidStatusCodeError } from "../../apiMessages/apiMessageBase";
 
 interface QuickLaunchProps{
     id: string;
@@ -59,6 +60,8 @@ function QuickLaunchBody(props: QuickLaunchProps){
     const  [scheduledScript, setScheduledScript] = createSignal<string>("---");
     const  [scriptState, setScriptState] = createSignal<string>("---");
 
+    const [errorMessages, setErrorMessages] = createSignal<Popup[]>([]);
+
     const refreshCntxt = useRefreshValue;
 
     async function refreshFileList(){
@@ -86,21 +89,51 @@ function QuickLaunchBody(props: QuickLaunchProps){
         ])
     }
 
+    function handleError(error : unknown, message : string){
+        if(error instanceof ApiInvalidStatusCodeError){
+            if(error.responseMessage){
+                setErrorMessages([
+                    ...errorMessages(),
+                    {
+                        message: message,
+                        details: error.responseMessage,
+                        severity: "error"
+                    }
+                ])
+            }
+        }
+    }
+
     async function stop(){
-        await Scheduler.sendStopScheduled();
+        try {
+            await Scheduler.sendStopScheduled();
+        } catch (error) {
+            handleError(error,"unable to stop script");
+            throw error;
+        }
         await refreshAll(true);
         return true;
     }
 
 
     async function start(){
-        await Scheduler.sendStartScheduled();
+        try {
+            await Scheduler.sendStartScheduled();
+        } catch (error) {
+            handleError(error,"unable to start script");
+            throw error;
+        }
         await refreshAll(true);
         return true;
     }
 
     async function selectScript(fileName : string){
-        await Scheduler.sendSetScheduled({fileName: fileName});
+        try {
+            await Scheduler.sendSetScheduled({fileName: fileName});
+        } catch (error) {
+            handleError(error,`unable to schedule script "${fileName}"`);
+            throw error;
+        }
         await refreshAll(true);
         return true;
     }
@@ -133,6 +166,10 @@ function QuickLaunchBody(props: QuickLaunchProps){
                     </>
                 )}
                 customRefreshProvider={true}
+                popupPanel={{
+                    getter: errorMessages,
+                    setter: setErrorMessages
+                }}
             >
             <div class={styles.selected_script}>
                 <b>Selected script</b>
