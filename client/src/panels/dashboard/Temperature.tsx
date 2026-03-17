@@ -6,69 +6,52 @@ import { Button } from "../../common/Button/Button"
 import { createEffect, createSignal, createUniqueId, type JSXElement } from "solid-js"
 import { Icon } from "../../common/Icon/Icon"
 import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
-import { getColor } from "../../common/other/colorGenerator"
-import { LineChart } from "../../common/LineChart/LineChart"
+import { darkenColor, getColor } from "../../common/other/colorGenerator"
+import { LineChart, type datasetType } from "../../common/LineChart/LineChart"
 import { formatTime, getCountdownArray } from "../../common/other/utils"
 import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
 import { RadialSelect } from "../../common/RadialSelect/RadialSelect"
 import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
 import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider"
 import { TemperatureLogs } from "../../apiMessages/temperature-logs/_"
-
+import styles from "./Temperature.module.css"
 // create subrows by setting icon as undefined
 // row indexes are then given automatically after generating the array
 type row = {
+    lastSubRow?: boolean
     icon?: string,
-    name: string, 
-    target: apiMessageSimple | undefined, 
+    name: NameType,
     instance: moduleInstancesType,
-    subRowIndex?: number,
-    rowIndex? : number,
-    lastSubRow? : boolean
+    targetkey?: string
 }
 
-const endpointToName : {[key: string]: string} = {
+
+const endpointToName = {
     "/sensor/bottle/temperature" : "Bottle",
     "/sensor/bottle/top/measured_temperature" : "Bottle.Top",
     "/sensor/bottle/bottom/measured_temperature" : "Bottle.Bottom",
+    "fluorometer":"Fluorometer",
     "/sensor/fluorometer/detector/temperature" : "Fluorometer.Detector",
     "/sensor/fluorometer/emitor/temperature" : "Fluorometer.Emitor",
     "/sensor/spectrophotometer/emitor/temperature" : "Spectrophotometer",
     "/control/led_panel/temperature" : "LED panel",
-    "/control/heater/plate_temperature" : "Heater plate"
+    "/control/heater/plate_temperature" : "Heater plate",
+    "test":"Test"
 }as const;
 
-function createRow(data: row, index:number) : JSXElement[] {
-    return [
-        <Icon 
-            color={
-                getColor(data.rowIndex || 0,data.subRowIndex || 0)
-            } 
-            name={
-                (data.icon)?(
-                    data.icon
-                ):(
-                    (data.lastSubRow)?(
-                        "┗"
-                    ):(
-                        "┣"
-                    )
-                )
-            }
-        ></Icon>,
+const nameToEndpoint = Object.fromEntries(
+    Object.entries(endpointToName).map(([k, v]) => [v, k])
+) as { [K in keyof typeof endpointToName as typeof endpointToName[K]]: K };
 
-        <p style={{
-            "justify-content":"start",
-            "border-left": (data.instance != "Exclusive")?`3px solid ${moduleInstanceColors[data.instance]}`:undefined,
-            "padding-left": (data.instance != "Exclusive")?"5px":undefined
-        }}>{data.name}</p>,
+type NameType = keyof typeof nameToEndpoint;
+type EndpointType = keyof typeof endpointToName;
 
-        (data.target)?(
-            <ApiFetcher target={data.target} unit="°C" numberOnly={{decimalPlaces: 2}}></ApiFetcher>
-        ):(
-            <p></p>
-        )
-    ]
+function getEndpoint(name : string) : EndpointType | undefined{
+    return (nameToEndpoint as Record<string,EndpointType>)[name];
+}
+
+function getName(endpoint : string) : NameType | undefined{
+    return (endpointToName as Record<string,NameType>)[endpoint];
 }
 
 function generateTimeLabels(currentTime : number, count : number, scope : "M"|"D"|"H") {
@@ -109,6 +92,31 @@ export function TemperatureBody(props : TemperatureBodyProps) {
     const [scope, setScope] = createSignal<"M"|"D"|"H">("M");
     const [labels, setLabels] = createSignal<string[]>([])
     const [datasets, setDatasets] = createSignal<TemperatureLogs.Logs>({})
+    const [hiddenDatasets, setHiddenDatasets] = createSignal<Record<NameType,boolean | undefined>>({
+        Bottle: false,
+        "Bottle.Top": true,
+        "Bottle.Bottom": true,
+        Fluorometer: true,
+        "Fluorometer.Detector": true,
+        "Fluorometer.Emitor": true,
+        Spectrophotometer: true,
+        "LED panel": true,
+        "Heater plate": true,
+        Test: undefined
+    });
+    const [colors, setColors] = createSignal<Record<NameType,string | undefined>>({
+        Bottle: undefined,
+        "Bottle.Top": undefined,
+        "Bottle.Bottom": undefined,
+        Fluorometer: undefined,
+        "Fluorometer.Detector": undefined,
+        "Fluorometer.Emitor": undefined,
+        Spectrophotometer: undefined,
+        "LED panel": undefined,
+        "Heater plate": undefined,
+        Test: undefined
+    });
+
     const moduleListCntxt = useModuleListValue();
     const scopeGroupName = createUniqueId()
     const refreshCntxt = useRefreshValue;
@@ -116,31 +124,72 @@ export function TemperatureBody(props : TemperatureBodyProps) {
     let lastRefresh = 0;
     let lastScope = ""
 
-    function assignIndexes(rows : row[]){
-        let rowI=-1;
-        let subRowI=0;
-        let lastRow : undefined | row;
-        for(let i=0;i<rows.length;i++){
-            let row = rows[i];
-            if(row.icon){
-                row.subRowIndex=undefined;
-                row.rowIndex=++rowI;
-                
-                subRowI = 0;
-            }else{
-                row.subRowIndex=++subRowI;
-                row.rowIndex=rowI;
-                row.lastSubRow = true;
+    function toggleDatasetVisibility(name : NameType){
+        setHiddenDatasets(prev => ({
+            ...prev,
+            [name]: !(prev[name] ?? false)
+        }));
+    }
 
-                if(lastRow){
-                    if(!lastRow.icon){
-                        lastRow.lastSubRow = false;
-                    }
-                }
-            }
-            lastRow = row;
+    function renderRow(data: row, index:number) : JSXElement[] {
+        function isActive(name : NameType){
+            return  colors()[data.name] !== undefined && nameToEndpoint[data.name].at(0) === "/";
         }
-        return rows;
+        return [
+            <button 
+                classList={{
+                    [styles.icon_button]: true,
+                    [styles.hidden]: hiddenDatasets()[data.name] ?? false,
+                    [styles.active] : isActive(data.name)
+                }}
+                onclick={()=>{
+                    if(isActive(data.name)){
+                        toggleDatasetVisibility(data.name);
+                    }
+                }}
+                style={{
+                    color: colors()[data.name]
+                }}
+            >
+                <Icon 
+                    color={
+                        colors()[data.name]
+                    } 
+                    name={
+                        (data.icon)?(
+                            data.icon
+                        ):(
+                            (data.lastSubRow ?? false)?(
+                                "┗"
+                            ):(
+                                "┣"
+                            )
+                        )
+                    }
+                ></Icon>
+            </button>,
+            <p style={{
+                "justify-content":"start",
+                "border-left": (data.instance != "Exclusive")?`3px solid ${moduleInstanceColors[data.instance]}`:undefined,
+                "padding-left": (data.instance != "Exclusive")?"5px":undefined
+            }}>{data.name}</p>,
+
+            (nameToEndpoint[data.name].at(0) == "/")?(
+                <ApiFetcher 
+                    target={{
+                        url: nameToEndpoint[data.name],
+                        key: data.targetkey ?? "temperature"
+                    }} 
+                    unit="°C" 
+                    numberOnly={{
+                        decimalPlaces: 2
+                    }}
+                    minInterval={5000}
+                ></ApiFetcher>
+            ):(
+                <p></p>
+            )
+        ]
     }
 
     function refreshRows(moduleList: Module[]) {
@@ -151,43 +200,37 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                 result.push(
                     {
                         icon:       "water_full", 
-                        name:       "Bottle", 
-                        target:     { url: "/sensor/bottle/temperature", key: "temperature" },
+                        name:       "Bottle",
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 
-                        name:       "Top", 
-                        target:     { url: "/sensor/bottle/top/measured_temperature", key: "temperature"},
+                        name:       "Bottle.Top",
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 
-                        name:       "Bottom", 
-                        target:     { url: "/sensor/bottle/bottom/measured_temperature", key: "temperature" },
-                        instance:   "Exclusive"
+                        name:       "Bottle.Bottom",
+                        instance:   "Exclusive",
+                        lastSubRow: true
                     },{
                         icon:       "water_lux", 
-                        name:       "Fluorometer", 
-                        target:     undefined,
+                        name:       "Fluorometer",
+                        instance:   "Exclusive"
+                    },{
+                        icon:       undefined,
+                        name:       "Fluorometer.Detector",
                         instance:   "Exclusive"
                     },{
                         icon:       undefined, 
-                        name:       "Detector", 
-                        target:     { url: "/sensor/fluorometer/detector/temperature", key: "temperature" },
-                        instance:   "Exclusive"
-                    },{
-                        icon:       undefined, 
-                        name:       "Emitor", 
-                        target:     { url: "/sensor/fluorometer/emitor/temperature", key: "temperature" },
-                        instance:   "Exclusive"
+                        name:       "Fluorometer.Emitor",
+                        instance:   "Exclusive",
+                        lastSubRow: true
                     },{
                         icon:       "wb_incandescent", 
-                        name:       "Spectrophotometer", 
-                        target:     { url: "/sensor/spectrophotometer/emitor/temperature", key: "temperature" },
+                        name:       "Spectrophotometer",
                         instance:   "Exclusive"
                     },{
-                        icon:       "wb_twilight", 
-                        name:       "LED panel", 
-                        target:     { url: "/control/led_panel/temperature", key: "temperature" },
+                        icon:       "wb_twilight",
+                        name:       "LED panel",
                         instance:   "Exclusive"
                     },
                 )
@@ -198,7 +241,6 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                     {
                         icon:       "mode_heat", 
                         name:       "Heater plate", 
-                        target:     {url: "/control/heater/plate_temperature", key:"temperature"},
                         instance:   "Exclusive"
                     }
                 )
@@ -207,13 +249,10 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             for (let instance of getInstancesForType(moduleList, "pump")) {
                 result.push({
                     icon: "water_full",
-                    name: "test",
-                    target: {url: "/sensor/bottle/temperature", key:"temperature"},
+                    name: "Test",
                     instance: instance
                 })
             }
-
-            result=assignIndexes(result);
 
             setRows(result);
         }
@@ -229,16 +268,71 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         refreshRows(moduleListCntxt.state())
     }
 
-    function parseDatasets(datasets : TemperatureLogs.Logs) : {data: (number|undefined)[], label: string}[]{
-        let result : {data: (number|undefined)[], label: string}[] = [];
+    function parseDatasets(datasets : TemperatureLogs.Logs, hiddenDatabase : Record<NameType,boolean|undefined>) : datasetType[]{
+        let result : datasetType[] = [];
+        let newColors : Record<NameType,string | undefined> = {
+            Bottle: undefined,
+            "Bottle.Top": undefined,
+            "Bottle.Bottom": undefined,
+            Fluorometer: undefined,
+            "Fluorometer.Detector": undefined,
+            "Fluorometer.Emitor": undefined,
+            Spectrophotometer: undefined,
+            "LED panel": undefined,
+            "Heater plate": undefined,
+            Test: undefined
+        };
+        let subIndexes : Record<string, number> = {}
+        let currIndex = 0;
+
+        function getNameColor(name : NameType) : string{
+            const existingEntry = newColors[name];
+            if(existingEntry!==undefined){
+                return existingEntry;
+            }
+
+            const split = name.split(".");
+            const newColorsGeneric = newColors as Record<string,string|undefined>
+            if(split.length==1){
+                const newColor = getColor(currIndex++);
+                newColors[name] = newColor;
+                return newColor;
+            }else{
+                const parent = split[0] as NameType;
+
+                let parentColor = newColors[parent];
+                if(parentColor === undefined){
+                    parentColor = getNameColor(parent);
+                }
+
+                let subIndex = subIndexes[parent];
+                if(subIndex !== undefined){
+                    subIndexes[parent]+=1;
+                }else{
+                    subIndexes[parent]=3;
+                }
+                console.log("darkening color: ",parentColor, "by:",subIndex, "to:", darkenColor(parentColor,subIndex ?? 1));
+                const resultColor = darkenColor(parentColor,subIndex ?? 2);
+                newColors[name] = resultColor;
+                return resultColor;
+            }
+        }
+
         for(let endpoint in datasets){
             if(datasets[endpoint]){
+                let name = getName(endpoint);
+                let color = (name!==undefined)?(getNameColor(name)):("#cccccc");
                 result.push({
-                    label: endpointToName[endpoint] ?? endpoint,
+                    label: name ?? endpoint,
                     data: datasets[endpoint],
+                    hidden: (name!==undefined)?(hiddenDatabase[name]):(false),
+                    borderColor: color,
+                    backgroundColor: darkenColor(color,2)
                 })
             }
         }
+
+        setColors(newColors);
         return result;
     }
 
@@ -283,11 +377,11 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         }
         let scopeForThisFetch = scope();
         let result = await TemperatureLogs.sendGetLogs({
-            timeBack: 1000+Date.now()-lastRefresh,
+            fromTime: lastRefresh,
             scope: scopeForThisFetch
         })
         if(result.logCount > 0 && scopeForThisFetch == scope()){
-            lastRefresh = Date.now();
+            lastRefresh = result.toTime;
             addLogsToChart(result.logs);
             setLabels(generateTimeLabels(Date.now(),historyLen,scope()));
         }
@@ -299,7 +393,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                 customRefreshProvider={true}
             >
                 <TableStatic 
-                    renderRow={createRow} 
+                    renderRow={renderRow} 
                     data={rows()} 
                     headers={["color", "name", "current"]} 
                     colSizes={["40px",undefined,"60px"]}
@@ -317,7 +411,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                 <div style={{flex:"1 1 auto", "min-height": 0}}>
                     <LineChart 
                         labels={labels()} 
-                        datasets={parseDatasets(datasets())}
+                        datasets={parseDatasets(datasets(),hiddenDatasets())}
                         options={{
                             x:{
                                 showTicks: true
@@ -353,7 +447,7 @@ export function Temperature(props: TemperatureProps) {
     const [rows, setRows] = createSignal(0);
     return (
         <GridElement id={props.id} w={1} h={widgetHeightChange(rows())+3}>
-            <RefreshProvider>
+            <RefreshProvider autoRefreshPeriod={1000}>
                 <TemperatureBody 
                     rowNumberSetter={setRows}
                     {...props}
