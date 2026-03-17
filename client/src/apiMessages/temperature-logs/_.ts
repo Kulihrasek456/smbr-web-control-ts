@@ -8,11 +8,12 @@ export namespace TemperatureLogs{
     export type getLogsResult = {
         logs: Logs,
         logCount: number,
-        historyLen: number
+        historyLen: number,
+        toTime : number
     }
 
     export type getLogs = {
-        timeBack: number,
+        fromTime: number,
         scope : "M"| "H" | "D"
     }
 
@@ -21,7 +22,7 @@ export namespace TemperatureLogs{
             url: "/temperature-logs",
             target: "webControlApi",
             data:JSON.stringify({
-                timeBack : options.timeBack,
+                fromTime : options.fromTime,
                 scope : options.scope
             }),
             method: "POST"
@@ -54,11 +55,13 @@ export namespace TemperatureLogs{
         },opts);
         checkNumber(data,"logCount",opts);
         checkNumber(data,"historyLen",opts);
+        checkNumber(data,"toTime",opts);
 
         return {
             logs: result,
             logCount: data.logCount,
-            historyLen: data.historyLen
+            historyLen: data.historyLen,
+            toTime: data.toTime
         }
     }
 }
