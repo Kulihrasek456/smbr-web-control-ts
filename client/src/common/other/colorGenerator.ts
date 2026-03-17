@@ -11,14 +11,18 @@ let colors = [
     "#642470"
 ]
 
-export function getColor(index : number, darken=0){
+export function getColor(index : number, darken=0) : string{
     const baseColor = colors[index % colors.length];
     if(darken>0){
-        let colorColor = colord(baseColor);
-        for(let i=0;i<darken;i++){
-            colorColor = colorColor.darken(0.1);
-        }
-        return colorColor.toHex()
+        return darkenColor(baseColor,darken);
     }
     return baseColor
+}
+
+export function darkenColor(baseColor : string ,amount : number) : string{
+    let colorColor = colord(baseColor);
+    for(let i=0;i<amount;i++){
+        colorColor = colorColor.darken(0.1);
+    }
+    return colorColor.toHex()
 }
