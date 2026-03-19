@@ -100,16 +100,16 @@ class LogContainer{
             return result
         }
 
-        let resultLen : number = timeBack / this.step
+        let resultLen : number = (timeBack+1) / this.step
         if(resultLen > this.len){
             resultLen = this.len;
         }
-
+        //#TODO race condition, the whole logs should be copied to ensure data consistency
         for(let endpoint in this.logs){
             let resultPart : (number | undefined)[] = [];
             let history = this.logs[endpoint]
             if(history){
-                for (let i = this.len-1 ; i >= this.len-resultLen; i--){
+                for (let i = this.len-resultLen ; i < this.len-1; i++){
                     let index = Math.trunc((i + this.head) % this.len)
                     resultPart.push(history[index])
                 }
