@@ -447,7 +447,7 @@ export function Temperature(props: TemperatureProps) {
     const [rows, setRows] = createSignal(0);
     return (
         <GridElement id={props.id} w={1} h={widgetHeightChange(rows())+3}>
-            <RefreshProvider autoRefreshPeriod={1000}>
+            <RefreshProvider /*autoRefreshPeriod={1000} #TODO remove when temperature logs stop dropping data*/>
                 <TemperatureBody 
                     rowNumberSetter={setRows}
                     {...props}
