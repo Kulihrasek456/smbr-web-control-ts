@@ -18,7 +18,7 @@ export function WidgetHotbarValue(props: WidgetHotbarValueProps){
     return (
         <div class={styles.apiValue}>
             <p>{props.name}</p>
-            <ApiFetcher target={props.apiFetcherProps.target} interval={props.apiFetcherProps.interval} unit={props.apiFetcherProps.unit}></ApiFetcher>
+            <ApiFetcher {...props.apiFetcherProps}></ApiFetcher>
         </div>
     )
 }
