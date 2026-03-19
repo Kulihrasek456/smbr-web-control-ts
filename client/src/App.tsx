@@ -104,7 +104,7 @@ function App() {
                   <button class={styles.logo}><img src={Public.images.minilogo} /></button>
                   <AutoScrollerP
                      class={styles.title}
-                     value='Smart Modular Photo Bioreaktor'
+                     value='Smart Modular Photo Bioreactor'
                   ></AutoScrollerP>
                   <div class={styles.hotbar_right}>
                      <Hotbar></Hotbar>
