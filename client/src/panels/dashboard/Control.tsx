@@ -88,7 +88,7 @@ export function Control(props : ControlProps){
                         buttonTooltip="turn off the heater"
                         buttonText="turn off"
                         min={0}
-                        max={90}
+                        max={60}
                         unit="°C"
                         getter={{url:"/control/heater/target_temperature",key:"temperature"}}
                         onClick={async (value : number | undefined)=>{
