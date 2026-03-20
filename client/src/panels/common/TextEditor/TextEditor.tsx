@@ -351,6 +351,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
   const [processID, setProcessID] = createSignal<number>(0);
   const [scriptContent, setScriptContent] = createSignal("string");
   const [startedAt, setStartedAt] = createSignal<Date | undefined>(undefined);
+  const [calledLines, setCalledLines] = createSignal<number[]>([]);
 
   async function updateScriptPreview(){
     let result = await Scheduler.sendGetScheduled();
@@ -369,13 +370,14 @@ function RuntimeInfo(props: RuntimeInfoProps) {
     if(refreshValueUpdate(refreshCntxt())){
       let result = await Scheduler.sendRuntimeInfo();
 
-
+      let newCalledLines : number[] = [];
       let newCallStack : twoColTableRow[]= [];
       for(let line of result.stack){
         newCallStack.push({
           left: line.toString(),
           right: scriptContent().split("\n")[line-1]
         })
+        newCalledLines.push(line);
       }
 
       let newConsoleOut : twoColTableRow[] = [];
@@ -395,6 +397,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
       setStatus(result.state);
       setProcessID(result.processId);
       setStartedAt(result.startedAt);
+      setCalledLines(newCalledLines);
     }
   })
 
@@ -519,6 +522,7 @@ function RuntimeInfo(props: RuntimeInfoProps) {
             <CodeMirrorWrapper 
               initialValueGetter={scriptContent} 
               readOnly={true}
+              highlightedLines={calledLines()}
             ></CodeMirrorWrapper>
 
           </OutputContainer>
