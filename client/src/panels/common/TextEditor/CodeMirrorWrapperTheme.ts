@@ -1,6 +1,8 @@
 import { HighlightStyle, syntaxHighlighting } from "@codemirror/language";
+import { StateField, StateEffect, type Text as EditorText} from "@codemirror/state";
 import { tags as t } from "@lezer/highlight";
 import { EditorView } from "codemirror";
+import { Decoration } from "@codemirror/view";
 
 
 export const customTheme = EditorView.theme({
@@ -62,7 +64,14 @@ export const customTheme = EditorView.theme({
     // active line gutter
     ".cm-activeLineGutter": {
         backgroundColor: "var(--bg-color-4)"
-    }
+    },
+
+    ".cm-highlightedLineMain": {
+        backgroundColor: "var(--acc-color-2)"
+    },
+    ".cm-highlightedLineSecondary": {
+        backgroundColor: "var(--acc-color-1)"
+    },
 }, { dark: true });
 
 
@@ -82,3 +91,43 @@ export const customSyntaxHighligting = HighlightStyle.define([
     { tag: t.punctuation, color: "white" },                            // : , [ ] -
     { tag: t.heading, color: "darkorange", fontWeight: "bold" }       // markdown
 ]);
+
+export const setHighlightedLinesEffect = StateEffect.define<number[]>();
+
+function createLineDecorations(doc : EditorText, lineNumbers : number[]) {
+  const decorations = [];
+  let firstLine = true;
+
+  for (let lineNumber of lineNumbers) {
+    if (lineNumber < 1 || lineNumber > doc.lines) continue;
+    
+    const line = doc.line(lineNumber);
+    
+    decorations.push(
+      Decoration.line({
+        class: firstLine?"cm-highlightedLineMain":"cm-highlightedLineSecondary"
+      }).range(line.from)
+    );
+    
+    firstLine = false;
+  }
+
+  return Decoration.set(decorations);
+}
+
+export const highlightedLinesField = StateField.define({
+  create() {
+    return Decoration.none;
+  },
+
+  update(decorations, tr) {
+    for (let effect of tr.effects) {
+      if (effect.is(setHighlightedLinesEffect)) {
+        return createLineDecorations(tr.state.doc, effect.value);
+      }
+    }
+    return decorations.map(tr.changes);
+  },
+
+  provide: f => EditorView.decorations.from(f)
+});

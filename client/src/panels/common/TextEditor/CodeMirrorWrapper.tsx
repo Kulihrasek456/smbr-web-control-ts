@@ -4,7 +4,7 @@ import { yaml } from "@codemirror/lang-yaml";
 
 import { syntaxHighlighting, indentUnit } from "@codemirror/language";
 
-import { customTheme, customSyntaxHighligting } from "./CodeMirrorWrapperTheme";
+import { customTheme, customSyntaxHighligting, setHighlightedLinesEffect, highlightedLinesField} from "./CodeMirrorWrapperTheme";
 
 import { keymap, type EditorViewConfig } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
@@ -18,6 +18,7 @@ const hideCursorTheme = EditorView.theme({
 
 export interface CodeMirrorWrapperProps {
   initialValueGetter: ()=>string; // DO NOT USE THIS TO GET THE SAME VALUE AS SETTER, IT WILL CREATE AN INIFINITE LOOP
+  highlightedLines?: number[];
   onChange?: (value: string) => void;
   onSave?: () => void;
   readOnly?: boolean;
@@ -46,6 +47,7 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
       EditorState.create(getConfig(false,newCode))
     )
     /*
+    this code changes only the value of the editor, ctrl+z etc remains
     if (view) {
       view.dispatch({
         changes: {
@@ -58,6 +60,15 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
     */
   };
 
+  function setHighlightedLines(lines : number[]){
+    if(view){
+
+      view.dispatch({
+        effects: setHighlightedLinesEffect.of(lines)
+      });
+    }
+  }
+
   function getConfig(initialization : boolean, value: string) : EditorStateConfig{
     let result : EditorViewConfig = {
         doc: value,
@@ -67,6 +78,7 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
           EditorState.tabSize.of(4),
           keymap.of([indentWithTab]),
           saveKeybind,
+          highlightedLinesField,
           yaml(),
           customTheme,
           readOnlyCompartment.of(EditorState.readOnly.of(props.readOnly ?? false)),
@@ -118,6 +130,26 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
       });
     }
   });
+
+  let lastLines : number[] = [];
+  createEffect(()=>{
+    if(props.highlightedLines){
+      if(props.highlightedLines.length===lastLines.length){
+        let changeDetected = false;
+        for(let i = 0; i < lastLines.length; i++){
+          if(lastLines[i] !== props.highlightedLines[i]){
+            changeDetected = true;
+            break;
+          }
+        }
+
+        if(!changeDetected){
+          return
+        }
+      }
+      setHighlightedLines(props.highlightedLines)
+    }
+  })
 
   return (
     <div 
