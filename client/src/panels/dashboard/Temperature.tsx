@@ -247,11 +247,14 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             }
 
             for (let instance of getInstancesForType(moduleList, "pump")) {
+                /*
+                #TODO this code is an example of an instanced module temperature
                 result.push({
                     icon: "water_full",
                     name: "Test",
                     instance: instance
                 })
+                */
             }
 
             setRows(result);
