@@ -1,7 +1,7 @@
 other
- - [ ] better button visuals
+ - [x] better button visuals
  - [ ] fix vertical sliders on IOS (extremely thick)
- - [ ] add error display
+ - [x] add error display
  - [x] fix runtime info collpasing in favor of editor (width: 0 needed)
  - [ ] fix gridstack grid not holding its width in device pannel
  - [x] sort modules by UID to reduce flickering
@@ -34,7 +34,7 @@ dashboard
  - Temperature widget
      - [x] visual
      - [x] functionality - table
-     - [ ] functionality - chart
+     - [x] functionality - chart
  - Control widget
      - [x] visual
      - [x] functionality
@@ -59,10 +59,10 @@ text editor
  - file browser 
      - [x] create file buttons
      - [x] recursive
-     - [ ] two columns
+     - [x] two columns
      - [x] ctrl+z brings back the previous files value
      - [x] unsaved changes alert
-     - [ ] syntax problems alert
+     - [x] syntax problems alert
 
 hotbar
  - [ ] better clock

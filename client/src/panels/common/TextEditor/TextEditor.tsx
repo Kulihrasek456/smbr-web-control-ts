@@ -617,7 +617,6 @@ export function TextEditor(props : TextEditorProps) {
   const [fileName,setFileName] = createSignal<string | undefined>();
   const [fileContent,setFileContent] = createSignal<string | undefined>();
   const [fileList, setFileList] = createSignal<FileListDirectory | undefined>();
-  const [directoryList, setDirectoryList] = createSignal<FileListDirectory | undefined>(); //#TODO connect this to the twoColLayout fileList
   const [dirtyFlag, setDirtyFlag] = createSignal<boolean>(false);
   const [errorMessages, setErrorMessages] = createSignal<Popup[]>([]);
 
