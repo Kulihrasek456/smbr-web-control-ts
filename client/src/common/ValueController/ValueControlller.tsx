@@ -4,7 +4,7 @@ import { sendApiMessageSimple, sendApiMessageSimplePost, type apiMessageSimple }
 import { isNumber } from "chart.js/helpers";
 import { enforceMax, enforceMin } from "../other/inputFilters";
 import { ValueDisplay } from "../ApiFetcher/ValueDisplay";
-import { refreshValueUpdate, useRefreshValue } from "../other/RefreshProvider";
+import { refreshValueUpdate, useRefreshContext } from "../other/RefreshProvider";
 import { Button } from "../Button/Button";
 
 //#TODO this implementation is not pretty. It should be refractored in the near future.
@@ -134,7 +134,7 @@ interface ValueControllerApiControl{
 export function ValueControllerApiControl(props : ValueControllerApiControl){
     const [value, setValue] = createSignal<number | undefined>(undefined);
     const [error, setError] = createSignal<boolean>(false);
-    const refreshCntx = useRefreshValue;
+    const refreshCntx = useRefreshContext();
 
     async function refreshValue(){
         try {
@@ -158,7 +158,7 @@ export function ValueControllerApiControl(props : ValueControllerApiControl){
     }
 
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshCntx())){
+        if(!refreshValueUpdate(refreshCntx?.listen())){
             return
         }
         await refreshValue();

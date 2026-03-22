@@ -12,7 +12,7 @@ import { RadialOption, RadialSelect } from "../../common/RadialSelect/RadialSele
 import { createUniqueId } from "solid-js";
 import { enforceMax, enforceMin, enforceMinMax } from "../../common/other/inputFilters";
 import { Icon } from "../../common/Icon/Icon";
-import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
 import { Sensor_Fluorometer } from "../../apiMessages/sensor/fluorometer";
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import type { TooltipItem } from "chart.js";
@@ -171,7 +171,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     let lastMeasurementId = -1;
     
     const gainGroupName = createUniqueId();
-    const refreshValue = useRefreshValue;
+    const refreshValue = useRefreshContext();
 
     async function getFileName() : Promise<string | undefined>{
         let measurement = currentMeasurement();
@@ -218,7 +218,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     
     let lastUpdate = 0;
     createEffect(async () => {
-        if(!refreshValueUpdate(refreshValue(),{length:5000,lastUpdate:lastUpdate})){
+        if(!refreshValueUpdate(refreshValue?.listen(),{length:5000,lastUpdate:lastUpdate})){
             return
         }
         lastUpdate = Date.now();

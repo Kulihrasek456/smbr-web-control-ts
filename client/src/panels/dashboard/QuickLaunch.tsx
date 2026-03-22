@@ -5,7 +5,7 @@ import { Icon } from "../../common/Icon/Icon";
 import { type Popup, Widget } from "../common/Widget";
 
 import styles from "./QuickLaunch.module.css"
-import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
 import { Recipes } from "../../apiMessages/recipes/_";
 import { Scheduler } from "../../apiMessages/scheduler/_";
 import { sleep } from "../../common/other/utils";
@@ -62,7 +62,7 @@ function QuickLaunchBody(props: QuickLaunchProps){
 
     const [errorMessages, setErrorMessages] = createSignal<Popup[]>([]);
 
-    const refreshCntxt = useRefreshValue;
+    const refreshCntxt = useRefreshContext();
 
     async function refreshFileList(){
         let response = await Recipes.sendGetFileList({reloadFromFileSystem:false});
@@ -139,7 +139,7 @@ function QuickLaunchBody(props: QuickLaunchProps){
     }
 
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshCntxt())){
+        if(!refreshValueUpdate(refreshCntxt?.listen())){
             return
         }
 

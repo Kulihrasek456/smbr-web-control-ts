@@ -4,7 +4,7 @@ import { Widget } from "../common/Widget";
 import { Icon } from "../../common/Icon/Icon";
 import { createEffect, createSignal, onMount } from "solid-js";
 import { Button } from "../../common/Button/Button";
-import { refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider";
+import { refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
 import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import { isDebug } from "../../common/debug/debugFlag";
 import { Sensor_Spectrophotometer } from "../../apiMessages/sensor/spectrophotometer";
@@ -40,7 +40,7 @@ function TransSpectrophotometerBody(
     const [rows, setRows] = createSignal<row[]>([])
     
     const [error, setError] = createSignal<boolean>(false);
-    const refreshValue = useRefreshValue
+    const refreshValue = useRefreshContext()
     
     function setRowsToUndefined(){
         let newRows = []
@@ -89,7 +89,7 @@ function TransSpectrophotometerBody(
     let lastUpdate = 0;
 
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshValue(),{length:12000,lastUpdate:lastUpdate}) || inProgress){
+        if(!refreshValueUpdate(refreshValue?.listen(),{length:12000,lastUpdate:lastUpdate}) || inProgress){
             return
         }
         lastUpdate = Date.now();

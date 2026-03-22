@@ -2,8 +2,8 @@ import styles from "./Slider.module.css"
 import { createEffect, createSignal, Show } from "solid-js"
 import { mapRangeToRange } from "../other/utils"
 import { isChromium, isSafari } from "@solid-primitives/platform";
-import { useRefreshValue } from "../other/RefreshProvider";
 import { sendApiMessageSimple, sendApiMessageSimplePost, type apiMessageSimple } from "../../apiMessages/apiMessageSimple";
+import { refreshValueUpdate, useRefreshContext } from "../other/RefreshProvider";
 
 function chromeFix_Slider(element : HTMLInputElement, vertical : boolean){
     if((window.webkitURL != null)){
@@ -145,13 +145,13 @@ interface SliderApiControlProps{
 
 export function SliderApiControl(props : SliderApiControlProps){
     const [value,setValue] = createSignal<number>(0);
-    const refreshCntx = useRefreshValue()
+    const refreshCntx = useRefreshContext()
 
     let currentState : "setting" | "idle" = "idle"
     let lastChange = 0;
 
     createEffect(async ()=>{
-        if(!refreshCntx || refreshCntx()._ts == 0){
+        if(refreshValueUpdate(refreshCntx?.listen())){
             return
         }
         if(currentState==="idle"){

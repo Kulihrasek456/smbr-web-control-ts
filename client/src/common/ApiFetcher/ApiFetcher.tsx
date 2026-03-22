@@ -1,6 +1,6 @@
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 
-import { refreshValueUpdate, useRefreshValue } from '../other/RefreshProvider';
+import { refreshValueUpdate, useRefreshContext } from '../other/RefreshProvider';
 import { sendApiMessageSimple, type apiMessageSimple } from '../../apiMessages/apiMessageSimple';
 import { ValueDisplay, type ValueDisplayProps } from './ValueDisplay';
 
@@ -15,7 +15,7 @@ export function ApiFetcher(props: ApiFetcherProps) {
 
     const [value, setValue] = createSignal<string | undefined>(undefinedPlaceholder);
     const [error, setError] = createSignal<boolean>(false);
-    const refreshValue = useRefreshValue
+    const refreshValue = useRefreshContext()
     
     let inProgress : boolean = false;
     let lastUpdate : number = 0;
@@ -25,7 +25,7 @@ export function ApiFetcher(props: ApiFetcherProps) {
             length: props.minInterval, 
             lastUpdate: lastUpdate
         }:undefined;
-        if(!refreshValueUpdate(refreshValue(), minInterval) || inProgress){
+        if(!refreshValueUpdate(refreshValue?.listen(), minInterval) || inProgress){
             return
         }
         lastUpdate = Date.now();

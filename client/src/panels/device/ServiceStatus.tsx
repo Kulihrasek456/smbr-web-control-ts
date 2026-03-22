@@ -5,7 +5,7 @@ import { Widget } from "../common/Widget"
 
 import styles from "./ServiceStatus.module.css"
 import { ServicesStatus  as ServicesStatusNamespace} from "../../apiMessages/services-status/_"
-import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider"
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider"
 import { AutoScrollerP } from "../../common/AutoScroller/AutoScroller"
 
 interface ServiceStatusProps{
@@ -48,10 +48,10 @@ function renderRow(value : row, index : number){
 
 export function ServicesStatusBody(props : ServiceStatusBodyProps){
     const [rows, setRows] = createSignal<row[]>([])
-    const refreshCntxt = useRefreshValue;
+    const refreshCntxt = useRefreshContext();
 
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshCntxt())){
+        if(!refreshValueUpdate(refreshCntxt?.listen())){
             return;
         }
         try {

@@ -5,7 +5,7 @@ import { formatTime } from '../../common/other/utils';
 import styles from './Hotbar.module.css'
 import { countInstancesOfType, useModuleListValue } from '../../common/other/ModuleListProvider';
 import type { apiMessageSimple } from '../../apiMessages/apiMessageSimple';
-import { refreshValueUpdate, useRefreshValue } from '../../common/other/RefreshProvider';
+import { refreshValueUpdate, useRefreshContext } from '../../common/other/RefreshProvider';
 import { ValueDisplay } from '../../common/ApiFetcher/ValueDisplay';
 import { System } from '../../apiMessages/system/_';
 
@@ -27,7 +27,7 @@ function SimpleDisplay({ name, target }: SimpleDisplayProps) {
 export function Hotbar() {
     const [time, setTime] = createSignal(new Date());
     const moduleListCntxt = useModuleListValue();
-    const refreshCntxt = useRefreshValue;
+    const refreshCntxt = useRefreshContext();
     const [countsErrs, setCountsErrs] = createSignal<{err: boolean, count: number | undefined}>({err:false,count:undefined});
     const [countsWarns, setCountsWarns] = createSignal<{err: boolean, count: number | undefined}>({err:false,count:undefined});
     const [error, setError] = createSignal<boolean>(false);
@@ -71,7 +71,7 @@ export function Hotbar() {
     }
 
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshCntxt())){
+        if(!refreshValueUpdate(refreshCntxt?.listen())){
             return;
         }
         refreshCountsErrs();

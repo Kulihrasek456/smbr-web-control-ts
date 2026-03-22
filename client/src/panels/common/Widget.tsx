@@ -6,7 +6,7 @@ import { Button } from "../../common/Button/Button";
 
 import styles from './Widget.module.css'
 import { ApiFetcher, type ApiFetcherProps } from "../../common/ApiFetcher/ApiFetcher";
-import { RefreshProvider, useRefreshTrigger } from "../../common/other/RefreshProvider";
+import { RefreshProvider, useRefreshContext } from "../../common/other/RefreshProvider";
 
 
 interface WidgetHotbarValueProps {
@@ -24,10 +24,10 @@ export function WidgetHotbarValue(props: WidgetHotbarValueProps){
 }
 
 function WidgetRefreshButton() {
-    const triggerRefresh = useRefreshTrigger();
+    const refreshCntx = useRefreshContext();
     return (
         <Button 
-            callback={async (): Promise<boolean> => {triggerRefresh?.({forced:true,_ts:Date.now()}); return true;}}
+            callback={async (): Promise<boolean> => {refreshCntx?.refresh(true); return true;}}
             tooltip="Refresh values"
         >
             <Icon scale={1.2} name="autorenew"></Icon>

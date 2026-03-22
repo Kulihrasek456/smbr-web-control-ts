@@ -12,7 +12,7 @@ import { formatTime, getCountdownArray } from "../../common/other/utils"
 import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
 import { RadialSelect } from "../../common/RadialSelect/RadialSelect"
 import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
-import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../common/other/RefreshProvider"
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider"
 import { TemperatureLogs } from "../../apiMessages/temperature-logs/_"
 import styles from "./Temperature.module.css"
 // create subrows by setting icon as undefined
@@ -119,7 +119,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
 
     const moduleListCntxt = useModuleListValue();
     const scopeGroupName = createUniqueId()
-    const refreshCntxt = useRefreshValue;
+    const refreshCntxt = useRefreshContext();
     const historyLen = 80;
     let lastRefresh = 0;
     let lastScope = ""
@@ -369,7 +369,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         props.rowNumberSetter(rows().length)
     })
     createEffect(async ()=>{
-        if(!refreshValueUpdate(refreshCntxt()) && lastScope == scope()){
+        if(!refreshValueUpdate(refreshCntxt?.listen()) && lastScope == scope()){
             return;
         }
         if(lastScope != scope()){

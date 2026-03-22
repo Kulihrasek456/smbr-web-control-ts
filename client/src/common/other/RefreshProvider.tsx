@@ -1,49 +1,72 @@
-import { createContext, useContext, createSignal, createEffect, onMount, onCleanup } from "solid-js";
+import { createContext, useContext, createSignal, createEffect, onMount, onCleanup, Show } from "solid-js";
 
-export interface RefreshPayload {
-  forced: boolean;
-  _ts: number;
+export var showDebugFrames = false;
+
+type RefreshValue = {
+  forced: boolean,
+  timeStamp : number
 }
 
-const RefreshContext = createContext<(payload: RefreshPayload) => void>();
-const RefreshValueContext = createContext<() => RefreshPayload>();
+type RefreshContextValue = {
+  disabled: ()=>boolean,
+  refresh: (forced : boolean) => void;
+  listen: () => RefreshValue
+}
+const RefreshContext = createContext<RefreshContextValue>();
 
 interface RefreshProviderProps{ 
   children: any, 
   autoRefreshPeriod?: number,
   disabled?: boolean
 }
-  let mountCount = 0;
-
 
 export function RefreshProvider(props: RefreshProviderProps) {
-  const [lastRefresh, setLastRefresh] = createSignal<RefreshPayload>({
-    forced: false,
-    _ts: 0,
+  const [disabled, setDisabled] = createSignal<boolean>(props.disabled??false);
+  const [value, setValue] = createSignal<RefreshValue>({
+    timeStamp: 0,
+    forced: false
   });
 
-  const parentValue = useContext(RefreshValueContext);
+  function doRefresh(forced : boolean){
+    setValue({
+      timeStamp: Date.now(),
+      forced: forced
+    })
+  }
 
-  createEffect(() => {
-    const pVal = parentValue?.();
-    if (pVal && pVal._ts > 0 && !props.disabled) {
-      setLastRefresh(pVal);
-    }
+  const [lastRefresh, setLastRefresh] = createSignal<RefreshContextValue>({
+    disabled: disabled,
+    refresh: doRefresh,
+    listen: value
   });
 
-  const trigger = (payload: RefreshPayload) => {
-    if(payload.forced){
-      console.log("forcefully refreshing...");
-    }
-    if(!props.disabled){
-      setLastRefresh(payload);
-    }
-  };
+  function isDisabled(selfDisabled : boolean | undefined, parentDisabled : boolean){
+    return (selfDisabled ?? false) || parentDisabled;
+  }
 
-  const softRefresh = () => {
-    if(!props.disabled){
-      setLastRefresh({_ts:Date.now(),forced:false});
+  const parentContext = useContext(RefreshContext);
+
+  createEffect(()=>{
+    let parent = parentContext;
+    if(parent !== undefined){
+      setDisabled(isDisabled(props.disabled,parent.disabled()));
+    }else{
+      setDisabled(props.disabled??false);
     }
+  })
+
+
+  createEffect(()=>{
+    let parent = parentContext;
+    if(parent !== undefined){
+      if(!isDisabled(props.disabled, disabled())){
+        setValue(parent.listen());
+      }
+    }
+  })
+
+  function softRefresh(){
+    doRefresh(false);
   }
 
   let intervalId : number | undefined = undefined;
@@ -59,9 +82,9 @@ export function RefreshProvider(props: RefreshProviderProps) {
     stopInterval()
     intervalId = setInterval(softRefresh,period)
   }
+
   onMount(() => {
     if(!props.disabled){
-      console.warn("doing initial refresh because: ",props.disabled);
       if(props.autoRefreshPeriod){
         softRefresh()
 
@@ -73,7 +96,7 @@ export function RefreshProvider(props: RefreshProviderProps) {
   onCleanup(() => stopInterval());
 
   createEffect(()=>{
-    if(!props.disabled && props.autoRefreshPeriod){
+    if(!isDisabled(props.disabled,disabled()) && props.autoRefreshPeriod){
       softRefresh()
       startInterval(props.autoRefreshPeriod)
     }else{
@@ -84,35 +107,42 @@ export function RefreshProvider(props: RefreshProviderProps) {
 
 
   return (
-    <RefreshContext.Provider value={trigger}>
-      <RefreshValueContext.Provider value={lastRefresh}>
+    <RefreshContext.Provider value={lastRefresh()}>
+      <Show when={showDebugFrames}>
+        <div style={{
+          position: "absolute",
+          width: "100%",
+          height: "100%",
+          border: "1px solid",
+          "border-color": (disabled())?"red":"green",
+          "pointer-events": "none"
+        }}>
+          <p>{value().timeStamp}</p>
+        </div>
+      </Show>
         {props.children}
-      </RefreshValueContext.Provider>
     </RefreshContext.Provider>
   );
 }
-// for signaling a refresh, use: () => trigger({ forced: true, refetchConfigs: true, _ts: Date.now() })
-export const useRefreshTrigger = () => useContext(RefreshContext);
 
-// for only subscribing to changes, use this context as normal
-export const useRefreshValue = () => useContext(RefreshValueContext);
+export const useRefreshContext = () => useContext(RefreshContext);
 
-export function refreshValueUpdate(refreshCntxt : (() => RefreshPayload) | undefined , minInterval ?: { length : number, lastUpdate : number}): boolean {
-    let val = refreshCntxt?.();
-    if (val) {
-        if(val._ts != 0){
-            if(val.forced){
-                return true;
-            }
-            if(minInterval){
-                if(Date.now() - minInterval.lastUpdate > minInterval.length){
-                    return true
-                }
-            }else{
-                return true;
-            }
+export function refreshValueUpdate(refreshValue : RefreshValue | undefined, minInterval ?: { length : number, lastUpdate : number}): boolean {
+  if(refreshValue){
+    if(refreshValue.timeStamp != 0){
+      if(refreshValue.forced){
+        return true;
+      }
+  
+      if(minInterval){
+        if(Date.now() - minInterval.lastUpdate > minInterval.length){
+          return true
         }
+        return false;
+      }else{
+        return true;
+      }
     }
-    
-    return false;
+  }
+  return false;
 }

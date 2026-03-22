@@ -1,5 +1,5 @@
 import { createContext, useContext, createSignal, createEffect, onMount, onCleanup, children } from "solid-js";
-import { refreshValueUpdate, useRefreshValue } from "./RefreshProvider";
+import { refreshValueUpdate, useRefreshContext } from "./RefreshProvider";
 import { System } from "../../apiMessages/system/_";
 
 export const moduleTypes = [
@@ -124,14 +124,14 @@ export function countInstancesOfType(moduleList: Module[] | undefined, type: mod
 
 
 export function ModuleListRefresher(props: { enabled: boolean, children?: any, min_interval: number}) {
-    const refreshCntx = useRefreshValue;
+    const refreshCntx = useRefreshContext();
     const moduleListCntx = useModuleListValue();
     let lastUpdate = 0;
     createEffect(async () => {
         if (!props.enabled){
             return
         }
-        if (!refreshValueUpdate(refreshCntx(), { length: props.min_interval, lastUpdate })) {
+        if (!refreshValueUpdate(refreshCntx?.listen(), { length: props.min_interval, lastUpdate })) {
             return
         }
         if(!moduleListCntx){

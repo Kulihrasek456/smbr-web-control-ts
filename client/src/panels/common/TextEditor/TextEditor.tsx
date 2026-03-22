@@ -8,7 +8,7 @@ import textEditorStyles from "./TextEditor.module.css"
 import { Button } from "../../../common/Button/Button";
 import { Icon } from "../../../common/Icon/Icon";
 import { TableStatic } from "../../../common/Table/Table";
-import { RefreshProvider, refreshValueUpdate, useRefreshValue } from "../../../common/other/RefreshProvider";
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../../common/other/RefreshProvider";
 import { ApiInvalidStatusCodeError, targets, type targetsType } from "../../../apiMessages/apiMessageBase";
 import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
 import { Scheduler } from "../../../apiMessages/scheduler/_";
@@ -343,7 +343,7 @@ type twoColTableRow = {
 }
 
 function RuntimeInfo(props: RuntimeInfoProps) {
-  const refreshCntxt = useRefreshValue;
+  const refreshCntxt = useRefreshContext();
   const [selected, setSelected] = createSignal<string | undefined>(undefined);
   const [status, setStatus] = createSignal<"Running" | "Paused" | "Stopped" | "NeverStarted">("Paused");
   const [callStack, setCallStack] = createSignal<twoColTableRow[]>([]);
@@ -362,12 +362,12 @@ function RuntimeInfo(props: RuntimeInfoProps) {
 
   let lastUpdate = 0;
   createEffect(async ()=>{
-    if(refreshValueUpdate(refreshCntxt(),{length: 10000,lastUpdate:lastUpdate})){
+    if(refreshValueUpdate(refreshCntxt?.listen(),{length: 10000,lastUpdate:lastUpdate})){
       lastUpdate = Date.now();
       await updateScriptPreview();
     }
 
-    if(refreshValueUpdate(refreshCntxt())){
+    if(refreshValueUpdate(refreshCntxt?.listen())){
       let result = await Scheduler.sendRuntimeInfo();
 
       let newCalledLines : number[] = [];
@@ -611,7 +611,7 @@ interface TextEditorProps {
 
 export function TextEditor(props : TextEditorProps) {
   let runtimeInfo!: HTMLDivElement;
-  const refreshCntxt = useRefreshValue;
+  const refreshCntxt = useRefreshContext();
 
   // this is the currently edited, local version of a file
   const [fileName,setFileName] = createSignal<string | undefined>();
@@ -825,8 +825,8 @@ export function TextEditor(props : TextEditorProps) {
   })
 
   createEffect(async ()=>{
-    if(refreshValueUpdate(refreshCntxt())){
-      await reloadFileList(refreshCntxt()?.()?.forced ?? false);
+    if(refreshValueUpdate(refreshCntxt?.listen())){
+      await reloadFileList(refreshCntxt?.listen().forced ?? false);
     }
   })
 
