@@ -8,6 +8,8 @@ import { enforceMinMax } from "../../common/other/inputFilters"
 import styles from "./Control.module.css"
 import { sendApiMessage } from "../../apiMessages/apiMessageBase"
 import { Sensor_Heater } from "../../apiMessages/sensor/heater"
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider"
+import { Control_Mixer } from "../../apiMessages/control/mixer"
 
 
 interface ControlProps{
@@ -18,6 +20,25 @@ interface ControlBodyProps {
 }
 
 export function ControlBody(props : ControlBodyProps){
+    const [mixerMinMax, setMixerMinMax] = createSignal<{
+        min: number,
+        max: number
+    } | undefined>()
+
+    const refreshCntxt = useRefreshContext();
+
+    createEffect(async ()=>{
+        if(!refreshValueUpdate(refreshCntxt?.listen())){
+            return
+        }
+
+        let response = await Control_Mixer.sendInfo();
+        setMixerMinMax({
+            min: response.minRPM,
+            max: response.maxRPM
+        })
+    })
+
 
     return (
         <Widget name="Control" customRefreshProvider={true}>
