@@ -59,7 +59,7 @@ export const customTheme = EditorView.theme({
     },
     // active line
     ".cm-activeLine": {
-        backgroundColor: "transparent !important"
+        backgroundColor: "transparent"
     },
     // active line gutter
     ".cm-activeLineGutter": {
