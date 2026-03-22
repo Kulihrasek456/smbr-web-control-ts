@@ -314,7 +314,6 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                 }else{
                     subIndexes[parent]=3;
                 }
-                console.log("darkening color: ",parentColor, "by:",subIndex, "to:", darkenColor(parentColor,subIndex ?? 1));
                 const resultColor = darkenColor(parentColor,subIndex ?? 2);
                 newColors[name] = resultColor;
                 return resultColor;

@@ -247,10 +247,6 @@ function TwoColFileList(props: FileListProps){
     return undefined
   }
   
-  createEffect(()=>{
-    console.log("new dir selected: ",activeDirectory());
-  })
-
   return (
     <>
       <div class={fileListStyles.container}>

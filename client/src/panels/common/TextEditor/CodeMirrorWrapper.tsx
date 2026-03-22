@@ -42,7 +42,6 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
   ]);
 
   function loadCustomCode(newCode : string){
-    console.log("Code editor is loading new content");
     view?.setState(
       EditorState.create(getConfig(false,newCode))
     )

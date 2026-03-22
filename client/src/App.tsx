@@ -88,8 +88,6 @@ function App() {
    const [moduleListDisabled, setModuleListDisabled] = createSignal(isDebug);
    const [moduleListUpdateInterval, setModuleListUpdateInterval] = createSignal(15000);
 
-   console.debug("update")
-
   const items : {text: string, iconName: string, component: ()=>JSXElement}[] = [
       { text: "Dashboard", iconName: "home", component: Dashboard },
       { text: "Scripts", iconName: "science", component: Scripts },

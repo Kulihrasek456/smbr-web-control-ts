@@ -24,7 +24,6 @@ export function ValueDisplay(props:ValueDisplayProps){
         if(props.numberOnly){
             let result : number = Number(val)
             if(!isNumber(result)){
-                console.warn("value: ",val," is not a number!");
                 return undefinedPlaceholder
             }
             if(props.numberOnly.resultModifier){
