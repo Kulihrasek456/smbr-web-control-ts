@@ -148,6 +148,7 @@ export function CodeMirrorWrapper(props: CodeMirrorWrapperProps) {
         }
       }
       setHighlightedLines(props.highlightedLines)
+      lastLines=props.highlightedLines;
     }
   })
 
