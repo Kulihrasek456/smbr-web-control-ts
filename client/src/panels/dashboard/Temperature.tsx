@@ -166,6 +166,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                             )
                         )
                     }
+                    animateColor={true}
                 ></Icon>
             </button>,
             <p style={{
