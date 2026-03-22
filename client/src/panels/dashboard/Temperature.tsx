@@ -296,7 +296,6 @@ export function TemperatureBody(props : TemperatureBodyProps) {
             }
 
             const split = name.split(".");
-            const newColorsGeneric = newColors as Record<string,string|undefined>
             if(split.length==1){
                 const newColor = getColor(currIndex++);
                 newColors[name] = newColor;
@@ -381,11 +380,11 @@ export function TemperatureBody(props : TemperatureBodyProps) {
         }
         let scopeForThisFetch = scope();
         let result = await TemperatureLogs.sendGetLogs({
-            fromTime: lastRefresh,
+            fromCycle: lastRefresh,
             scope: scopeForThisFetch
         })
         if(result.logCount > 0 && scopeForThisFetch == scope()){
-            lastRefresh = result.toTime;
+            lastRefresh = result.toCycle;
             addLogsToChart(result.logs);
             setLabels(generateTimeLabels(Date.now(),historyLen,scope()));
         }
@@ -451,7 +450,7 @@ export function Temperature(props: TemperatureProps) {
     const [rows, setRows] = createSignal(0);
     return (
         <GridElement id={props.id} w={1} h={widgetHeightChange(rows())+3}>
-            <RefreshProvider /*autoRefreshPeriod={1000} #TODO remove when temperature logs stop dropping data*/>
+            <RefreshProvider autoRefreshPeriod={1500}>
                 <TemperatureBody 
                     rowNumberSetter={setRows}
                     {...props}
