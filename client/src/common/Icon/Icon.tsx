@@ -6,6 +6,7 @@ type IconProps = {
     color?: string;
     class?: string;
     scale?: number;
+    animateColor?: boolean;
 };
 
 export function Icon(props: IconProps) {
@@ -16,6 +17,7 @@ export function Icon(props: IconProps) {
             classList={{
                 [styles.icon]: true,
                 [styles.filled]: props.filled ?? true,
+                [styles.color_animated]: props.animateColor ?? false,
                 ["icon"]: true
             }}
             style={{

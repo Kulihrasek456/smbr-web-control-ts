@@ -28,3 +28,7 @@
     'opsz' 24,
     'wght' 250;
 }
+
+.color_animated{
+  transition: color 0.2s ease-in-out;
+}
