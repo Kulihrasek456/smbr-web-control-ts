@@ -5,7 +5,6 @@ import { Router, type Request, type Response } from 'express'
 import { sendApiMessageSimple, type apiMessageSimple } from './apiMessageSimple.js'
 import { isNumber, isString } from './utils.js'
 
-const apiTarget : string = "127.0.0.1:8089"
 
 type module = {
         module_type : moduleTypesType
@@ -76,6 +75,7 @@ class LogContainer{
     }
 
     push(log : Log, currTime : number){
+        this.head = (this.head+1) % this.len;
 
         for(let endpoint in log.data){
             let logData = log.data[endpoint];
@@ -89,29 +89,29 @@ class LogContainer{
             }
         }
 
-        this.head = (this.head+1) % this.len;
         this.newestLogTime = currTime;
     }
 
-    getValues(timeBack : number) : Record<string,(number|undefined)[]>{
+    getValues(fromCycle : number) : Record<string,(number|undefined)[]>{
         let result : Record<string,(number|undefined)[]> = {};
 
-        if(this.newestLogTime == timeBack){
+        if(this.newestLogTime == fromCycle){
             return result
         }
 
-        let resultLen : number = (timeBack+1) / this.step
+        let resultLen : number = Math.trunc((this.newestLogTime-fromCycle) / this.step);
         if(resultLen > this.len){
             resultLen = this.len;
         }
-        //#TODO race condition, the whole logs should be copied to ensure data consistency
+        
         for(let endpoint in this.logs){
             let resultPart : (number | undefined)[] = [];
             let history = this.logs[endpoint]
             if(history){
-                for (let i = this.len-resultLen ; i < this.len-1; i++){
-                    let index = Math.trunc((i + this.head) % this.len)
-                    resultPart.push(history[index])
+                for (let i = 1-resultLen ; i <= 0; i++){
+                    resultPart.push(history[
+                        (i + this.head + this.len) % this.len
+                    ])
                 }
             }
             result[endpoint]= resultPart;
@@ -120,11 +120,11 @@ class LogContainer{
         return result;
     }
 
-    avg(timeBack : number) : Log{
+    avg(fromCycle : number) : Log{
         let counts : Record<string, number> = {}
         let sums : Record<string, number> = {}
 
-        let logsSection = this.getValues(timeBack);
+        let logsSection = this.getValues(fromCycle);
 
         for(let endpoint in logsSection){
             counts[endpoint] = 0;
@@ -157,12 +157,12 @@ type ParsedLog = {endpoint: string, values:(number|undefined)[]}
 function logsToApiResponse(
     logs : Record<string,(number|undefined)[]>,
     historyLen:number, 
-    toTime : number
+    toCycle : number
 ) : {
     logs:ParsedLog[],
     logCount: number, 
     historyLen: number,
-    toTime: number
+    toCycle: number
 }{
     let result  : ParsedLog[] = [];
     let logCount = 0;
@@ -181,7 +181,7 @@ function logsToApiResponse(
         logs: result,
         logCount: logCount,
         historyLen: historyLen,
-        toTime: toTime
+        toCycle: toCycle
     };
 }
 
@@ -192,21 +192,19 @@ export class TempLogger {
     forceReload : boolean = true;
     lastReload : number = 0;
 
-    updateCounter : number = 0;
-
     timeStarted : number;
-
+    
     mLogs : LogContainer
     hLogs : LogContainer
     dLogs : LogContainer
-
-    lastHUpdate : number = Date.now();
-    lastDUpdate : number = Date.now();
+    
+    updateCounter : number = 0;
+    lastUpdateValues : Log = {data:{}};
 
     constructor(historyLen : number) {
-        this.mLogs = new LogContainer(historyLen,    1000);
-        this.hLogs = new LogContainer(historyLen,   60000);
-        this.dLogs = new LogContainer(historyLen, 3600000);
+        this.mLogs = new LogContainer(historyLen,    1);
+        this.hLogs = new LogContainer(historyLen,   60);
+        this.dLogs = new LogContainer(historyLen, 3600);
 
         this.timeStarted = Date.now();
 
@@ -237,106 +235,92 @@ export class TempLogger {
     }
 
     async update(){
+        this.updateCounter++;
+
+        this.mLogs.push(this.lastUpdateValues, this.updateCounter);
+
+        let lastHUpdate = this.hLogs.newestLogTime;
+        let lastDUpdate = this.dLogs.newestLogTime;
+
+        if(this.updateCounter-lastHUpdate > this.hLogs.step){
+            console.debug("temperature logger hour log updated");
+            this.hLogs.push(
+                this.mLogs.avg(lastHUpdate),this.updateCounter
+            );
+        }
+
+        if(this.updateCounter-lastDUpdate > this.dLogs.step){
+            console.debug("temperature logger day log updated");
+            this.dLogs.push(
+                this.hLogs.avg(lastDUpdate),this.updateCounter
+            );
+        }
+
         if(this.forceReload || Date.now()-this.lastReload > 10000){
             if(!(await this.reloadModules())){
                 return
             }
         }
 
-        let currentLog : Log = {
-            data: {}
-        }
+        this.lastUpdateValues = {data:{}};
 
-        let currTime = Date.now();
-
-        let lastHUpdate = this.lastHUpdate;
-        let updateHLog = false;
-        if(currTime-lastHUpdate > 60000){
-            this.lastHUpdate = currTime;
-            updateHLog = true;
-        }
-
-        let updateDLog = false;
-        let lastDUpdate = this.lastDUpdate;
-        if(currTime-lastDUpdate > 3600000){
-            this.lastDUpdate = currTime;
-            updateDLog = true;
-        }
-
-        //creates an array of promises. every promise is an api call getting the target endpoints value
-        let apiMessages : Promise<any>[] = []
+        // creates a promise for every api call getting the target endpoints value
+        // retrieved values are saved into the lastUpdateValues log (but only if the 
+        // current update number is the same as before)
+        let originalUpdateNumber = this.updateCounter;
         for(let module of this.loadedModules){
             for(let target of moduleToEndpoints[module.module_type]){
-                apiMessages.push((async ()=>{
-                    let log = "";
+                (async ()=>{
                     try {
-                        log = "getting api message: "+target.url
                         let result = await sendApiMessageSimple(target);
                         
                         if(!isNumber(result)){
-                            console.debug(log," returned wrong type: ", typeof result);
-                            return;
+                            throw Error("wrong type returned: "+ typeof result);
                         }
-    
-                        currentLog.data[target.url] = result;
+                        
+                        if(this.updateCounter !== originalUpdateNumber){
+                            console.warn(`Temperature endpoint: ${JSON.stringify(target)} took too long to answer, response was discarded (missed by : ${this.updateCounter-originalUpdateNumber} updates)`);
+                        }
+                        
+                        this.lastUpdateValues.data[target.url] = result;
+
                     } catch (error) {
-                        console.error("Error while getting: ",log,"\n", error);
+                        console.error("Error while getting temperature endpoint: ",JSON.stringify(target),"\n", error);
                         this.forceReload = true;
                     }
-                })())
+                })()
             }
-        }
-
-        await Promise.allSettled(apiMessages);
-
-        this.mLogs.push(currentLog,currTime);
-        if(updateHLog){
-            console.debug("temperature logger hour log updated");
-            this.hLogs.push(
-                this.mLogs.avg(currTime - lastHUpdate),currTime
-            );
-        }
-        if(updateDLog){
-            console.debug("temperature logger day log updated");
-            this.dLogs.push(
-                this.hLogs.avg(currTime - lastDUpdate),currTime
-            );
         }
     }
 
     getter(req: Request, res: Response){
-        let fromTime = req.body["fromTime"];
-        if(fromTime < this.timeStarted){
-            fromTime = this.timeStarted;
-        }
-        let toTime = Date.now();
-        let timeBack = toTime - fromTime;
-        if(isNumber(timeBack)){
-            let scope = req.body["scope"];
-            if(isString(req.body["scope"])){
-                let result : Record<string,(number|undefined)[]> = {};
-                let historyLen : number = 0;
-                switch (scope) {
-                    case "M":
-                        result = this.mLogs.getValues(timeBack);
-                        historyLen=this.mLogs.len;
-                        break;
-                    case "H":
-                        result = this.hLogs.getValues(timeBack);
-                        historyLen=this.hLogs.len;
-                        break;
-                    case "D":
-                        result = this.dLogs.getValues(timeBack);
-                        historyLen=this.dLogs.len;
-                        break;
-                
-                    default:
-                        res.status(400).send(JSON.stringify({message:"invalid scope selected"}))
-                        return;
-                }
-                res.status(200).send(JSON.stringify(logsToApiResponse(result,historyLen,toTime)));
-                return
+        const fromCycle : any = req.body["fromCycle"];
+        const scope : any = req.body["scope"];
+        if(isNumber(fromCycle) && isString(scope)){
+            let targetLog : LogContainer;
+
+            switch (scope) {
+                case "M":
+                    targetLog = this.mLogs;
+                    break;
+                case "H":
+                    targetLog = this.hLogs;
+                    break;
+                case "D":
+                    targetLog = this.dLogs;
+                    break;
+            
+                default:
+                    res.status(400).send(JSON.stringify({message:"invalid scope selected"}))
+                    return;
             }
+
+            const toCycle = targetLog.newestLogTime;
+            const result = targetLog.getValues(fromCycle);
+            const historyLen = targetLog.len;
+
+            res.status(200).send(JSON.stringify(logsToApiResponse(result,historyLen,toCycle)));
+            return
         }
         res.status(400).send(JSON.stringify({message:"missing values in message body"}));    
     }
