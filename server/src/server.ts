@@ -9,6 +9,7 @@ import { TempLogger } from './temperature-history.js';
 import fs from 'fs';
 import { isNumber, isString } from './utils.js';
 import { smbr_config } from './config.js';
+import { timeModulesRouter } from './time-module.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -113,6 +114,7 @@ app.use(express.static(distPath));
 app.use('/config-files', configFilesRouter);
 app.use('/services-status', serviceStatusRouter);
 app.use('/temperature-logs', tempLogger.router);
+app.use('/time',timeModulesRouter);
 
 if(!noFrontEnd){
     app.use((req, res) => {
