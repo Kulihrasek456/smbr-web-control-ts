@@ -98,18 +98,40 @@ export function mapRangeToRange(number : number, inMin : number,inMax : number, 
 }
 
 
-export function formatTime(formatString : string,timestamp =new Date()){
-    const seconds = timestamp.getSeconds()
-    const minutes = timestamp.getMinutes()
-    const hours   = timestamp.getHours()
+export function formatTime(formatString : string,timestamp =new Date(), useUTCtime = false){
+    let seconds;
+    let minutes;
+    let hours;
+    let date;
+    let day;
+    let month;
+    let year;
+    if(useUTCtime){
+        seconds = timestamp.getSeconds()
+        minutes = timestamp.getMinutes()
+        hours   = timestamp.getHours()
+        date    = timestamp.getDate()
+        day     = timestamp.getDay()
+        month   = timestamp.getMonth()+1
+        year    = timestamp.getFullYear()
+    }else{
+        seconds = timestamp.getUTCSeconds()
+        minutes = timestamp.getUTCMinutes()
+        hours   = timestamp.getUTCHours()
+        date    = timestamp.getUTCDate()
+        day     = timestamp.getUTCDay()
+        month   = timestamp.getUTCMonth()+1
+        year    = timestamp.getUTCFullYear()
+    }
+
 
     formatString = formatString.replaceAll("ss",seconds.toString())
     formatString = formatString.replaceAll("mm",minutes.toString())
     formatString = formatString.replaceAll("hh",hours.toString())
-    formatString = formatString.replaceAll("dd",timestamp.getDate().toString())
-    formatString = formatString.replaceAll("wd",timestamp.getDay().toString())
-    formatString = formatString.replaceAll("mo",(timestamp.getMonth()+1).toString())
-    formatString = formatString.replaceAll("yyyy",timestamp.getFullYear().toString())
+    formatString = formatString.replaceAll("dd",date.toString())
+    formatString = formatString.replaceAll("wd",day.toString())
+    formatString = formatString.replaceAll("mo",month.toString())
+    formatString = formatString.replaceAll("yyyy",year.toString())
 
     formatString = formatString.replaceAll("SS",((seconds<10)?"0"+seconds:seconds).toString());
     formatString = formatString.replaceAll("MM",((minutes<10)?"0"+minutes:minutes).toString());
