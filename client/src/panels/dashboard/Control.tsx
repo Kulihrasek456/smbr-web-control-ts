@@ -32,11 +32,16 @@ export function ControlBody(props : ControlBodyProps){
             return
         }
 
-        let response = await Control_Mixer.sendInfo();
-        setMixerMinMax({
-            min: response.minRPM,
-            max: response.maxRPM
-        })
+        try {
+            let response = await Control_Mixer.sendInfo();
+            setMixerMinMax({
+                min: response.minRPM,
+                max: response.maxRPM
+            })
+        } catch (error) {
+            setMixerMinMax(undefined)
+            throw error;
+        }
     })
 
 
