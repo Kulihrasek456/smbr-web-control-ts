@@ -70,6 +70,9 @@ function renderStats(measurement : Sensor_Fluorometer.Measurement) : statRow[]{
         }, {
             name: "detector_gain",
             value: <ValueDisplay value={measurement.detector_gain.toString()}></ValueDisplay>
+        },{
+            name: "intensity",
+            value: <ValueDisplay value={(measurement.intensity*100).toString()} numberOnly={{decimalPlaces: 0}} unit="%"></ValueDisplay>
         }, {
             name: "timebase",
             value: <ValueDisplay value={measurement.timebase.toString()}></ValueDisplay>
