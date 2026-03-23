@@ -78,7 +78,10 @@ function TransSpectrophotometerBody(
                 value={value.relative_value}
                 unit="%"
                 numberOnly={{
-                    decimalPlaces: 1
+                    decimalPlaces: 1,
+                    resultModifier(value) {
+                        return value*100
+                    },
                 }}
                 error={error()}
             ></ValueDisplay>
