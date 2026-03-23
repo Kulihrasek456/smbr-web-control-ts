@@ -8,6 +8,7 @@ import type { apiMessageSimple } from '../../apiMessages/apiMessageSimple';
 import { refreshValueUpdate, useRefreshContext } from '../../common/other/RefreshProvider';
 import { ValueDisplay } from '../../common/ApiFetcher/ValueDisplay';
 import { System } from '../../apiMessages/system/_';
+import { Time } from '../../apiMessages/time/_';
 
 
 type SimpleDisplayProps = {
@@ -25,7 +26,8 @@ function SimpleDisplay({ name, target }: SimpleDisplayProps) {
 }
 
 export function Hotbar() {
-    const [time, setTime] = createSignal(new Date());
+    const [time, setTime] = createSignal<{time: Date|undefined, error: boolean}>({time:undefined,error:false});
+    const [serverTimeOffset , setServerTimeOffset] = createSignal<number|undefined>(undefined);
     const moduleListCntxt = useModuleListValue();
     const refreshCntxt = useRefreshContext();
     const [countsErrs, setCountsErrs] = createSignal<{err: boolean, count: number | undefined}>({err:false,count:undefined});
@@ -34,7 +36,18 @@ export function Hotbar() {
 
     onMount(()=>{
         let id = setInterval(()=>{
-            setTime(new Date())
+            let offset = serverTimeOffset();
+            if(offset!==undefined){
+                setTime({
+                    time: new Date(Date.now()+offset),
+                    error: false
+                })
+            }else{
+                setTime({
+                    time: undefined,
+                    error: true
+                });
+            }
         },100)
 
         onCleanup(()=>{
@@ -53,6 +66,7 @@ export function Hotbar() {
                 err: true,
                 count: undefined
             });
+            throw error
         }
         
     }
@@ -67,6 +81,16 @@ export function Hotbar() {
                 err: true,
                 count: undefined
             });
+            throw error
+        }
+    }
+    async function refreshTimeOffset(){
+        try {
+            let response = await Time.getTime();
+            setServerTimeOffset(Date.now() - response.getTime())
+        } catch (error) {
+            setServerTimeOffset(undefined)
+            throw error
         }
     }
 
@@ -74,8 +98,10 @@ export function Hotbar() {
         if(!refreshValueUpdate(refreshCntxt?.listen())){
             return;
         }
+
         refreshCountsErrs();
         refreshCountsWarns();
+        refreshTimeOffset();
     })
 
     return (
@@ -102,9 +128,18 @@ export function Hotbar() {
                     ></ValueDisplay>
                 </div>
             </div>
-            <div class={styles.twoRowContainer}>
-                <p>{formatTime("hh:MM",time())}</p>
-                <p>{formatTime("dd.mo. yyyy",time())}</p>
+            <div 
+                class={styles.twoRowContainer}
+                style={{width: "80px"}}
+            >
+                <ValueDisplay
+                    value={(time().time===undefined)?undefined:formatTime("hh:MM",time().time)}
+                    error={time().error}
+                ></ValueDisplay>
+                <ValueDisplay
+                    value={(time().time===undefined)?undefined:formatTime("dd.mo. yyyy",time().time)}
+                    error={time().error}
+                ></ValueDisplay>
             </div>      
             <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive")}>
                 <SimpleDisplay name='hostname' target={{url: "/core/hostname", key: "hostname"}}></SimpleDisplay>
