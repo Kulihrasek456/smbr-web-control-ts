@@ -1,0 +1,134 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    flex: 1 1 auto;
+}
+
+.header{
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: start;
+    align-items: stretch;
+    gap: 5px;
+}
+
+.tab{
+    min-width: 100px;
+    border-bottom: none !important;
+
+    border-bottom-right-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 7px;
+
+    background-color: var(--accent-color-1) !important;
+}
+
+.tab.active{
+    border-color: var(--acc-color-3);
+}
+
+.body{
+    flex: 1 1 auto;
+
+    background-color: var(--bg-color-1);
+    border: 1px solid var(--bg-color-4);
+
+    border-radius: 0 0 5px 5px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+
+    min-height: 0;
+    height: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 5px;
+}
+
+.error_message{
+    color: var(--err-color-3);
+    font-weight: bold;
+    font-size: 15px;
+
+    text-align: center;
+    flex: 1 1 auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.separator{
+    height: 5px;
+    background-color: var(--bg-color-3);
+    border-bottom: 1px solid var(--bg-color-4);
+}
+
+.problem{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+
+    --accent-color-1: var(--bg-color-2);
+    --accent-color-2: var(--bg-color-3);
+
+    border: 1px solid var(--accent-color-2);
+    background-color: var(--accent-color-1);
+
+    margin: 5px;
+
+    padding: 5px;
+
+    >*{
+        padding: 0 2px;
+    }
+}
+.warning{
+     --accent-color-1: rgba(var(--warn-color-2-rgb),0.5);
+     --accent-color-2: rgba(var(--warn-color-3-rgb),0.5);
+}
+
+.error{
+     --accent-color-1: rgba(var(--err-color-2-rgb),0.6);
+     --accent-color-2: rgba(var(--err-color-3-rgb),0.5);
+}
+
+
+.problem_header{
+    flex: 0 0 auto;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+
+    border-bottom: 2px solid var(--accent-color-2);
+}
+
+.type{
+    flex: 1 1 auto;
+}
+
+.id{
+    flex: 0 0 auto;
+}
+
+.message{
+    flex: 1 1 auto;
+    padding-top: 5px;
+    white-space: wrap;
+}
+
+.detail{
+    white-space: wrap;
+    color: var(--bg-color-5);
+}
