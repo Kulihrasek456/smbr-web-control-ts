@@ -158,7 +158,7 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
     const [stats, setStats] = createSignal<statRow[]>([]);
     
     const [length,setLength] = createSignal<number>(1);
-    const [intensity,setIntensity] = createSignal<number>(50);
+    const [intensity,setIntensity] = createSignal<number>(100);
     const [gain, setGain] = createSignal<Sensor_Fluorometer.detectorGainsType>("x1");
 
     const [chartData, setChartData] = createSignal<ChartData>(parseSamples([]))
