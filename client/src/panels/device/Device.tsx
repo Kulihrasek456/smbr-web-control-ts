@@ -7,6 +7,7 @@ import { DeviceInformation } from "./DeviceInformation.tsx";
 import { ModuleListDisplay } from "./ModuleList.tsx";
 import { ServicesStatus } from "./ServiceStatus.tsx";
 import { CanStatistics } from "./CanStatistics.tsx";
+import { ModuleProblems } from "./Problems.tsx";
 
 export function Device() {
   const moduleListCntxt = useModuleListValue();
@@ -21,6 +22,7 @@ export function Device() {
             <DeviceInformation id="deviceInformation"></DeviceInformation>
           </Show>
           <CanStatistics id="canStatistics"></CanStatistics>
+          <ModuleProblems id="problems"></ModuleProblems>
       </GridstackGrid>
     </div>
   );
