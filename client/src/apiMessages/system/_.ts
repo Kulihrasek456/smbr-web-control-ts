@@ -44,14 +44,16 @@ export namespace System{
         }
     }
 
+    export type Problem = {
+        type : string,
+        id: number,
+        message: string,
+        detail: string
+    }
+
     export type  problemResult = {
         message: string,
-        problems: {
-            type : string,
-            id: number,
-            message: string,
-            detail: string
-        }[]
+        problems: Problem[]
     }
 
     async function sendProblems(url : string) : Promise<problemResult>{
