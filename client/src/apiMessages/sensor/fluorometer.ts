@@ -29,7 +29,7 @@ export namespace Sensor_Fluorometer{
         samples: Sample[]
     }
     
-    function checkMeasurement(data : any, opts : apiMessageOptions){
+    function checkMeasurement(data : any, opts : apiMessageOptions) : Measurement{
         checkNumber(data,"measurement_id",opts);
         checkBoolean(data,"read",opts);
         checkBoolean(data,"saturated",opts);
@@ -48,6 +48,21 @@ export namespace Sensor_Fluorometer{
             checkNumber(element,"time_ms",opts);
             return true;
         },opts);
+
+        return {
+            measurement_id: data.measurement_id,
+            read: data.read,
+            saturated: data.saturated,
+            detector_gain: data.detector_gain,
+            intensity: data.emitor_intensity,
+            timebase: data.timebase,
+            length_ms: data.length_ms,
+            required_samples: data.required_samples,
+            captured_samples: data.captured_samples,
+            missing_samples: data.missing_samples,
+            timestamp: data.timestamp,
+            samples: data.samples
+        }
     }
     
     
@@ -85,11 +100,9 @@ export namespace Sensor_Fluorometer{
         let result = await sendJsonApiMessage(opts)
     
         let data = ( result.jsonValue as Measurement)
-    
-        checkMeasurement(data,opts);
-    
+        
         return {
-            measurement: data
+            measurement: checkMeasurement(data,opts)
         }
     }
     
@@ -132,11 +145,9 @@ export namespace Sensor_Fluorometer{
     
         let response = await sendJsonApiMessage(opts);
         let data = response.jsonValue
-    
-        checkMeasurement(data,opts);
-    
+        
         return {
-            measurement: data
+            measurement: checkMeasurement(data,opts)
         }
     }
 
