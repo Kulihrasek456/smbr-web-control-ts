@@ -109,7 +109,10 @@ export function ModuleListProvider(props : ModuleListProviderProps){
 
 export const useModuleListValue = () => useContext(ModuleListContext);
 
-export function getInstancesForType(moduleList : Module[],type : moduleTypesType, includeInvalid = false){
+export function getInstancesForType(moduleList : Module[] | undefined,type : moduleTypesType, includeInvalid = false){
+  if(!moduleList){
+    return [];
+  }
   let result : moduleInstancesType[] = []
   moduleList.forEach(element => {
     if(element.type == type){
