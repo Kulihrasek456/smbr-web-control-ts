@@ -48,6 +48,25 @@ export const moduleInstanceColors = {
   "Instance_12" : "rgb( 255 , 140 , 255 )",
 } as const;
 
+export const instanceToIndex = {
+  "Undefined"   : 0,
+  "Exclusive"   : 0,
+  "All"         : 0,
+  "Reserved"    : 0,
+  "Instance_1"  : 1,
+  "Instance_2"  : 2,
+  "Instance_3"  : 3, 
+  "Instance_4"  : 4,
+  "Instance_5"  : 5,
+  "Instance_6"  : 6,
+  "Instance_7"  : 7,
+  "Instance_8"  : 8,
+  "Instance_9"  : 9,
+  "Instance_10" : 10,
+  "Instance_11" : 11,
+  "Instance_12" : 12
+} as const;
+
 export type moduleTypesType = typeof moduleTypes[number]
 export type moduleInstancesType = typeof moduleInstances[number]
 
