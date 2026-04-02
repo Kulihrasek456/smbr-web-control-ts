@@ -1,6 +1,6 @@
 import { createEffect, createSignal } from "solid-js";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import { useModuleListValue, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
+import { instanceToIndex, useModuleListValue, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
 import { TableStatic, widgetHeightChange } from "../../common/Table/Table";
 import { Widget } from "../common/Widget";
 import { Button } from "../../common/Button/Button";
@@ -11,30 +11,41 @@ import { System } from "../../apiMessages/system/_";
 import { sleep } from "../../common/other/utils";
 
 
-async function restartModule(moduleType: moduleTypesType, uid: string){
-    await sendApiMessageSimplePost({url:"/"+moduleType+"/restart",key:"uid"},uid);
+function getModuleEndpoint(module : System.module, endpoint : string){
+    switch (module.module_type) {
+        case "pump":
+            return `/pump/${endpoint}?instance=${instanceToIndex[module.instance]}`
+        default:
+            return `/${module.module_type}/${endpoint}`
+    }
+}
+
+async function restartModule(module: System.module){
+    await sendApiMessageSimplePost({url:getModuleEndpoint(module,"/restart"),key:"uid"},module.uid);
     await sleep(3000);
     return true
 }
 
+
 function renderRow(value : System.module, index: number){
+
     return([
         <p>{value.module_type}</p>,
         <p>{value.uid}</p>,
         <p>{value.instance}</p>,
         <ApiFetcher 
             numberOnly={{decimalPlaces: 2}} 
-            target={{url: "/"+value.module_type+"/ping" ,key: "time_ms"}} 
+            target={{url: getModuleEndpoint(value,"/ping") ,key: "time_ms"}} 
             unit="ms"
         ></ApiFetcher>,
         <ApiFetcher 
             numberOnly={{decimalPlaces: 2}} 
-            target={{url: "/"+value.module_type+"/core_temp" ,key: "temperature"}} 
+            target={{url: getModuleEndpoint(value,"/core_temp") ,key: "temperature"}} 
             unit="°C"
         ></ApiFetcher>,
         <ApiFetcher 
             numberOnly={{decimalPlaces: 2}} 
-            target={{url: "/"+value.module_type+"/board_temp" ,key: "temperature"}} 
+            target={{url: getModuleEndpoint(value,"/board_temp") ,key: "temperature"}} 
             unit="°C"
         ></ApiFetcher>,
         <ApiFetcher 
@@ -42,12 +53,12 @@ function renderRow(value : System.module, index: number){
                 decimalPlaces: 2,
                 resultModifier: (value:number)=>(value*100)
             }} 
-            target={{url: "/"+value.module_type+"/load" ,key: "load"}} 
+            target={{url: getModuleEndpoint(value,"/load") ,key: "load"}} 
             unit="%"
         ></ApiFetcher>,
         <Button 
             tooltip="Restart this module"
-            callback={()=>restartModule(value.module_type,value.uid)}
+            callback={()=>restartModule(value)}
         >
             <Icon scale={1.4} name="refresh"></Icon>
         </Button>
