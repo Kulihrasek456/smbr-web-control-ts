@@ -130,6 +130,27 @@ export function getInstancesForType(moduleList : Module[] | undefined,type : mod
   return result
 }
 
+export function getModulesOfType(moduleList : Module[] | undefined, type : moduleTypesType, includeInvalid = false){
+  if(!moduleList){
+    return [];
+  }
+  let result : Module[] = []
+  moduleList.forEach(element => {
+    if(element.type == type){
+      if ((
+        element.instance != "Undefined"
+        && element.instance != "Exclusive"
+        && element.instance != "All"
+        && element.instance != "Reserved")
+        || includeInvalid
+      ) {
+        result.push(element);
+      }
+    }
+  });
+  return result
+}
+
 export function countInstancesOfType(moduleList: Module[] | undefined, type: moduleTypesType, instance: moduleInstancesType){
   if(!moduleList){
     return 0;
