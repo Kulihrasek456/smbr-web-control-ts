@@ -7,6 +7,7 @@ import { Button } from "../../common/Button/Button";
 import styles from './Widget.module.css'
 import { ApiFetcher, type ApiFetcherProps } from "../../common/ApiFetcher/ApiFetcher";
 import { RefreshProvider, useRefreshContext } from "../../common/other/RefreshProvider";
+import { instanceToIndex, moduleInstanceColors, type Module } from "../../common/other/ModuleListProvider";
 
 
 interface WidgetHotbarValueProps {
@@ -51,7 +52,8 @@ interface WidgetProps {
     hotbarTargets?: () => JSXElement;
     name: string;
     customRefreshProvider?: boolean;
-    popupPanel?: PopupPanelProps
+    popupPanel?: PopupPanelProps;
+    module?: Module
 }
 
 export function Widget(props: WidgetProps) {
@@ -59,11 +61,30 @@ export function Widget(props: WidgetProps) {
         <RefreshProviderWrapper wrap={!(props.customRefreshProvider ?? false)}>
             <div class={styles.container}>
             
-                <div class={styles.header}>
+                <div 
+                    class={styles.header}
+                    style={{
+                        "border-bottom": (props.module !== undefined) ? (
+                            `3px solid ${moduleInstanceColors[props.module.instance]}`
+                        ) : (
+                            undefined
+                        )
+                    }}
+                >
                     <div class={styles["drag-handle"] + " drag-handle"}>
                         <Icon name="open_with"></Icon>
                     </div>
                     <h2 class={styles.title}>{props.name}</h2>
+                    <Show when={instanceToIndex[props.module?.instance ?? "Undefined"] > 0}>
+                        <div 
+                            class={styles["instace-display"]}
+                            style={{
+                                "--instance-color": moduleInstanceColors[props.module?.instance ?? "Undefined"]
+                            }}
+                        >
+                            <p>{instanceToIndex[props.module?.instance ?? "Undefined"]}</p>
+                        </div>
+                    </Show>
                     <div class={styles.hotbarPanel}>
                         <Show when={props.hotbarTargets} fallback={<></>}>
                             {props.hotbarTargets?.()}

@@ -34,6 +34,34 @@
     cursor: grab;
 }
 
+.instace-display{
+    position: relative;
+    top: 3px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 120%;
+
+    padding: 2px;
+
+    border: 1px solid var(--instance-color);
+    border-radius: 5px 5px 0 0;
+
+    user-select: none;
+
+    cursor: pointer;
+
+    p{
+        position: relative;
+        bottom: 3px;
+        font-weight: bold;
+    }
+}
+
+.instace-display:hover{
+    color: var(--instance-color);
+}
+
 .hotbarPanel{
     display: flex;
     justify-content: space-between;
