@@ -18,6 +18,7 @@ import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
 import type { TooltipItem } from "chart.js";
 import { sendApiMessageSimple } from "../../apiMessages/apiMessageSimple";
 import { LoadingDots } from "../../common/LoadingDots/loadingDots";
+import { Time } from "../../apiMessages/time/_";
 
 type statRow = {
     name: string;
@@ -206,6 +207,11 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
             lastMeasurementId = measurement.measurement_id;
             setPopupMessageLoading(false);
             setPopupMessage(undefined);
+            try {
+                Sensor_Fluorometer.fillCorrectedTimestamp(measurement);
+            } catch (error) {
+                
+            }
             setCurrentMeasurement(measurement)
             setStats(renderStats(measurement))
             setChartData(parseSamples(measurement.samples))
