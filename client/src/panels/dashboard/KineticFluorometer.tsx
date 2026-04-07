@@ -190,8 +190,8 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
                 filename = 'OJIP_unknownDevice_';
             }
             filename+= measurement.measurement_id + "_";
-            let timestamp = new Date(measurement.timestamp);
-            filename+= timestamp.toISOString().replace(/[:.]/g, '-'); //ISO 8601
+
+            filename+= measurement.timestamp.replace(/[:.]/g, '-'); //ISO 8601
             return filename;
         }
         
