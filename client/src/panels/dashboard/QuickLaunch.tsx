@@ -20,39 +20,7 @@ function parseMacroName(fileName : string){
 }
 
 function QuickLaunchBody(props: QuickLaunchProps){
-    const [scripts, setScripts] = createSignal<string[]>([
-        "macros|A",
-        "macros|Maximum_Effort_Longname_Testing",
-        "macros|Standard_User",
-        "macros|Bo",
-        "macros|Supercalifragilistic_Extra_Long",
-        "macros|Omega_System",
-        "macros|J",
-        "macros|Ultra_Wide_Column_Width_Test_Case",
-        "macros|Sigma_Data",
-        "macros|Li",
-        "macros|Winter_Season_Identifier_2026",
-        "macros|Cy",
-        "macros|Horizontal_Scroll_Enabler_String",
-        "macros|Maintenance_Fixer",
-        "macros|K",
-        "macros|Longest_Possible_Name_Buffer_X1",
-        "macros|Ocean_Wave",
-        "macros|Xi",
-        "macros|Database_Stress_Tester_Instance",
-        "macros|Dry_Desert",
-        "macros|V",
-        "macros|String_Padding_Required_Check",
-        "macros|Apple_Green",
-        "macros|Zo",
-        "macros|Overflow_Prevention_Unit_Alpha",
-        "macros|Music_Beat",
-        "macros|I",
-        "macros|Robust_Input_Validator_Method",
-        "macros|Toadstool",
-        "macros|Ox",
-        "macros|End_Of_The_Line_Final_Record_Z"
-    ]);
+    const [scripts, setScripts] = createSignal<string[]>([]);
 
     
     const [searchText, setSearchText] = createSignal<string>("");
