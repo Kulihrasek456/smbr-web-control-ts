@@ -1,12 +1,11 @@
 other
  - [x] better button visuals
- - [ ] fix vertical sliders on IOS (extremely thick)
+ - [x] fix vertical sliders on IOS (extremely thick)
  - [x] add error display
  - [x] fix runtime info collpasing in favor of editor (width: 0 needed)
  - [ ] fix gridstack grid not holding its width in device pannel
  - [x] sort modules by UID to reduce flickering
  - [x] text overflow problems
- - [ ] open runtime info on scheduler select
  - [x] restart timeout
 
 api fetchers
@@ -67,3 +66,6 @@ text editor
 hotbar
  - [ ] better clock
  - [x] title overflow on small screens
+
+server
+ - [ ] align logs with minutes / hours

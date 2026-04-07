@@ -183,7 +183,6 @@ export function KinematicFluorometerBody(props: KinematicFluorometerProps){
         if(measurement){
             let filename = 'OJIP_';
             try { 
-                //#TODO cache this
                 filename+= (await sendApiMessageSimple({url:"/core/hostname",key:"hostname"})).toString() + "_";
                 filename+= (await sendApiMessageSimple({url:"/core/sid",key:"sid"})).toString() + "_";
             } catch (error) {
