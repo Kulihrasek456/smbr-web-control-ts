@@ -151,7 +151,7 @@ export function SliderApiControl(props : SliderApiControlProps){
     let lastChange = 0;
 
     createEffect(async ()=>{
-        if(refreshValueUpdate(refreshCntx?.listen())){
+        if(!refreshValueUpdate(refreshCntx?.listen())){
             return
         }
         if(currentState==="idle"){
