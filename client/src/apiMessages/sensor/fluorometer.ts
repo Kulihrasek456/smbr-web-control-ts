@@ -1,4 +1,5 @@
 import { ApiMessageError, checkArray, checkBoolean, checkNumber, checkString, checkStringEnum, checkTimestamp, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
+import { Time } from "../time/_";
 
 export namespace Sensor_Fluorometer{
     const detectorGainsValues = ["x1", "x10", "x50", "Auto"] as const
@@ -25,7 +26,8 @@ export namespace Sensor_Fluorometer{
         required_samples: number,
         captured_samples: number,
         missing_samples: number,
-        timestamp: Date,
+        timestamp: string,
+        timestampCorrect: Date | undefined,
         samples: Sample[]
     }
     
@@ -61,10 +63,15 @@ export namespace Sensor_Fluorometer{
             captured_samples: data.captured_samples,
             missing_samples: data.missing_samples,
             timestamp: data.timestamp,
+            timestampCorrect: undefined,
             samples: data.samples
         }
     }
     
+    export async function fillCorrectedTimestamp(measurement : Measurement){
+        let correctedTime = await Time.sendConvertTime({timestamp:measurement.timestamp});
+        measurement.timestampCorrect = correctedTime;
+    }
     
     type capture = {
         detectorGain: detectorGainsType
