@@ -1,4 +1,4 @@
-import { createEffect, createSignal, For } from "solid-js";
+import { createEffect, createSignal, For, Show } from "solid-js";
 import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
 import type { Module, moduleInstancesType } from "../../common/other/ModuleListProvider";
 import { SliderApiControl } from "../../common/Slider/Slider";
@@ -44,33 +44,38 @@ export function PumpModuleBody(props : PumpModuleBodyProps){
         <div class={styles.container}>
             <For each={pumpArr}>
                 {(el,index)=>(
-                    <div classList={{
-                        [styles.slider_container]:true,
-                        [styles.disabled]:index() >= (pumpCount() ?? 0)
-                    }}>
-                        <SliderApiControl
-                            class={styles.slider}
-                            direction="V"
-                            title={"Pump " + el}
-                            
-                            bounds={{min: -1, max: 1, show: true}}
-                            step={0.05}
-                            decimals={2}
-                            
-                            target={{
-                                getter:{url:Pumps.getPumpUrl(props.module.instance,el,"speed"),key:"speed"},
-                                setter:{url:Pumps.getPumpUrl(props.module.instance,el,"speed"),key:"speed"}
-                            }}
-                        ></SliderApiControl>
-                        <div class={styles.not_installed_container}>
-                            <Icon 
-                                class={styles.icon}
-                                name="devices_off"
-                            ></Icon>
-                            <p>not</p>
-                            <p>installed</p>
-                        </div>
-                    </div>
+                    <Show 
+                        when={index() < (pumpCount() ?? 0)}
+                        fallback={
+                            <div class={styles.not_installed_container}>
+                                <div class={styles.slot_border}></div>
+                                <div class={styles.not_installed_body}>
+                                    <Icon 
+                                        class={styles.icon}
+                                        name="devices_off"
+                                    ></Icon>
+                                    <p>not</p>
+                                    <p>installed</p>
+                                </div>
+                                <div class={styles.slot_border}></div>
+                            </div>
+                        }
+                    >    
+                    <SliderApiControl
+                        class={styles.slider}
+                        direction="V"
+                        title={"Pump " + el}
+                        
+                        bounds={{min: -1, max: 1, show: true}}
+                        step={0.05}
+                        decimals={2}
+                        
+                        target={{
+                            getter:{url:Pumps.getPumpUrl(props.module.instance,el,"speed"),key:"speed"},
+                        }}
+                    ></SliderApiControl>
+                        
+                    </Show>
                 )}
             </For>
         </div>
