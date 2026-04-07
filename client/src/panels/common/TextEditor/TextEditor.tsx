@@ -696,6 +696,9 @@ export function TextEditor(props : TextEditorProps) {
     let currFileName = fileName();
     if(currFileName !== undefined){
       if(unsavedChangesCheck()){
+        if(await !window.confirm(`are you sure you want to dele the file named "${currFileName}"?`)){
+          return false;
+        }
         try {
           await sendApiMessageDeleteFile({
             fileName: currFileName,
