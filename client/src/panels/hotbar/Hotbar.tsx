@@ -4,7 +4,7 @@ import { formatTime } from '../../common/other/utils';
 
 import styles from './Hotbar.module.css'
 import { countInstancesOfType, useModuleListValue } from '../../common/other/ModuleListProvider';
-import type { apiMessageSimple } from '../../apiMessages/apiMessageSimple';
+import { sendApiMessageSimple, type apiMessageSimple } from '../../apiMessages/apiMessageSimple';
 import { refreshValueUpdate, useRefreshContext } from '../../common/other/RefreshProvider';
 import { ValueDisplay } from '../../common/ApiFetcher/ValueDisplay';
 import { System } from '../../apiMessages/system/_';
@@ -21,6 +21,44 @@ function SimpleDisplay({ name, target }: SimpleDisplayProps) {
         <div class={styles.twoRowContainer + " " + styles.bold}>
             <p>{name+ ":"}</p>
             <ApiFetcher target={target}></ApiFetcher>
+        </div>
+    )
+}
+
+function HostnameDisplay(){
+    const refreshCntxt = useRefreshContext();
+    const [value, setValue] = createSignal<string | undefined>(undefined);
+    const [error, setError] = createSignal<boolean>(false);
+
+    createEffect(async ()=>{
+        if(!refreshValueUpdate(refreshCntxt?.listen())){
+            return
+        }
+        try {
+            let result = await sendApiMessageSimple({
+                url: "/core/hostname", 
+                key: "hostname"
+            });
+            setError(false);
+            setValue(result.toString());
+        
+            document.title = `[${result.toString()}]: SMBR-web-control`;
+        } catch (error) {
+            setError(true);
+            setValue(undefined);
+            
+            document.title = `SMBR-web-control`;
+            throw error;
+        }
+    })
+
+    return (
+        <div class={styles.twoRowContainer + " " + styles.bold}>
+            <p>{"hostname:"}</p>
+            <ValueDisplay
+                value={value()}
+                error={error()}
+            ></ValueDisplay>
         </div>
     )
 }
@@ -142,7 +180,7 @@ export function Hotbar() {
                 ></ValueDisplay>
             </div>      
             <Show when={countInstancesOfType(moduleListCntxt?.state(),"core","Exclusive")}>
-                <SimpleDisplay name='hostname' target={{url: "/core/hostname", key: "hostname"}}></SimpleDisplay>
+                <HostnameDisplay></HostnameDisplay>
                 <SimpleDisplay name='IP adress' target={{ url: "/core/ip_address", key: "ipAddress" }}></SimpleDisplay>
                 <SimpleDisplay name='short ID' target={{url: "/core/sid", key: "sid"}}></SimpleDisplay>
             </Show>  
