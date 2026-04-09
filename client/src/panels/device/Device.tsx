@@ -14,7 +14,7 @@ export function Device() {
   
 
   return (
-    <div style={{ padding: "8px" }}>
+    <div  style={{ padding: "8px", "overflow-x": "hidden", "overflow-y" : "scroll"}}>
       <GridstackGrid>
           <ModuleListDisplay id="moduleList"></ModuleListDisplay>
           <ServicesStatus id="serviceStatus"></ServicesStatus>
