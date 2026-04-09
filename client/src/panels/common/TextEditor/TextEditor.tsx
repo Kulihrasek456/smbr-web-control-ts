@@ -24,6 +24,8 @@ interface FileListElementProps {
 
   isRoot?: boolean,
 
+  searchText?: ()=>(string | undefined),
+
   // the full previous path
   prefixPath?: string,
 
@@ -49,13 +51,23 @@ function FileListElement(props: FileListElementProps) {
       props.data.name + "|"
     ))
   );
+
+  function isSearchFor(searchText : string|undefined | undefined, fileName : string){
+    console.debug(`checking: "${searchText}" with "${fileName}`)
+    return (searchText!==undefined)?(
+      fileName.startsWith(searchText)
+    ):(
+      undefined
+    )
+  }
   
   return (
     <ul 
       classList={{
         [fileListStyles["directory"]]:!isRoot(),
         [fileListStyles["root"]]:isRoot(),
-        [fileListStyles["collapsed"]]:true
+        [fileListStyles["collapsed"]]:true,
+        [fileListStyles["search_filtered"]]: props.searchText?.() !== undefined
       }}
       ref={self}
     >
@@ -102,6 +114,7 @@ function FileListElement(props: FileListElementProps) {
               activeFileName={props.activeFileName}
               onFileCreate={props.onFileCreate}
               dirsOnly={props.dirsOnly}
+              searchText={props.searchText}
             ></FileListElement>
           )}
         </For>
@@ -111,7 +124,9 @@ function FileListElement(props: FileListElementProps) {
               <li 
                 classList={{
                   [fileListStyles["file"]]:true,
-                  [fileListStyles["active"]]: (props.activeFileName() === prefixPath()+fileName)
+                  [fileListStyles["active"]]: (props.activeFileName() === prefixPath()+fileName),
+                  [fileListStyles["search_result"]]: isSearchFor(props.searchText?.(),fileName) ?? false,
+                  [fileListStyles["not_search_result"]]: !(isSearchFor(props.searchText?.(),fileName) ?? true)
                 }}
                 onclick={()=>{props.onSelect(prefixPath()+fileName)}}
               >
@@ -147,12 +162,22 @@ function FileList(props: FileListProps) {
   let newFileInput : HTMLInputElement | undefined;
   let newFileContainer : HTMLDivElement | undefined;
 
-
+  const [searchText, setSearchText] = createSignal<string>();
 
   return (
     <div class={fileListStyles.container}>
       <div class={fileListStyles.search}>
-        <input class={fileListStyles["search-field"]} placeholder="type in to search..."></input>
+        <input 
+          class={fileListStyles["search-field"]} 
+          placeholder="type in to search..."
+          onInput={(e)=>{
+            if(e.currentTarget.value !== ""){
+              setSearchText(e.currentTarget.value.replaceAll("/","|"));
+            } else {
+              setSearchText(undefined);
+            }
+          }}
+        ></input>
       </div>
       <div class={fileListStyles["button-panel"]}>
         <Show when={props.buttons}>
@@ -202,6 +227,7 @@ function FileList(props: FileListProps) {
           activeFileName={props.activeFileName}
           maxDepth={props.maxDepth}
           prefixPath={props.pathPrefix}
+          searchText={searchText}
           onFileCreate={
             (props.createFileButton)?(
               (fileName : string)=>{
