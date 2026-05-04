@@ -33,7 +33,13 @@ export function DebugModuleEditor(props : DebugModuleEditorProps){
         if(cookieData){
             if(moduleListCntx){
                 console.log(cookieData)
-                let parsedCookie = JSON.parse(cookieData)
+                let parsedCookie : any = {};
+                try {
+                    parsedCookie = JSON.parse(cookieData)
+                } catch (error) {
+                    console.error("invalid content of the server cookie: ",cookieData);
+                    setCookie("");
+                }
                 if(!isArray(parsedCookie)){
                     return
                 }
@@ -181,6 +187,11 @@ export function DebugApiMessageHostnameEditor(props :DebugApiMessageHostnameEdit
                 setReactorHostname(cookieData.reactor)
             }
         } catch (error) {
+            let cookieData = cookie();
+            if(cookieData){
+                console.error("invalid content of the server cookie: ",cookieData);
+            }
+            setCookie("");
         }
     })
 
