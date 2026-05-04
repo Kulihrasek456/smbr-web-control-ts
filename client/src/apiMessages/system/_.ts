@@ -1,5 +1,5 @@
 import { moduleInstances, moduleTypes, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
-import { checkArray, checkNumber, checkString, checkStringEnum, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
+import { checkArray, checkNumber, checkString, checkStringEnum, checkTimestamp, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
 
 export namespace System{
 
@@ -82,5 +82,43 @@ export namespace System{
 
     export async function sendWarnings() : Promise<problemResult>{
        return await sendProblems("/system/warnings");
+    }
+
+    export type issueType = {
+        id: number,
+        name: string,
+        index: number,
+        timestamp: string,
+        value: number,
+        module: moduleTypesType,
+        instance: moduleInstancesType
+    }
+
+    export type issuesResult = {
+        message: string,
+        issues : issueType[]
+    }
+
+    export async function sendIssues() : Promise<issuesResult>{
+        let opts : apiMessageOptions = {
+            url: "/system/module/issues"
+        }
+
+        let response = await sendJsonApiMessage(opts);
+        let data = response.jsonValue;
+
+        checkString(data,"message",opts);
+        checkArray(data,"issues",(el)=>{
+            checkNumber(el,"id",opts);
+            checkString(el,"name",opts);
+            checkNumber(el,"index",opts);
+            checkTimestamp(el,"timestamp",opts);
+            checkNumber(el,"value",opts);
+            checkStringEnum(el,"module",moduleTypes,opts);
+            checkStringEnum(el,"instance",moduleInstances,opts);
+            return true;
+        },opts);
+
+        return data;
     }
 }
