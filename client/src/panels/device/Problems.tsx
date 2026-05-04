@@ -191,7 +191,7 @@ export function ModuleProblems(props:ModuleProblemsProps){
     
     return (
         <GridElement id={props.id} w={1} h={4}>
-            <Widget name="Module issues">
+            <Widget name="Module problems">
                 <ModuleProblemsBody></ModuleProblemsBody>
             </Widget>
         </GridElement>
