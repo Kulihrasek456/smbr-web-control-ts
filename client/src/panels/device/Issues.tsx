@@ -182,7 +182,7 @@ function ModuleIssuesBody(props : ModuleIssuesProps){
 export function ModuleIssues(props: ModuleIssuesProps){
     
     return (
-        <GridElement id={props.id} w={1} h={4}>
+        <GridElement id={props.id} w={1} h={5}>
             <Widget name="Module issues">
                 <ModuleIssuesBody {...props}></ModuleIssuesBody>
             </Widget>
