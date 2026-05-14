@@ -63,7 +63,7 @@
 
 .basic_info{
     display: flex;
-    gap: 10px;
+    gap: 5px;
     justify-content: start;
     align-items: center;
 
@@ -72,13 +72,21 @@
     .time{
         flex: 1 0 auto;
         text-align: right;
+        
+        color: var(--bg-color-5);
+        
+        display: flex;
+        justify-content: end;
+        align-items: center;
+        
+        gap: 5px;
     }
     >.basic_info{
         padding: 0 10px;
         border-bottom: 1px solid var(--bg-color-4);
     }
     .module_name{
-        width: 130px;
+        width: 120px;
     }
 }
 
@@ -101,6 +109,13 @@
 
     .name{
         flex: 1 0 auto;
+    }
+    
+    .message{
+        flex: 1 0 auto;
+        display: flex;
+        justify-content: start;
+        align-items: center;
     }
 }
 
