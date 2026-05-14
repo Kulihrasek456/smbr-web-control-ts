@@ -117,7 +117,16 @@ export namespace System{
             checkStringEnum(el,"module",moduleTypes,opts);
             checkStringEnum(el,"instance",moduleInstances,opts);
             return true;
-        },opts);
+        }, opts);
+        
+        data.issues.sort((a : issueType, b : issueType) => {
+            let res = a.module.localeCompare(b.module);
+            if (res == 0) {
+                return a.instance.localeCompare(b.instance);
+            } else {
+                return res;
+            }
+        })
 
         return data;
     }
