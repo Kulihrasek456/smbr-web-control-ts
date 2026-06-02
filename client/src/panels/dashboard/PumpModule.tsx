@@ -1,16 +1,15 @@
 import { createEffect, createSignal, For, Show } from "solid-js";
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import type { Module, moduleInstancesType } from "../../common/other/ModuleListProvider";
-import { SliderApiControl } from "../../common/Slider/Slider";
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
+import { type Module } from "../../components/other/ModuleListProvider";
+import { ApiSlider } from "../../components/ApiSlider/ApiSlider";
 import { Widget } from "../common/Widget";
 
 import styles from "./PumpModule.module.css"
-import { refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
+import { useRefreshContext, refreshValueUpdate } from "../../common/web-components/other/RefreshProvider";
 import { Pumps } from "../../apiMessages/pumps/_";
 import { sendApiMessageSimple } from "../../apiMessages/apiMessageSimple";
 import { isNumber } from "chart.js/helpers";
-import { Icon } from "../../common/Icon/Icon";
-
+import { Icon } from "../../components/Icon/Icon";
 
 interface PumpModuleBodyProps {
     module : Module
@@ -61,7 +60,7 @@ export function PumpModuleBody(props : PumpModuleBodyProps){
                             </div>
                         }
                     >    
-                    <SliderApiControl
+                    <ApiSlider
                         class={styles.slider}
                         direction="V"
                         title={"Pump " + el}
@@ -73,7 +72,7 @@ export function PumpModuleBody(props : PumpModuleBodyProps){
                         target={{
                             getter:{url:Pumps.getPumpUrl(props.module.instance,el,"speed"),key:"speed"},
                         }}
-                    ></SliderApiControl>
+                    ></ApiSlider>
                         
                     </Show>
                 )}

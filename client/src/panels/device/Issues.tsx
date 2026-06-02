@@ -1,14 +1,11 @@
 import { createEffect, createSignal, For, Show, type JSXElement } from "solid-js"
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
 import { Widget } from "../common/Widget"
 import styles from "./Issues.module.css"
 import { System } from "../../apiMessages/system/_";
-import { refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
-import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
-import { TableStatic } from "../../common/Table/Table";
-import { moduleInstanceColors, moduleInstances } from "../../common/other/ModuleListProvider";
-import { render } from "solid-js/web";
-
+import { refreshValueUpdate, useRefreshContext } from "../../common/web-components/other/RefreshProvider";
+import { ValueDisplay } from "../../common/web-components/ValueDisplay/ValueDisplay";
+import { moduleInstanceColors, moduleInstances } from "../../components/other/ModuleListProvider";
 
 function renderGeneric(issue: System.issueType) : JSXElement {
     return renderSpecific(

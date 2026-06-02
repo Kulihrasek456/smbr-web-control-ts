@@ -1,4 +1,4 @@
-import { moduleInstances, moduleTypes, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
+import { moduleInstances, moduleTypes, type moduleInstancesType, type moduleTypesType } from "../../components/other/ModuleListProvider";
 import { checkArray, checkNumber, checkString, checkStringEnum, checkTimestamp, sendJsonApiMessage, type apiMessageOptions } from "../apiMessageBase"
 
 export namespace System{

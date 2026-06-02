@@ -1,11 +1,10 @@
 import { createEffect, createSignal, For, Show } from "solid-js"
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
 import { Widget } from "../common/Widget"
 import styles from "./Problems.module.css"
 import { System } from "../../apiMessages/system/_";
-import { refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
-import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
-import { RadialSelect } from "../../common/RadialSelect/RadialSelect";
+import { refreshValueUpdate, useRefreshContext } from "../../common/web-components/other/RefreshProvider";
+import { ValueDisplay } from "../../common/web-components/ValueDisplay/ValueDisplay";
 
 const problemTypes = [
     "Errors",

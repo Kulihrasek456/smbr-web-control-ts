@@ -1,8 +1,8 @@
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
 import { Widget } from "../common/Widget"
-import { TableStatic, widgetHeightChange } from "../../common/Table/Table"
+import { TableStatic, widgetHeightChange } from "../../common/web-components/Table/Table"
 import { createSignal } from "solid-js"
-import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
+import { ApiFetcher } from "../../components/ApiFetcher/ApiFetcher"
 import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
 
 interface DeviceInformationProps{

@@ -1,16 +1,14 @@
 import { createEffect, createSignal } from "solid-js"
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
-import { Slider, SliderApiControl } from "../../common/Slider/Slider"
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
+import { ApiSlider } from "../../components/ApiSlider/ApiSlider"
 import { Widget } from "../common/Widget"
-import { ValueController, ValueControllerApiControl } from "../../common/ValueController/ValueControlller"
-
-import { enforceMinMax } from "../../common/other/inputFilters"
-import styles from "./Control.module.css"
+import { ApiValueController } from "../../components/ValueController/ValueControlller"
 import { sendApiMessage } from "../../apiMessages/apiMessageBase"
 import { Sensor_Heater } from "../../apiMessages/sensor/heater"
-import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider"
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/web-components/other/RefreshProvider"
 import { Control_Mixer } from "../../apiMessages/control/mixer"
 
+import styles from "./Control.module.css"
 
 interface ControlProps{
     id : string
@@ -56,7 +54,7 @@ export function ControlBody(props : ControlBodyProps){
                     gap: "10px"
                 }}
             >
-                <SliderApiControl 
+                <ApiSlider 
                     target={{
                         getter: {url:"/control/aerator/speed", key:"speed"}
                     }}
@@ -64,9 +62,9 @@ export function ControlBody(props : ControlBodyProps){
                     direction="H"
                     bounds={{min: 0, max: 1}} 
                     step={0.05}
-                ></SliderApiControl>
+                ></ApiSlider>
                 
-                <SliderApiControl
+                <ApiSlider
                     target={{
                         getter: {url:"/control/mixer/speed", key:"speed"}
                     }}
@@ -74,9 +72,9 @@ export function ControlBody(props : ControlBodyProps){
                     direction="H" 
                     bounds={{min: 0, max: 1}} 
                     step={0.05}
-                ></SliderApiControl>
+                ></ApiSlider>
                 
-                <SliderApiControl 
+                <ApiSlider 
                     target={{
                         getter: {url:"/control/cuvette_pump/speed", key:"speed"}
                     }}
@@ -84,9 +82,9 @@ export function ControlBody(props : ControlBodyProps){
                     direction="H" 
                     bounds={{min: -1, max: 1}} 
                     step={0.05}
-                ></SliderApiControl>
+                ></ApiSlider>
 
-                <ValueControllerApiControl
+                <ApiValueController
                     title="Mixer target rpm"
                     buttonTooltip="turn off the mixer"
                     valueName="current target"
@@ -98,9 +96,9 @@ export function ControlBody(props : ControlBodyProps){
                     onClick={async (value : number | undefined)=>{
                         sendApiMessage({url:"/control/mixer/stop"});
                     }}
-                ></ValueControllerApiControl>
+                ></ApiValueController>
 
-                <SliderApiControl 
+                <ApiSlider 
                     target={{
                         getter: {url:"/control/heater/intensity", key:"intensity"}
                     }}
@@ -108,9 +106,9 @@ export function ControlBody(props : ControlBodyProps){
                     direction="H" 
                     bounds={{min: -1, max: 1}} 
                     step={0.05}
-                ></SliderApiControl>
+                ></ApiSlider>
 
-                <ValueControllerApiControl
+                <ApiValueController
                     title="Heater target temperature"
                     valueName="current target"
                     buttonTooltip="turn off the heater"
@@ -123,7 +121,7 @@ export function ControlBody(props : ControlBodyProps){
                         sendApiMessage({url:"/control/heater/turn_off"});
                     }}
                     getValueFunction={async ()=>((await Sensor_Heater.sendGetTarget()).targetTemp)}
-                ></ValueControllerApiControl>
+                ></ApiValueController>
             </div>
         </Widget>
     )

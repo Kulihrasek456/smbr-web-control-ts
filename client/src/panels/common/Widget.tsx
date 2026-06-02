@@ -1,14 +1,13 @@
-import { children, For, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import type { JSX, JSXElement } from "solid-js";
 
-import { Icon } from "../../common/Icon/Icon";
-import { Button } from "../../common/Button/Button";
+import { Icon } from "../../components/Icon/Icon";
+import { Button } from "../../common/web-components/Button/Button";
 
 import styles from './Widget.module.css'
-import { ApiFetcher, type ApiFetcherProps } from "../../common/ApiFetcher/ApiFetcher";
-import { RefreshProvider, useRefreshContext } from "../../common/other/RefreshProvider";
-import { instanceToIndex, moduleInstanceColors, type Module } from "../../common/other/ModuleListProvider";
-
+import { ApiFetcher, type ApiFetcherProps } from "../../components/ApiFetcher/ApiFetcher";
+import { RefreshProvider, useRefreshContext } from "../../common/web-components/other/RefreshProvider";
+import { instanceToIndex, moduleInstanceColors, type Module } from "../../components/other/ModuleListProvider";
 
 interface WidgetHotbarValueProps {
     name:string,

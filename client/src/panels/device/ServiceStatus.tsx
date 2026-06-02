@@ -1,12 +1,12 @@
 import { createEffect, createSignal } from "solid-js"
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
-import { TableStatic, widgetHeightChange } from "../../common/Table/Table"
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
+import { TableStatic, widgetHeightChange } from "../../common/web-components/Table/Table"
 import { Widget } from "../common/Widget"
 
 import styles from "./ServiceStatus.module.css"
 import { ServicesStatus  as ServicesStatusNamespace} from "../../apiMessages/services-status/_"
-import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider"
-import { AutoScrollerP } from "../../common/AutoScroller/AutoScroller"
+import { refreshValueUpdate, useRefreshContext } from "../../common/web-components/other/RefreshProvider"
+import { AutoScrollerP } from "../../common/web-components/AutoScroller/AutoScroller"
 
 interface ServiceStatusProps{
     id:string

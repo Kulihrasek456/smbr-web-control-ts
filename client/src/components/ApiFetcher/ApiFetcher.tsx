@@ -1,8 +1,8 @@
 import { createEffect, createSignal, onCleanup, onMount, Show } from 'solid-js'
 
-import { refreshValueUpdate, useRefreshContext } from '../other/RefreshProvider';
 import { sendApiMessageSimple, type apiMessageSimple } from '../../apiMessages/apiMessageSimple';
-import { ValueDisplay, type ValueDisplayProps } from './ValueDisplay';
+import { refreshValueUpdate, useRefreshContext } from '../../common/web-components/other/RefreshProvider';
+import { ValueDisplay, type ValueDisplayProps } from '../../common/web-components/ValueDisplay/ValueDisplay';
 
 export interface ApiFetcherProps extends Omit<ValueDisplayProps,"value">{
     target: apiMessageSimple;

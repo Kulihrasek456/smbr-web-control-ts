@@ -1,25 +1,22 @@
-import { TableStatic, widgetHeightChange } from "../../common/Table/Table"
+import { TableStatic, widgetHeightChange } from "../../common/web-components/Table/Table"
 import { Widget, WidgetHotbarValue } from "../common/Widget"
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid"
-import type { JSX } from "solid-js/jsx-runtime"
-import { Button } from "../../common/Button/Button"
-import { createEffect, createSignal, createUniqueId, type JSXElement } from "solid-js"
-import { Icon } from "../../common/Icon/Icon"
-import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher"
-import { darkenColor, getColor } from "../../common/other/colorGenerator"
-import { LineChart, type datasetType } from "../../common/LineChart/LineChart"
-import { formatTime, getCountdownArray } from "../../common/other/utils"
-import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../common/other/ModuleListProvider"
-import { RadialSelect } from "../../common/RadialSelect/RadialSelect"
-import type { apiMessageSimple } from "../../apiMessages/apiMessageSimple"
-import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider"
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
+import { createEffect, createSignal, createUniqueId, Show, type JSXElement } from "solid-js"
+import { Icon, type Icons } from "../../components/Icon/Icon"
+import { ApiFetcher } from "../../components/ApiFetcher/ApiFetcher"
+import { darkenColor, getColor } from "../../common/web-components/other/colorGenerator"
+import { LineChart, type datasetType } from "../../components/LineChart/LineChart"
+import { formatTime, getCountdownArray } from "../../common/web-components/other/utils"
+import { countInstancesOfType, getInstancesForType, moduleInstanceColors, useModuleListValue, type Module, type moduleInstancesType } from "../../components/other/ModuleListProvider";
+import { RadialSelect } from "../../common/web-components/RadialSelect/RadialSelect"
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/web-components/other/RefreshProvider"
 import { TemperatureLogs } from "../../apiMessages/temperature-logs/_"
 import styles from "./Temperature.module.css"
 // create subrows by setting icon as undefined
 // row indexes are then given automatically after generating the array
 type row = {
     lastSubRow?: boolean
-    icon?: string,
+    icon?: Icons,
     name: NameType,
     instance: moduleInstancesType,
     targetkey?: string
@@ -151,23 +148,24 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                     color: colors()[data.name]
                 }}
             >
-                <Icon 
-                    color={
-                        colors()[data.name]
-                    } 
-                    name={
-                        (data.icon)?(
-                            data.icon
+                <Show when={data.icon} fallback={
+                    <p>{
+                        (data.lastSubRow ?? false) ? (
+                            "┗"
                         ):(
-                            (data.lastSubRow ?? false)?(
-                                "┗"
-                            ):(
-                                "┣"
-                            )
+                            "┣"
                         )
-                    }
-                    animateColor={true}
-                ></Icon>
+                    }</p>
+                }>
+                    <Icon 
+                        color={
+                            colors()[data.name]
+                        } 
+                        name={data.icon ?? "error"}
+                        animateColor={true}
+                    ></Icon>
+                </Show>
+                
             </button>,
             <p style={{
                 "justify-content":"start",

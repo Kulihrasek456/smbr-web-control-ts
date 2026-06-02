@@ -1,6 +1,6 @@
 import { For, Show } from "solid-js"
-import { GridstackGrid } from "../../common/GridstackGrid/GridstackGrid"
-import { countInstancesOfType, getModulesOfType, useModuleListValue } from "../../common/other/ModuleListProvider"
+import { GridstackGrid } from "../../components/GridstackGrid/GridstackGrid"
+import { countInstancesOfType, getModulesOfType, useModuleListValue } from "../../components/other/ModuleListProvider"
 import { Control } from "./Control"
 import { KinematicFluorometer } from "./KineticFluorometer"
 import { LEDPanel } from "./LedPanel"

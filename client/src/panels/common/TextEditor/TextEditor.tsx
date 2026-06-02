@@ -1,18 +1,17 @@
 import { createEffect, createMemo, createSignal, For, onCleanup, onMount, Show, type JSX, type JSXElement } from "solid-js";
-import { CodeMirrorWrapper, type CodeMirrorWrapperProps } from "./CodeMirrorWrapper";
+import { CodeMirrorWrapper } from "./CodeMirrorWrapper";
 
 import codeStyles from "./CodePart.module.css";
 import fileListStyles from "./FileList.module.css";
 import runtimeInfoStyles from "./RuntimeInfo.module.css";
 import textEditorStyles from "./TextEditor.module.css"
-import { Button } from "../../../common/Button/Button";
-import { Icon } from "../../../common/Icon/Icon";
-import { TableStatic } from "../../../common/Table/Table";
-import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../../common/other/RefreshProvider";
-import { ApiInvalidStatusCodeError, targets, type targetsType } from "../../../apiMessages/apiMessageBase";
+import { Button } from "../../../common/web-components/Button/Button";
+import { Icon } from "../../../components/Icon/Icon";
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../../common/web-components/other/RefreshProvider";
+import { ApiInvalidStatusCodeError, type targetsType } from "../../../apiMessages/apiMessageBase";
 import { parseApiMessageFileList, sendApiMessageDeleteFile, sendApiMessageGetFileContent, sendApiMessageGetFileList, sendApiMessageSetFileContent, type apiMessageGetFileContentResult, type FileListDirectory } from "../../../apiMessages/apiMessageFileOperations";
 import { Scheduler } from "../../../apiMessages/scheduler/_";
-import { AutoScrollerP } from "../../../common/AutoScroller/AutoScroller";
+import { AutoScrollerP } from "../../../common/web-components/AutoScroller/AutoScroller";
 import { PopupPanel, type Popup } from "../Widget";
 
 

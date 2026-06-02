@@ -1,4 +1,4 @@
-import { onMount, onCleanup, createSignal, createEffect } from "solid-js";
+import { onMount, onCleanup, createEffect } from "solid-js";
 import { EditorView, basicSetup } from "codemirror";
 import { yaml } from "@codemirror/lang-yaml";
 

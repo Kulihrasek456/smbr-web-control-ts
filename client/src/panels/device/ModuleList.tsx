@@ -1,14 +1,14 @@
 import { createEffect, createSignal } from "solid-js";
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import { instanceToIndex, useModuleListValue, type moduleInstancesType, type moduleTypesType } from "../../common/other/ModuleListProvider";
-import { TableStatic, widgetHeightChange } from "../../common/Table/Table";
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
+import { instanceToIndex, useModuleListValue } from "../../components/other/ModuleListProvider";
+import { TableStatic, widgetHeightChange } from "../../common/web-components/Table/Table";
 import { Widget } from "../common/Widget";
-import { Button } from "../../common/Button/Button";
-import { Icon } from "../../common/Icon/Icon";
-import { ApiFetcher } from "../../common/ApiFetcher/ApiFetcher";
+import { Button } from "../../common/web-components/Button/Button";
+import { Icon } from "../../components/Icon/Icon";
+import { ApiFetcher } from "../../components/ApiFetcher/ApiFetcher";
 import { sendApiMessageSimplePost } from "../../apiMessages/apiMessageSimple";
 import { System } from "../../apiMessages/system/_";
-import { sleep } from "../../common/other/utils";
+import { sleep } from "../../common/web-components/other/utils";
 
 
 function getModuleEndpoint(module : System.module, endpoint : string){

@@ -1,8 +1,6 @@
-import { Chart, Title, Tooltip, Legend, Colors, type TooltipItem, LogarithmicScale, type ChartOptions, type ChartType, type ScaleChartOptions } from 'chart.js';
-import { isNumber } from 'chart.js/helpers';
+import { Chart, Title, Tooltip, Legend, Colors, type TooltipItem, LogarithmicScale, type ChartOptions } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
 import { Line } from 'solid-chartjs';
-import { createEffect, createSignal, mergeProps, onMount } from 'solid-js';
 
 interface chartScaleOptions {
     showTicks ?: boolean,

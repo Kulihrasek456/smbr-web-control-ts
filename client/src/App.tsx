@@ -1,9 +1,9 @@
 import { createSignal, For, Show, type Accessor, type JSXElement } from 'solid-js'
-import './common/css/colors.css'
-import './common/css/global.css'
+import './common/web-components/css/colors.css'
+import './common/web-components/css/global.css'
 import styles from './App.module.css'
 
-import { Icon } from './common/Icon/Icon'
+import { Icon, type Icons } from './components/Icon/Icon'
 import { Public } from './assets/PublicFiles'
 
 import { Dashboard } from './panels/dashboard/Dashboard'
@@ -11,13 +11,13 @@ import { Scripts } from './panels/scripts/Scripts'
 import { Config } from './panels/config/Config'
 import { Device } from './panels/device/Device'
 import { Hotbar } from './panels/hotbar/Hotbar'
-import { RefreshProvider } from './common/other/RefreshProvider'
-import { isDebug } from './common/debug/debugFlag'
-import { DebugApiMessageHostnameEditor, DebugModuleEditor, DebugRefreshProviderInterval } from './common/debug/Debug'
-import { ModuleListProvider, ModuleListRefresher } from './common/other/ModuleListProvider'
-import { AutoScrollerP } from './common/AutoScroller/AutoScroller'
+import { RefreshProvider } from './common/web-components/other/RefreshProvider'
+import { isDebug } from './components/debug/debugFlag'
+import { DebugApiMessageHostnameEditor, DebugModuleEditor, DebugRefreshProviderInterval } from './components/debug/Debug'
+import { ModuleListProvider, ModuleListRefresher } from './components/other/ModuleListProvider'
+import { AutoScrollerP } from './common/web-components/AutoScroller/AutoScroller'
 
-type ItemProps = { text: string; iconName: string, active: Accessor<string>, onClick?: ()=>void};
+type ItemProps = { text: string; iconName: Icons, active: Accessor<string>, onClick?: ()=>void};
 
 function Item({ text, iconName,onClick,active}: ItemProps) {
    return (
@@ -88,7 +88,7 @@ function App() {
    const [moduleListDisabled, setModuleListDisabled] = createSignal(isDebug);
    const [moduleListUpdateInterval, setModuleListUpdateInterval] = createSignal(15000);
 
-  const items : {text: string, iconName: string, component: ()=>JSXElement}[] = [
+  const items : {text: string, iconName: Icons, component: ()=>JSXElement}[] = [
       { text: "Dashboard", iconName: "home", component: Dashboard },
       { text: "Scripts", iconName: "science", component: Scripts },
       { text: "Config", iconName: "build", component: Config },

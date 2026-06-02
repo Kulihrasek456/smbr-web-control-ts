@@ -1,24 +1,23 @@
 import { createEffect, createSignal, For, onMount, Show, type JSXElement } from "solid-js";
-import { Button } from "../../common/Button/Button";
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import { LineChart, type CustomChartOptions } from "../../common/LineChart/LineChart";
-import { downloadCanvas, downloadStringAsFile, getCountdownArray, getEmptyDatasets, isArray } from "../../common/other/utils";
-import { Widget, WidgetHotbarValue } from "../common/Widget";
+import { Button } from "../../common/web-components/Button/Button";
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid";
+import { LineChart, type CustomChartOptions } from "../../components/LineChart/LineChart";
+import { downloadCanvas, downloadStringAsFile } from "../../common/web-components/other/utils";
+import { Widget } from "../common/Widget";
 
 import styles from  "./KineticFluorometer.module.css"
-import { SliderSimple } from "../../common/Slider/Slider";
-import { RadialOption, RadialSelect } from "../../common/RadialSelect/RadialSelect";
+import { SliderSimple } from "../../common/web-components/Slider/Slider";
+import { RadialSelect } from "../../common/web-components/RadialSelect/RadialSelect";
 
 import { createUniqueId } from "solid-js";
-import { enforceMax, enforceMin, enforceMinMax } from "../../common/other/inputFilters";
-import { Icon } from "../../common/Icon/Icon";
-import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/other/RefreshProvider";
+import { enforceMax, enforceMin, enforceMinMax } from "../../common/web-components/other/inputFilters";
+import { Icon } from "../../components/Icon/Icon";
+import { RefreshProvider, refreshValueUpdate, useRefreshContext } from "../../common/web-components/other/RefreshProvider";
 import { Sensor_Fluorometer } from "../../apiMessages/sensor/fluorometer";
-import { ValueDisplay } from "../../common/ApiFetcher/ValueDisplay";
+import { ValueDisplay } from "../../common/web-components/ValueDisplay/ValueDisplay";
 import type { TooltipItem } from "chart.js";
 import { sendApiMessageSimple } from "../../apiMessages/apiMessageSimple";
-import { LoadingDots } from "../../common/LoadingDots/loadingDots";
-import { Time } from "../../apiMessages/time/_";
+import { LoadingDots } from "../../common/web-components/LoadingDots/loadingDots";
 
 type statRow = {
     name: string;

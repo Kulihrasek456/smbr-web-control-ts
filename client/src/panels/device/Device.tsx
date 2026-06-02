@@ -1,8 +1,6 @@
 import { Show } from "solid-js";
-import { GridstackGrid, GridElement } from "../../common/GridstackGrid/GridstackGrid.tsx";
-import { countInstancesOfType, useModuleListValue } from "../../common/other/ModuleListProvider.tsx";
-import { Control } from "../dashboard/Control.tsx";
-import { Temperature } from "../dashboard/Temperature.tsx";
+import { GridstackGrid } from "../../components/GridstackGrid/GridstackGrid.tsx";
+import { countInstancesOfType, useModuleListValue } from "../../components/other/ModuleListProvider.tsx";
 import { DeviceInformation } from "./DeviceInformation.tsx";
 import { ModuleListDisplay } from "./ModuleList.tsx";
 import { ServicesStatus } from "./ServiceStatus.tsx";

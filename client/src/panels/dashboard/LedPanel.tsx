@@ -1,11 +1,11 @@
-import { createSignal, For, type Accessor, type Setter } from "solid-js";
-import { GridElement } from "../../common/GridstackGrid/GridstackGrid";
-import { Slider, SliderApiControl } from "../../common/Slider/Slider";
+import { GridElement } from "../../components/GridstackGrid/GridstackGrid"
+import { ApiSlider } from "../../components/ApiSlider/ApiSlider";
 import { Widget } from "../common/Widget";
 
 import styles from "./LedPanel.module.css"
-import { Button } from "../../common/Button/Button";
-import { sendApiMessage, sendJsonApiMessage } from "../../apiMessages/apiMessageBase";
+import { Button } from "../../common/web-components/Button/Button";
+import { sendJsonApiMessage } from "../../apiMessages/apiMessageBase";
+import { For } from "solid-js";
 
 interface LEDPanelProps{
     id: string;
@@ -41,7 +41,7 @@ export function LEDPanel(props: LEDPanelProps){
                 <div class={styles.container}>
                     <For each={channels}>
                         {(el,index)=>(
-                            <SliderApiControl
+                            <ApiSlider
                                 class={styles.slider}
                                 direction="V"
                                 title={"Channel " + el}
@@ -57,7 +57,7 @@ export function LEDPanel(props: LEDPanelProps){
                                     getter:{url:"/control/led_panel/intensity/"+el,key:"intensity"},
                                     setter:{url:"/control/led_panel/intensity/"+el,key:"intensity"}
                                 }}
-                            ></SliderApiControl>
+                            ></ApiSlider>
                         )}
                     </For>
                 </div>
