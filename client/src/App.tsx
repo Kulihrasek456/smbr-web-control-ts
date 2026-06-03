@@ -1,9 +1,11 @@
 import { createSignal, For, Show, type Accessor, type JSXElement } from 'solid-js'
 import './common/web-components/css/colors.css'
 import './common/web-components/css/global.css'
+import "./components/Icon/iconFont.css"
 import styles from './App.module.css'
 
-import { Icon, type Icons } from './components/Icon/Icon'
+import { Icon } from './components/Icon/Icon'
+import { type Icons } from './components/Icon/icons_chars'
 import { Public } from './assets/PublicFiles'
 
 import { Dashboard } from './panels/dashboard/Dashboard'
@@ -95,7 +97,7 @@ function App() {
       { text: "Device", iconName: "terminal", component: Device },
    ];
    return (
-      <>
+       <>
          <ModuleListProvider>
             <RefreshProvider disabled={updateDisabled()} autoRefreshPeriod={updateInterval()}>
                <header class={styles.hotbar}>

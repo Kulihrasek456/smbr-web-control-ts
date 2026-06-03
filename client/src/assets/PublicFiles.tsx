@@ -1,6 +1,7 @@
 export const Public = {
     fonts: {
-        materialIcons: "/fonts/GoogleMaterialIcons.woff2"
+        materialSymbols: "/fonts/material_symbols_rounded/MaterialSymbolsRounded.ttf",
+        materialSymbolsOptimized: "/fonts/MaterialSymbolsOptimzed.woff2",
     },
     images: {
         minilogo: "/ui_elements/logo/minilogo.png",
