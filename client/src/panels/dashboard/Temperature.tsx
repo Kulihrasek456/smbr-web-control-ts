@@ -150,7 +150,7 @@ export function TemperatureBody(props : TemperatureBodyProps) {
                 }}
             >
                 <Show when={data.icon} fallback={
-                    <p>{
+                    <p class={styles.sub_sensor}>{
                         (data.lastSubRow ?? false) ? (
                             "┗"
                         ):(

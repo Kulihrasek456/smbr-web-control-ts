@@ -26,3 +26,7 @@
         transform: scale(1.5);
     }
 }
+
+.sub_sensor{
+    transition: color 0.2s ease-in-out;
+}
