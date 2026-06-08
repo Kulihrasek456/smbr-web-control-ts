@@ -11,7 +11,7 @@ export default defineConfig({
             IconCharacters.join(""),
             "material-symbols",
             "./public/fonts/material_symbols_rounded/MaterialSymbolsRounded.ttf",
-            "./public/fonts/MaterialSymbolsOptimzed.woff2"
+            "./public/fonts/MaterialSymbolsOptimized.woff2"
         )
     ],
 })

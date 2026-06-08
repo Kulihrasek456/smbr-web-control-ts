@@ -1,7 +1,7 @@
 export const Public = {
     fonts: {
         materialSymbols: "/fonts/material_symbols_rounded/MaterialSymbolsRounded.ttf",
-        materialSymbolsOptimized: "/fonts/MaterialSymbolsOptimzed.woff2",
+        materialSymbolsOptimized: "/fonts/MaterialSymbolsOptimized.woff2",
     },
     images: {
         minilogo: "/ui_elements/logo/minilogo.png",
