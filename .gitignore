@@ -35,4 +35,4 @@ server/*.local
 
 server_config.json
 
-client/public/fonts/MaterialSymbolsOptimzed.woff2
+client/public/fonts/MaterialSymbolsOptimized.woff2
