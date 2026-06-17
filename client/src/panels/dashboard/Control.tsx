@@ -80,7 +80,10 @@ export function ControlBody(props : ControlBodyProps){
                     }}
                     title="Cuvette pump" 
                     direction="H" 
-                    bounds={{min: -1, max: 1}} 
+                    bounds={{ min: -1, max: 1 }}
+                    deadzones={[
+                        {range: 0.15, snapPoint: 0}
+                    ]}
                     step={0.05}
                 ></ApiSlider>
 
@@ -104,7 +107,10 @@ export function ControlBody(props : ControlBodyProps){
                     }}
                     title="Heater" 
                     direction="H" 
-                    bounds={{min: -1, max: 1}} 
+                    bounds={{ min: -1, max: 1 }} 
+                    deadzones={[
+                        {range: 0.2, snapPoint: 0}
+                    ]}
                     step={0.05}
                 ></ApiSlider>
 
