@@ -15,7 +15,11 @@ interface SliderApiControlProps{
         min : number,
         max : number,
         show? : boolean
-    }
+    },
+    deadzones?: {
+        snapPoint: number,
+        range: number
+    }[]
     decimals?:number,
     step?:number,
     unit?:string,
@@ -48,14 +52,23 @@ export function ApiSlider(props : SliderApiControlProps){
 
     function onInput(value : number){
         setValue(value);
+        let doSend = false;
 
         if(Date.now() > (props.minInterval??100)+lastChange){
             lastChange = Date.now();
-            sendValue(value);
-        }else{
-            if((props.imidiateStops??[props.bounds.min,props.bounds.max]).includes(value)){
-                sendValue(value);
+            doSend = true;
+        } else {
+            for (let deadzone of props.deadzones ?? []) {
+                if (deadzone.snapPoint == value) {
+                    doSend = true;
+                }
             }
+            if((props.imidiateStops??[props.bounds.min,props.bounds.max]).includes(value)){
+                doSend = true;
+            }
+        }
+        if (doSend) {
+            sendValue(value);
         }
     }
     function onChange(value : number){
@@ -75,6 +88,7 @@ export function ApiSlider(props : SliderApiControlProps){
             setter={setValue}
 
             decimals={props.decimals}
+            deadzones={props.deadzones}
 
             onChange={onChange}
             onInput={onInput}
