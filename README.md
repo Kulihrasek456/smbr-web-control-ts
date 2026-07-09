@@ -13,7 +13,9 @@ ___
 # how to install
 clone this repository into you desired directory
 ```bash
-git clone #TODO when repo is created
+git clone git@github.com:TrendBit/smbr-web-control-ts.git
+cd smbr-web-control-ts
+git submodule update --init --recursive
 ```
 
 if you don't have npm installed, you can install it with:
